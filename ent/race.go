@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/race"
 )
 
@@ -21,18 +22,18 @@ type Race struct {
 	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Alignment holds the value of the "alignment" field.
-	Alignment string `json:"alignment,omitempty"`
-	// Age holds the value of the "age" field.
-	Age string `json:"age,omitempty"`
-	// Size holds the value of the "size" field.
-	Size string `json:"size,omitempty"`
-	// SizeDescription holds the value of the "size_description" field.
-	SizeDescription string `json:"size_description,omitempty"`
-	// LanguageDesc holds the value of the "language_desc" field.
-	LanguageDesc string `json:"language_desc,omitempty"`
 	// Speed holds the value of the "speed" field.
 	Speed int `json:"speed,omitempty"`
+	// Size holds the value of the "size" field.
+	Size race.Size `json:"size,omitempty"`
+	// SizeDesc holds the value of the "size_desc" field.
+	SizeDesc string `json:"size_description"`
+	// AlignmentDesc holds the value of the "alignment_desc" field.
+	AlignmentDesc string `json:"alignment"`
+	// AgeDesc holds the value of the "age_desc" field.
+	AgeDesc string `json:"age"`
+	// LanguageDesc holds the value of the "language_desc" field.
+	LanguageDesc string `json:"language_desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RaceQuery when eager-loading is set.
 	Edges        RaceEdges `json:"-"`
@@ -41,84 +42,109 @@ type Race struct {
 
 // RaceEdges holds the relations/edges for other nodes in the graph.
 type RaceEdges struct {
-	// Proficiencies holds the value of the proficiencies edge.
-	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
-	// ProficiencyChoice holds the value of the proficiency_choice edge.
-	ProficiencyChoice []*ProficiencyChoice `json:"proficiency_choice,omitempty"`
-	// Languages holds the value of the languages edge.
-	Languages []*Language `json:"languages,omitempty"`
-	// Subrace holds the value of the subrace edge.
-	Subrace []*Subrace `json:"subrace,omitempty"`
 	// Traits holds the value of the traits edge.
 	Traits []*Trait `json:"traits,omitempty"`
+	// StartingProficiencies holds the value of the starting_proficiencies edge.
+	StartingProficiencies []*Proficiency `json:"starting_proficiencies,omitempty"`
+	// StartingProficiencyOptions holds the value of the starting_proficiency_options edge.
+	StartingProficiencyOptions []*ProficiencyChoice `json:"starting_proficiency_options,omitempty"`
 	// AbilityBonuses holds the value of the ability_bonuses edge.
-	AbilityBonuses []*AbilityBonus `json:"ability_bonuses,omitempty"`
+	AbilityBonuses []*AbilityScore `json:"ability_bonuses,omitempty"`
+	// Languages holds the value of the languages edge.
+	Languages []*Language `json:"languages,omitempty"`
+	// LanguageOptions holds the value of the language_options edge.
+	LanguageOptions *LanguageChoice `json:"language_options,omitempty"`
+	// Characters holds the value of the characters edge.
+	Characters []*Character `json:"characters,omitempty"`
+	// RaceAbilityBonuses holds the value of the race_ability_bonuses edge.
+	RaceAbilityBonuses []*AbilityBonus `json:"race_ability_bonuses,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [8]bool
 	// totalCount holds the count of the edges above.
-	totalCount [6]map[string]int
+	totalCount [7]map[string]int
 
-	namedProficiencies     map[string][]*Proficiency
-	namedProficiencyChoice map[string][]*ProficiencyChoice
-	namedLanguages         map[string][]*Language
-	namedSubrace           map[string][]*Subrace
-	namedTraits            map[string][]*Trait
-	namedAbilityBonuses    map[string][]*AbilityBonus
-}
-
-// ProficienciesOrErr returns the Proficiencies value or an error if the edge
-// was not loaded in eager-loading.
-func (e RaceEdges) ProficienciesOrErr() ([]*Proficiency, error) {
-	if e.loadedTypes[0] {
-		return e.Proficiencies, nil
-	}
-	return nil, &NotLoadedError{edge: "proficiencies"}
-}
-
-// ProficiencyChoiceOrErr returns the ProficiencyChoice value or an error if the edge
-// was not loaded in eager-loading.
-func (e RaceEdges) ProficiencyChoiceOrErr() ([]*ProficiencyChoice, error) {
-	if e.loadedTypes[1] {
-		return e.ProficiencyChoice, nil
-	}
-	return nil, &NotLoadedError{edge: "proficiency_choice"}
-}
-
-// LanguagesOrErr returns the Languages value or an error if the edge
-// was not loaded in eager-loading.
-func (e RaceEdges) LanguagesOrErr() ([]*Language, error) {
-	if e.loadedTypes[2] {
-		return e.Languages, nil
-	}
-	return nil, &NotLoadedError{edge: "languages"}
-}
-
-// SubraceOrErr returns the Subrace value or an error if the edge
-// was not loaded in eager-loading.
-func (e RaceEdges) SubraceOrErr() ([]*Subrace, error) {
-	if e.loadedTypes[3] {
-		return e.Subrace, nil
-	}
-	return nil, &NotLoadedError{edge: "subrace"}
+	namedTraits                     map[string][]*Trait
+	namedStartingProficiencies      map[string][]*Proficiency
+	namedStartingProficiencyOptions map[string][]*ProficiencyChoice
+	namedAbilityBonuses             map[string][]*AbilityScore
+	namedLanguages                  map[string][]*Language
+	namedCharacters                 map[string][]*Character
+	namedRaceAbilityBonuses         map[string][]*AbilityBonus
 }
 
 // TraitsOrErr returns the Traits value or an error if the edge
 // was not loaded in eager-loading.
 func (e RaceEdges) TraitsOrErr() ([]*Trait, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[0] {
 		return e.Traits, nil
 	}
 	return nil, &NotLoadedError{edge: "traits"}
 }
 
+// StartingProficienciesOrErr returns the StartingProficiencies value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) StartingProficienciesOrErr() ([]*Proficiency, error) {
+	if e.loadedTypes[1] {
+		return e.StartingProficiencies, nil
+	}
+	return nil, &NotLoadedError{edge: "starting_proficiencies"}
+}
+
+// StartingProficiencyOptionsOrErr returns the StartingProficiencyOptions value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) StartingProficiencyOptionsOrErr() ([]*ProficiencyChoice, error) {
+	if e.loadedTypes[2] {
+		return e.StartingProficiencyOptions, nil
+	}
+	return nil, &NotLoadedError{edge: "starting_proficiency_options"}
+}
+
 // AbilityBonusesOrErr returns the AbilityBonuses value or an error if the edge
 // was not loaded in eager-loading.
-func (e RaceEdges) AbilityBonusesOrErr() ([]*AbilityBonus, error) {
-	if e.loadedTypes[5] {
+func (e RaceEdges) AbilityBonusesOrErr() ([]*AbilityScore, error) {
+	if e.loadedTypes[3] {
 		return e.AbilityBonuses, nil
 	}
 	return nil, &NotLoadedError{edge: "ability_bonuses"}
+}
+
+// LanguagesOrErr returns the Languages value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) LanguagesOrErr() ([]*Language, error) {
+	if e.loadedTypes[4] {
+		return e.Languages, nil
+	}
+	return nil, &NotLoadedError{edge: "languages"}
+}
+
+// LanguageOptionsOrErr returns the LanguageOptions value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RaceEdges) LanguageOptionsOrErr() (*LanguageChoice, error) {
+	if e.LanguageOptions != nil {
+		return e.LanguageOptions, nil
+	} else if e.loadedTypes[5] {
+		return nil, &NotFoundError{label: languagechoice.Label}
+	}
+	return nil, &NotLoadedError{edge: "language_options"}
+}
+
+// CharactersOrErr returns the Characters value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) CharactersOrErr() ([]*Character, error) {
+	if e.loadedTypes[6] {
+		return e.Characters, nil
+	}
+	return nil, &NotLoadedError{edge: "characters"}
+}
+
+// RaceAbilityBonusesOrErr returns the RaceAbilityBonuses value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) RaceAbilityBonusesOrErr() ([]*AbilityBonus, error) {
+	if e.loadedTypes[7] {
+		return e.RaceAbilityBonuses, nil
+	}
+	return nil, &NotLoadedError{edge: "race_ability_bonuses"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -128,7 +154,7 @@ func (*Race) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case race.FieldID, race.FieldSpeed:
 			values[i] = new(sql.NullInt64)
-		case race.FieldIndx, race.FieldName, race.FieldAlignment, race.FieldAge, race.FieldSize, race.FieldSizeDescription, race.FieldLanguageDesc:
+		case race.FieldIndx, race.FieldName, race.FieldSize, race.FieldSizeDesc, race.FieldAlignmentDesc, race.FieldAgeDesc, race.FieldLanguageDesc:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -163,41 +189,41 @@ func (r *Race) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				r.Name = value.String
 			}
-		case race.FieldAlignment:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field alignment", values[i])
+		case race.FieldSpeed:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field speed", values[i])
 			} else if value.Valid {
-				r.Alignment = value.String
-			}
-		case race.FieldAge:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field age", values[i])
-			} else if value.Valid {
-				r.Age = value.String
+				r.Speed = int(value.Int64)
 			}
 		case race.FieldSize:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field size", values[i])
 			} else if value.Valid {
-				r.Size = value.String
+				r.Size = race.Size(value.String)
 			}
-		case race.FieldSizeDescription:
+		case race.FieldSizeDesc:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field size_description", values[i])
+				return fmt.Errorf("unexpected type %T for field size_desc", values[i])
 			} else if value.Valid {
-				r.SizeDescription = value.String
+				r.SizeDesc = value.String
+			}
+		case race.FieldAlignmentDesc:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field alignment_desc", values[i])
+			} else if value.Valid {
+				r.AlignmentDesc = value.String
+			}
+		case race.FieldAgeDesc:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field age_desc", values[i])
+			} else if value.Valid {
+				r.AgeDesc = value.String
 			}
 		case race.FieldLanguageDesc:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field language_desc", values[i])
 			} else if value.Valid {
 				r.LanguageDesc = value.String
-			}
-		case race.FieldSpeed:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field speed", values[i])
-			} else if value.Valid {
-				r.Speed = int(value.Int64)
 			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
@@ -212,14 +238,24 @@ func (r *Race) Value(name string) (ent.Value, error) {
 	return r.selectValues.Get(name)
 }
 
-// QueryProficiencies queries the "proficiencies" edge of the Race entity.
-func (r *Race) QueryProficiencies() *ProficiencyQuery {
-	return NewRaceClient(r.config).QueryProficiencies(r)
+// QueryTraits queries the "traits" edge of the Race entity.
+func (r *Race) QueryTraits() *TraitQuery {
+	return NewRaceClient(r.config).QueryTraits(r)
 }
 
-// QueryProficiencyChoice queries the "proficiency_choice" edge of the Race entity.
-func (r *Race) QueryProficiencyChoice() *ProficiencyChoiceQuery {
-	return NewRaceClient(r.config).QueryProficiencyChoice(r)
+// QueryStartingProficiencies queries the "starting_proficiencies" edge of the Race entity.
+func (r *Race) QueryStartingProficiencies() *ProficiencyQuery {
+	return NewRaceClient(r.config).QueryStartingProficiencies(r)
+}
+
+// QueryStartingProficiencyOptions queries the "starting_proficiency_options" edge of the Race entity.
+func (r *Race) QueryStartingProficiencyOptions() *ProficiencyChoiceQuery {
+	return NewRaceClient(r.config).QueryStartingProficiencyOptions(r)
+}
+
+// QueryAbilityBonuses queries the "ability_bonuses" edge of the Race entity.
+func (r *Race) QueryAbilityBonuses() *AbilityScoreQuery {
+	return NewRaceClient(r.config).QueryAbilityBonuses(r)
 }
 
 // QueryLanguages queries the "languages" edge of the Race entity.
@@ -227,19 +263,19 @@ func (r *Race) QueryLanguages() *LanguageQuery {
 	return NewRaceClient(r.config).QueryLanguages(r)
 }
 
-// QuerySubrace queries the "subrace" edge of the Race entity.
-func (r *Race) QuerySubrace() *SubraceQuery {
-	return NewRaceClient(r.config).QuerySubrace(r)
+// QueryLanguageOptions queries the "language_options" edge of the Race entity.
+func (r *Race) QueryLanguageOptions() *LanguageChoiceQuery {
+	return NewRaceClient(r.config).QueryLanguageOptions(r)
 }
 
-// QueryTraits queries the "traits" edge of the Race entity.
-func (r *Race) QueryTraits() *TraitQuery {
-	return NewRaceClient(r.config).QueryTraits(r)
+// QueryCharacters queries the "characters" edge of the Race entity.
+func (r *Race) QueryCharacters() *CharacterQuery {
+	return NewRaceClient(r.config).QueryCharacters(r)
 }
 
-// QueryAbilityBonuses queries the "ability_bonuses" edge of the Race entity.
-func (r *Race) QueryAbilityBonuses() *AbilityBonusQuery {
-	return NewRaceClient(r.config).QueryAbilityBonuses(r)
+// QueryRaceAbilityBonuses queries the "race_ability_bonuses" edge of the Race entity.
+func (r *Race) QueryRaceAbilityBonuses() *AbilityBonusQuery {
+	return NewRaceClient(r.config).QueryRaceAbilityBonuses(r)
 }
 
 // Update returns a builder for updating this Race.
@@ -271,23 +307,23 @@ func (r *Race) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(r.Name)
 	builder.WriteString(", ")
-	builder.WriteString("alignment=")
-	builder.WriteString(r.Alignment)
-	builder.WriteString(", ")
-	builder.WriteString("age=")
-	builder.WriteString(r.Age)
+	builder.WriteString("speed=")
+	builder.WriteString(fmt.Sprintf("%v", r.Speed))
 	builder.WriteString(", ")
 	builder.WriteString("size=")
-	builder.WriteString(r.Size)
+	builder.WriteString(fmt.Sprintf("%v", r.Size))
 	builder.WriteString(", ")
-	builder.WriteString("size_description=")
-	builder.WriteString(r.SizeDescription)
+	builder.WriteString("size_desc=")
+	builder.WriteString(r.SizeDesc)
+	builder.WriteString(", ")
+	builder.WriteString("alignment_desc=")
+	builder.WriteString(r.AlignmentDesc)
+	builder.WriteString(", ")
+	builder.WriteString("age_desc=")
+	builder.WriteString(r.AgeDesc)
 	builder.WriteString(", ")
 	builder.WriteString("language_desc=")
 	builder.WriteString(r.LanguageDesc)
-	builder.WriteString(", ")
-	builder.WriteString("speed=")
-	builder.WriteString(fmt.Sprintf("%v", r.Speed))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -325,60 +361,108 @@ func (r *Race) UnmarshalJSON(data []byte) error {
 func (rc *RaceCreate) SetRace(input *Race) *RaceCreate {
 	rc.SetIndx(input.Indx)
 	rc.SetName(input.Name)
-	rc.SetAlignment(input.Alignment)
-	rc.SetAge(input.Age)
-	rc.SetSize(input.Size)
-	rc.SetSizeDescription(input.SizeDescription)
-	rc.SetLanguageDesc(input.LanguageDesc)
 	rc.SetSpeed(input.Speed)
+	rc.SetSize(input.Size)
+	rc.SetSizeDesc(input.SizeDesc)
+	rc.SetAlignmentDesc(input.AlignmentDesc)
+	rc.SetAgeDesc(input.AgeDesc)
+	rc.SetLanguageDesc(input.LanguageDesc)
 	return rc
 }
 
-// NamedProficiencies returns the Proficiencies named value or an error if the edge was not
+// NamedTraits returns the Traits named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (r *Race) NamedProficiencies(name string) ([]*Proficiency, error) {
-	if r.Edges.namedProficiencies == nil {
+func (r *Race) NamedTraits(name string) ([]*Trait, error) {
+	if r.Edges.namedTraits == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := r.Edges.namedProficiencies[name]
+	nodes, ok := r.Edges.namedTraits[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (r *Race) appendNamedProficiencies(name string, edges ...*Proficiency) {
-	if r.Edges.namedProficiencies == nil {
-		r.Edges.namedProficiencies = make(map[string][]*Proficiency)
+func (r *Race) appendNamedTraits(name string, edges ...*Trait) {
+	if r.Edges.namedTraits == nil {
+		r.Edges.namedTraits = make(map[string][]*Trait)
 	}
 	if len(edges) == 0 {
-		r.Edges.namedProficiencies[name] = []*Proficiency{}
+		r.Edges.namedTraits[name] = []*Trait{}
 	} else {
-		r.Edges.namedProficiencies[name] = append(r.Edges.namedProficiencies[name], edges...)
+		r.Edges.namedTraits[name] = append(r.Edges.namedTraits[name], edges...)
 	}
 }
 
-// NamedProficiencyChoice returns the ProficiencyChoice named value or an error if the edge was not
+// NamedStartingProficiencies returns the StartingProficiencies named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (r *Race) NamedProficiencyChoice(name string) ([]*ProficiencyChoice, error) {
-	if r.Edges.namedProficiencyChoice == nil {
+func (r *Race) NamedStartingProficiencies(name string) ([]*Proficiency, error) {
+	if r.Edges.namedStartingProficiencies == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := r.Edges.namedProficiencyChoice[name]
+	nodes, ok := r.Edges.namedStartingProficiencies[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (r *Race) appendNamedProficiencyChoice(name string, edges ...*ProficiencyChoice) {
-	if r.Edges.namedProficiencyChoice == nil {
-		r.Edges.namedProficiencyChoice = make(map[string][]*ProficiencyChoice)
+func (r *Race) appendNamedStartingProficiencies(name string, edges ...*Proficiency) {
+	if r.Edges.namedStartingProficiencies == nil {
+		r.Edges.namedStartingProficiencies = make(map[string][]*Proficiency)
 	}
 	if len(edges) == 0 {
-		r.Edges.namedProficiencyChoice[name] = []*ProficiencyChoice{}
+		r.Edges.namedStartingProficiencies[name] = []*Proficiency{}
 	} else {
-		r.Edges.namedProficiencyChoice[name] = append(r.Edges.namedProficiencyChoice[name], edges...)
+		r.Edges.namedStartingProficiencies[name] = append(r.Edges.namedStartingProficiencies[name], edges...)
+	}
+}
+
+// NamedStartingProficiencyOptions returns the StartingProficiencyOptions named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedStartingProficiencyOptions(name string) ([]*ProficiencyChoice, error) {
+	if r.Edges.namedStartingProficiencyOptions == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedStartingProficiencyOptions[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedStartingProficiencyOptions(name string, edges ...*ProficiencyChoice) {
+	if r.Edges.namedStartingProficiencyOptions == nil {
+		r.Edges.namedStartingProficiencyOptions = make(map[string][]*ProficiencyChoice)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedStartingProficiencyOptions[name] = []*ProficiencyChoice{}
+	} else {
+		r.Edges.namedStartingProficiencyOptions[name] = append(r.Edges.namedStartingProficiencyOptions[name], edges...)
+	}
+}
+
+// NamedAbilityBonuses returns the AbilityBonuses named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedAbilityBonuses(name string) ([]*AbilityScore, error) {
+	if r.Edges.namedAbilityBonuses == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedAbilityBonuses[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedAbilityBonuses(name string, edges ...*AbilityScore) {
+	if r.Edges.namedAbilityBonuses == nil {
+		r.Edges.namedAbilityBonuses = make(map[string][]*AbilityScore)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedAbilityBonuses[name] = []*AbilityScore{}
+	} else {
+		r.Edges.namedAbilityBonuses[name] = append(r.Edges.namedAbilityBonuses[name], edges...)
 	}
 }
 
@@ -406,75 +490,51 @@ func (r *Race) appendNamedLanguages(name string, edges ...*Language) {
 	}
 }
 
-// NamedSubrace returns the Subrace named value or an error if the edge was not
+// NamedCharacters returns the Characters named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (r *Race) NamedSubrace(name string) ([]*Subrace, error) {
-	if r.Edges.namedSubrace == nil {
+func (r *Race) NamedCharacters(name string) ([]*Character, error) {
+	if r.Edges.namedCharacters == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := r.Edges.namedSubrace[name]
+	nodes, ok := r.Edges.namedCharacters[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (r *Race) appendNamedSubrace(name string, edges ...*Subrace) {
-	if r.Edges.namedSubrace == nil {
-		r.Edges.namedSubrace = make(map[string][]*Subrace)
+func (r *Race) appendNamedCharacters(name string, edges ...*Character) {
+	if r.Edges.namedCharacters == nil {
+		r.Edges.namedCharacters = make(map[string][]*Character)
 	}
 	if len(edges) == 0 {
-		r.Edges.namedSubrace[name] = []*Subrace{}
+		r.Edges.namedCharacters[name] = []*Character{}
 	} else {
-		r.Edges.namedSubrace[name] = append(r.Edges.namedSubrace[name], edges...)
+		r.Edges.namedCharacters[name] = append(r.Edges.namedCharacters[name], edges...)
 	}
 }
 
-// NamedTraits returns the Traits named value or an error if the edge was not
+// NamedRaceAbilityBonuses returns the RaceAbilityBonuses named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (r *Race) NamedTraits(name string) ([]*Trait, error) {
-	if r.Edges.namedTraits == nil {
+func (r *Race) NamedRaceAbilityBonuses(name string) ([]*AbilityBonus, error) {
+	if r.Edges.namedRaceAbilityBonuses == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := r.Edges.namedTraits[name]
+	nodes, ok := r.Edges.namedRaceAbilityBonuses[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (r *Race) appendNamedTraits(name string, edges ...*Trait) {
-	if r.Edges.namedTraits == nil {
-		r.Edges.namedTraits = make(map[string][]*Trait)
+func (r *Race) appendNamedRaceAbilityBonuses(name string, edges ...*AbilityBonus) {
+	if r.Edges.namedRaceAbilityBonuses == nil {
+		r.Edges.namedRaceAbilityBonuses = make(map[string][]*AbilityBonus)
 	}
 	if len(edges) == 0 {
-		r.Edges.namedTraits[name] = []*Trait{}
+		r.Edges.namedRaceAbilityBonuses[name] = []*AbilityBonus{}
 	} else {
-		r.Edges.namedTraits[name] = append(r.Edges.namedTraits[name], edges...)
-	}
-}
-
-// NamedAbilityBonuses returns the AbilityBonuses named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (r *Race) NamedAbilityBonuses(name string) ([]*AbilityBonus, error) {
-	if r.Edges.namedAbilityBonuses == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := r.Edges.namedAbilityBonuses[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (r *Race) appendNamedAbilityBonuses(name string, edges ...*AbilityBonus) {
-	if r.Edges.namedAbilityBonuses == nil {
-		r.Edges.namedAbilityBonuses = make(map[string][]*AbilityBonus)
-	}
-	if len(edges) == 0 {
-		r.Edges.namedAbilityBonuses[name] = []*AbilityBonus{}
-	} else {
-		r.Edges.namedAbilityBonuses[name] = append(r.Edges.namedAbilityBonuses[name], edges...)
+		r.Edges.namedRaceAbilityBonuses[name] = append(r.Edges.namedRaceAbilityBonuses[name], edges...)
 	}
 }
 

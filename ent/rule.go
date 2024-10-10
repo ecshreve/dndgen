@@ -22,7 +22,7 @@ type Rule struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RuleQuery when eager-loading is set.
 	Edges        RuleEdges `json:"-"`
@@ -31,24 +31,24 @@ type Rule struct {
 
 // RuleEdges holds the relations/edges for other nodes in the graph.
 type RuleEdges struct {
-	// RuleSections holds the value of the rule_sections edge.
-	RuleSections []*RuleSection `json:"subsections,omitempty"`
+	// Sections holds the value of the sections edge.
+	Sections []*RuleSection `json:"sections,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
 
-	namedRuleSections map[string][]*RuleSection
+	namedSections map[string][]*RuleSection
 }
 
-// RuleSectionsOrErr returns the RuleSections value or an error if the edge
+// SectionsOrErr returns the Sections value or an error if the edge
 // was not loaded in eager-loading.
-func (e RuleEdges) RuleSectionsOrErr() ([]*RuleSection, error) {
+func (e RuleEdges) SectionsOrErr() ([]*RuleSection, error) {
 	if e.loadedTypes[0] {
-		return e.RuleSections, nil
+		return e.Sections, nil
 	}
-	return nil, &NotLoadedError{edge: "rule_sections"}
+	return nil, &NotLoadedError{edge: "sections"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -56,9 +56,11 @@ func (*Rule) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case rule.FieldDesc:
+			values[i] = new([]byte)
 		case rule.FieldID:
 			values[i] = new(sql.NullInt64)
-		case rule.FieldIndx, rule.FieldName, rule.FieldDesc:
+		case rule.FieldIndx, rule.FieldName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -94,10 +96,12 @@ func (r *Rule) assignValues(columns []string, values []any) error {
 				r.Name = value.String
 			}
 		case rule.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				r.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &r.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
@@ -112,9 +116,9 @@ func (r *Rule) Value(name string) (ent.Value, error) {
 	return r.selectValues.Get(name)
 }
 
-// QueryRuleSections queries the "rule_sections" edge of the Rule entity.
-func (r *Rule) QueryRuleSections() *RuleSectionQuery {
-	return NewRuleClient(r.config).QueryRuleSections(r)
+// QuerySections queries the "sections" edge of the Rule entity.
+func (r *Rule) QuerySections() *RuleSectionQuery {
+	return NewRuleClient(r.config).QuerySections(r)
 }
 
 // Update returns a builder for updating this Rule.
@@ -147,7 +151,7 @@ func (r *Rule) String() string {
 	builder.WriteString(r.Name)
 	builder.WriteString(", ")
 	builder.WriteString("desc=")
-	builder.WriteString(r.Desc)
+	builder.WriteString(fmt.Sprintf("%v", r.Desc))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -189,27 +193,27 @@ func (rc *RuleCreate) SetRule(input *Rule) *RuleCreate {
 	return rc
 }
 
-// NamedRuleSections returns the RuleSections named value or an error if the edge was not
+// NamedSections returns the Sections named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (r *Rule) NamedRuleSections(name string) ([]*RuleSection, error) {
-	if r.Edges.namedRuleSections == nil {
+func (r *Rule) NamedSections(name string) ([]*RuleSection, error) {
+	if r.Edges.namedSections == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := r.Edges.namedRuleSections[name]
+	nodes, ok := r.Edges.namedSections[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (r *Rule) appendNamedRuleSections(name string, edges ...*RuleSection) {
-	if r.Edges.namedRuleSections == nil {
-		r.Edges.namedRuleSections = make(map[string][]*RuleSection)
+func (r *Rule) appendNamedSections(name string, edges ...*RuleSection) {
+	if r.Edges.namedSections == nil {
+		r.Edges.namedSections = make(map[string][]*RuleSection)
 	}
 	if len(edges) == 0 {
-		r.Edges.namedRuleSections[name] = []*RuleSection{}
+		r.Edges.namedSections[name] = []*RuleSection{}
 	} else {
-		r.Edges.namedRuleSections[name] = append(r.Edges.namedRuleSections[name], edges...)
+		r.Edges.namedSections[name] = append(r.Edges.namedSections[name], edges...)
 	}
 }
 

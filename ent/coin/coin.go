@@ -4,6 +4,7 @@ package coin
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -19,8 +20,17 @@ const (
 	FieldDesc = "desc"
 	// FieldGoldConversionRate holds the string denoting the gold_conversion_rate field in the database.
 	FieldGoldConversionRate = "gold_conversion_rate"
+	// EdgeCosts holds the string denoting the costs edge name in mutations.
+	EdgeCosts = "costs"
 	// Table holds the table name of the coin in the database.
 	Table = "coins"
+	// CostsTable is the table that holds the costs relation/edge.
+	CostsTable = "costs"
+	// CostsInverseTable is the table name for the Cost entity.
+	// It exists in this package in order to avoid circular dependency with the "cost" package.
+	CostsInverseTable = "costs"
+	// CostsColumn is the table column denoting the costs relation/edge.
+	CostsColumn = "cost_coin"
 )
 
 // Columns holds all SQL columns for coin fields.
@@ -67,12 +77,28 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByDesc orders the results by the desc field.
-func ByDesc(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDesc, opts...).ToFunc()
-}
-
 // ByGoldConversionRate orders the results by the gold_conversion_rate field.
 func ByGoldConversionRate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldGoldConversionRate, opts...).ToFunc()
+}
+
+// ByCostsCount orders the results by costs count.
+func ByCostsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCostsStep(), opts...)
+	}
+}
+
+// ByCosts orders the results by costs terms.
+func ByCosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCostsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newCostsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CostsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CostsTable, CostsColumn),
+	)
 }

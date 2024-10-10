@@ -1,0 +1,4 @@
+type Mutation {
+  createCharacter(input: CreateCharacterInput!): Character!
+  updateCharacter(id: ID!, input: UpdateCharacterInput!): Character!
+}

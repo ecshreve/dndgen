@@ -4,15 +4,14 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/armor"
-	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
@@ -20,15 +19,14 @@ import (
 // ArmorQuery is the builder for querying Armor entities.
 type ArmorQuery struct {
 	config
-	ctx                 *QueryContext
-	order               []armor.OrderOption
-	inters              []Interceptor
-	predicates          []predicate.Armor
-	withEquipment       *EquipmentQuery
-	withArmorClass      *ArmorClassQuery
-	modifiers           []func(*sql.Selector)
-	loadTotal           []func(context.Context, []*Armor) error
-	withNamedArmorClass map[string]*ArmorClassQuery
+	ctx           *QueryContext
+	order         []armor.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.Armor
+	withEquipment *EquipmentQuery
+	withFKs       bool
+	modifiers     []func(*sql.Selector)
+	loadTotal     []func(context.Context, []*Armor) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -87,32 +85,10 @@ func (aq *ArmorQuery) QueryEquipment() *EquipmentQuery {
 	return query
 }
 
-// QueryArmorClass chains the current query on the "armor_class" edge.
-func (aq *ArmorQuery) QueryArmorClass() *ArmorClassQuery {
-	query := (&ArmorClassClient{config: aq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := aq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(armor.Table, armor.FieldID, selector),
-			sqlgraph.To(armorclass.Table, armorclass.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, armor.ArmorClassTable, armor.ArmorClassColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // First returns the first Armor entity from the query.
 // Returns a *NotFoundError when no Armor was found.
 func (aq *ArmorQuery) First(ctx context.Context) (*Armor, error) {
-	nodes, err := aq.Limit(1).All(setContextOp(ctx, aq.ctx, "First"))
+	nodes, err := aq.Limit(1).All(setContextOp(ctx, aq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +111,7 @@ func (aq *ArmorQuery) FirstX(ctx context.Context) *Armor {
 // Returns a *NotFoundError when no Armor ID was found.
 func (aq *ArmorQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = aq.Limit(1).IDs(setContextOp(ctx, aq.ctx, "FirstID")); err != nil {
+	if ids, err = aq.Limit(1).IDs(setContextOp(ctx, aq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -158,7 +134,7 @@ func (aq *ArmorQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one Armor entity is found.
 // Returns a *NotFoundError when no Armor entities are found.
 func (aq *ArmorQuery) Only(ctx context.Context) (*Armor, error) {
-	nodes, err := aq.Limit(2).All(setContextOp(ctx, aq.ctx, "Only"))
+	nodes, err := aq.Limit(2).All(setContextOp(ctx, aq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +162,7 @@ func (aq *ArmorQuery) OnlyX(ctx context.Context) *Armor {
 // Returns a *NotFoundError when no entities are found.
 func (aq *ArmorQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = aq.Limit(2).IDs(setContextOp(ctx, aq.ctx, "OnlyID")); err != nil {
+	if ids, err = aq.Limit(2).IDs(setContextOp(ctx, aq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -211,7 +187,7 @@ func (aq *ArmorQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Armors.
 func (aq *ArmorQuery) All(ctx context.Context) ([]*Armor, error) {
-	ctx = setContextOp(ctx, aq.ctx, "All")
+	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryAll)
 	if err := aq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -233,7 +209,7 @@ func (aq *ArmorQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if aq.ctx.Unique == nil && aq.path != nil {
 		aq.Unique(true)
 	}
-	ctx = setContextOp(ctx, aq.ctx, "IDs")
+	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryIDs)
 	if err = aq.Select(armor.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -251,7 +227,7 @@ func (aq *ArmorQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (aq *ArmorQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, aq.ctx, "Count")
+	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryCount)
 	if err := aq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -269,7 +245,7 @@ func (aq *ArmorQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (aq *ArmorQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, aq.ctx, "Exist")
+	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryExist)
 	switch _, err := aq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -296,13 +272,12 @@ func (aq *ArmorQuery) Clone() *ArmorQuery {
 		return nil
 	}
 	return &ArmorQuery{
-		config:         aq.config,
-		ctx:            aq.ctx.Clone(),
-		order:          append([]armor.OrderOption{}, aq.order...),
-		inters:         append([]Interceptor{}, aq.inters...),
-		predicates:     append([]predicate.Armor{}, aq.predicates...),
-		withEquipment:  aq.withEquipment.Clone(),
-		withArmorClass: aq.withArmorClass.Clone(),
+		config:        aq.config,
+		ctx:           aq.ctx.Clone(),
+		order:         append([]armor.OrderOption{}, aq.order...),
+		inters:        append([]Interceptor{}, aq.inters...),
+		predicates:    append([]predicate.Armor{}, aq.predicates...),
+		withEquipment: aq.withEquipment.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -320,29 +295,18 @@ func (aq *ArmorQuery) WithEquipment(opts ...func(*EquipmentQuery)) *ArmorQuery {
 	return aq
 }
 
-// WithArmorClass tells the query-builder to eager-load the nodes that are connected to
-// the "armor_class" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *ArmorQuery) WithArmorClass(opts ...func(*ArmorClassQuery)) *ArmorQuery {
-	query := (&ArmorClassClient{config: aq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	aq.withArmorClass = query
-	return aq
-}
-
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"index"`
+//		ArmorCategory armor.ArmorCategory `json:"armor_category,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Armor.Query().
-//		GroupBy(armor.FieldIndx).
+//		GroupBy(armor.FieldArmorCategory).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (aq *ArmorQuery) GroupBy(field string, fields ...string) *ArmorGroupBy {
@@ -360,11 +324,11 @@ func (aq *ArmorQuery) GroupBy(field string, fields ...string) *ArmorGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"index"`
+//		ArmorCategory armor.ArmorCategory `json:"armor_category,omitempty"`
 //	}
 //
 //	client.Armor.Query().
-//		Select(armor.FieldIndx).
+//		Select(armor.FieldArmorCategory).
 //		Scan(ctx, &v)
 func (aq *ArmorQuery) Select(fields ...string) *ArmorSelect {
 	aq.ctx.Fields = append(aq.ctx.Fields, fields...)
@@ -408,12 +372,18 @@ func (aq *ArmorQuery) prepareQuery(ctx context.Context) error {
 func (aq *ArmorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Armor, error) {
 	var (
 		nodes       = []*Armor{}
+		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [1]bool{
 			aq.withEquipment != nil,
-			aq.withArmorClass != nil,
 		}
 	)
+	if aq.withEquipment != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, armor.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Armor).scanValues(nil, columns)
 	}
@@ -441,20 +411,6 @@ func (aq *ArmorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Armor,
 			return nil, err
 		}
 	}
-	if query := aq.withArmorClass; query != nil {
-		if err := aq.loadArmorClass(ctx, query, nodes,
-			func(n *Armor) { n.Edges.ArmorClass = []*ArmorClass{} },
-			func(n *Armor, e *ArmorClass) { n.Edges.ArmorClass = append(n.Edges.ArmorClass, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range aq.withNamedArmorClass {
-		if err := aq.loadArmorClass(ctx, query, nodes,
-			func(n *Armor) { n.appendNamedArmorClass(name) },
-			func(n *Armor, e *ArmorClass) { n.appendNamedArmorClass(name, e) }); err != nil {
-			return nil, err
-		}
-	}
 	for i := range aq.loadTotal {
 		if err := aq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
@@ -467,7 +423,10 @@ func (aq *ArmorQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, 
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Armor)
 	for i := range nodes {
-		fk := nodes[i].EquipmentID
+		if nodes[i].equipment_armor == nil {
+			continue
+		}
+		fk := *nodes[i].equipment_armor
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -484,42 +443,11 @@ func (aq *ArmorQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_armor" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
-	}
-	return nil
-}
-func (aq *ArmorQuery) loadArmorClass(ctx context.Context, query *ArmorClassQuery, nodes []*Armor, init func(*Armor), assign func(*Armor, *ArmorClass)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Armor)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.ArmorClass(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(armor.ArmorClassColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.armor_armor_class
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "armor_armor_class" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "armor_armor_class" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
 	}
 	return nil
 }
@@ -551,9 +479,6 @@ func (aq *ArmorQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != armor.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if aq.withEquipment != nil {
-			_spec.Node.AddColumnOnce(armor.FieldEquipmentID)
 		}
 	}
 	if ps := aq.predicates; len(ps) > 0 {
@@ -611,20 +536,6 @@ func (aq *ArmorQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// WithNamedArmorClass tells the query-builder to eager-load the nodes that are connected to the "armor_class"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (aq *ArmorQuery) WithNamedArmorClass(name string, opts ...func(*ArmorClassQuery)) *ArmorQuery {
-	query := (&ArmorClassClient{config: aq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if aq.withNamedArmorClass == nil {
-		aq.withNamedArmorClass = make(map[string]*ArmorClassQuery)
-	}
-	aq.withNamedArmorClass[name] = query
-	return aq
-}
-
 // ArmorGroupBy is the group-by builder for Armor entities.
 type ArmorGroupBy struct {
 	selector
@@ -639,7 +550,7 @@ func (agb *ArmorGroupBy) Aggregate(fns ...AggregateFunc) *ArmorGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (agb *ArmorGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, agb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, agb.build.ctx, ent.OpQueryGroupBy)
 	if err := agb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -687,7 +598,7 @@ func (as *ArmorSelect) Aggregate(fns ...AggregateFunc) *ArmorSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (as *ArmorSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, as.ctx, "Select")
+	ctx = setContextOp(ctx, as.ctx, ent.OpQuerySelect)
 	if err := as.prepareQuery(ctx); err != nil {
 		return err
 	}

@@ -9,9 +9,10 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentchoice"
+	"github.com/ecshreve/dndgen/ent/equipmententry"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 )
@@ -56,49 +57,64 @@ func (cc *ClassCreate) AddProficiencies(p ...*Proficiency) *ClassCreate {
 	return cc.AddProficiencyIDs(ids...)
 }
 
-// AddProficiencyChoiceIDs adds the "proficiency_choices" edge to the ProficiencyChoice entity by IDs.
-func (cc *ClassCreate) AddProficiencyChoiceIDs(ids ...int) *ClassCreate {
-	cc.mutation.AddProficiencyChoiceIDs(ids...)
+// AddProficiencyOptionIDs adds the "proficiency_options" edge to the ProficiencyChoice entity by IDs.
+func (cc *ClassCreate) AddProficiencyOptionIDs(ids ...int) *ClassCreate {
+	cc.mutation.AddProficiencyOptionIDs(ids...)
 	return cc
 }
 
-// AddProficiencyChoices adds the "proficiency_choices" edges to the ProficiencyChoice entity.
-func (cc *ClassCreate) AddProficiencyChoices(p ...*ProficiencyChoice) *ClassCreate {
+// AddProficiencyOptions adds the "proficiency_options" edges to the ProficiencyChoice entity.
+func (cc *ClassCreate) AddProficiencyOptions(p ...*ProficiencyChoice) *ClassCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return cc.AddProficiencyChoiceIDs(ids...)
+	return cc.AddProficiencyOptionIDs(ids...)
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (cc *ClassCreate) AddEquipmentIDs(ids ...int) *ClassCreate {
-	cc.mutation.AddEquipmentIDs(ids...)
+// AddStartingEquipmentIDs adds the "starting_equipment" edge to the EquipmentEntry entity by IDs.
+func (cc *ClassCreate) AddStartingEquipmentIDs(ids ...int) *ClassCreate {
+	cc.mutation.AddStartingEquipmentIDs(ids...)
 	return cc
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (cc *ClassCreate) AddEquipment(e ...*Equipment) *ClassCreate {
+// AddStartingEquipment adds the "starting_equipment" edges to the EquipmentEntry entity.
+func (cc *ClassCreate) AddStartingEquipment(e ...*EquipmentEntry) *ClassCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return cc.AddEquipmentIDs(ids...)
+	return cc.AddStartingEquipmentIDs(ids...)
 }
 
-// AddEquipmentChoiceIDs adds the "equipment_choices" edge to the EquipmentChoice entity by IDs.
-func (cc *ClassCreate) AddEquipmentChoiceIDs(ids ...int) *ClassCreate {
-	cc.mutation.AddEquipmentChoiceIDs(ids...)
+// AddSavingThrowIDs adds the "saving_throws" edge to the AbilityScore entity by IDs.
+func (cc *ClassCreate) AddSavingThrowIDs(ids ...int) *ClassCreate {
+	cc.mutation.AddSavingThrowIDs(ids...)
 	return cc
 }
 
-// AddEquipmentChoices adds the "equipment_choices" edges to the EquipmentChoice entity.
-func (cc *ClassCreate) AddEquipmentChoices(e ...*EquipmentChoice) *ClassCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// AddSavingThrows adds the "saving_throws" edges to the AbilityScore entity.
+func (cc *ClassCreate) AddSavingThrows(a ...*AbilityScore) *ClassCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
 	}
-	return cc.AddEquipmentChoiceIDs(ids...)
+	return cc.AddSavingThrowIDs(ids...)
+}
+
+// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
+func (cc *ClassCreate) AddCharacterIDs(ids ...int) *ClassCreate {
+	cc.mutation.AddCharacterIDs(ids...)
+	return cc
+}
+
+// AddCharacters adds the "characters" edges to the Character entity.
+func (cc *ClassCreate) AddCharacters(c ...*Character) *ClassCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cc.AddCharacterIDs(ids...)
 }
 
 // Mutation returns the ClassMutation object of the builder.
@@ -154,6 +170,11 @@ func (cc *ClassCreate) check() error {
 	if _, ok := cc.mutation.HitDie(); !ok {
 		return &ValidationError{Name: "hit_die", err: errors.New(`ent: missing required field "Class.hit_die"`)}
 	}
+	if v, ok := cc.mutation.HitDie(); ok {
+		if err := class.HitDieValidator(v); err != nil {
+			return &ValidationError{Name: "hit_die", err: fmt.Errorf(`ent: validator failed for field "Class.hit_die": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -208,12 +229,12 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.ProficiencyChoicesIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.ProficiencyOptionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   class.ProficiencyChoicesTable,
-			Columns: class.ProficiencyChoicesPrimaryKey,
+			Table:   class.ProficiencyOptionsTable,
+			Columns: []string{class.ProficiencyOptionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
@@ -224,15 +245,15 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.EquipmentIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.StartingEquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   class.EquipmentTable,
-			Columns: class.EquipmentPrimaryKey,
+			Table:   class.StartingEquipmentTable,
+			Columns: class.StartingEquipmentPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(equipmententry.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -240,15 +261,31 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.EquipmentChoicesIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.SavingThrowsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   class.EquipmentChoicesTable,
-			Columns: class.EquipmentChoicesPrimaryKey,
+			Table:   class.SavingThrowsTable,
+			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentchoice.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.CharactersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   class.CharactersTable,
+			Columns: []string{class.CharactersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -262,11 +299,15 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 // ClassCreateBulk is the builder for creating many Class entities in bulk.
 type ClassCreateBulk struct {
 	config
+	err      error
 	builders []*ClassCreate
 }
 
 // Save creates the Class entities in the database.
 func (ccb *ClassCreateBulk) Save(ctx context.Context) ([]*Class, error) {
+	if ccb.err != nil {
+		return nil, ccb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
 	nodes := make([]*Class, len(ccb.builders))
 	mutators := make([]Mutator, len(ccb.builders))

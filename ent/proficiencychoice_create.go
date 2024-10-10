@@ -29,27 +29,19 @@ func (pcc *ProficiencyChoiceCreate) SetChoose(i int) *ProficiencyChoiceCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (pcc *ProficiencyChoiceCreate) SetDesc(s string) *ProficiencyChoiceCreate {
+func (pcc *ProficiencyChoiceCreate) SetDesc(s []string) *ProficiencyChoiceCreate {
 	pcc.mutation.SetDesc(s)
 	return pcc
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (pcc *ProficiencyChoiceCreate) SetNillableDesc(s *string) *ProficiencyChoiceCreate {
-	if s != nil {
-		pcc.SetDesc(*s)
-	}
-	return pcc
-}
-
-// AddProficiencyIDs adds the "proficiency" edge to the Proficiency entity by IDs.
+// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
 func (pcc *ProficiencyChoiceCreate) AddProficiencyIDs(ids ...int) *ProficiencyChoiceCreate {
 	pcc.mutation.AddProficiencyIDs(ids...)
 	return pcc
 }
 
-// AddProficiency adds the "proficiency" edges to the Proficiency entity.
-func (pcc *ProficiencyChoiceCreate) AddProficiency(p ...*Proficiency) *ProficiencyChoiceCreate {
+// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
+func (pcc *ProficiencyChoiceCreate) AddProficiencies(p ...*Proficiency) *ProficiencyChoiceCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
@@ -57,68 +49,42 @@ func (pcc *ProficiencyChoiceCreate) AddProficiency(p ...*Proficiency) *Proficien
 	return pcc.AddProficiencyIDs(ids...)
 }
 
-// SetParentChoiceID sets the "parent_choice" edge to the ProficiencyChoice entity by ID.
-func (pcc *ProficiencyChoiceCreate) SetParentChoiceID(id int) *ProficiencyChoiceCreate {
-	pcc.mutation.SetParentChoiceID(id)
+// SetRaceID sets the "race" edge to the Race entity by ID.
+func (pcc *ProficiencyChoiceCreate) SetRaceID(id int) *ProficiencyChoiceCreate {
+	pcc.mutation.SetRaceID(id)
 	return pcc
 }
 
-// SetNillableParentChoiceID sets the "parent_choice" edge to the ProficiencyChoice entity by ID if the given value is not nil.
-func (pcc *ProficiencyChoiceCreate) SetNillableParentChoiceID(id *int) *ProficiencyChoiceCreate {
+// SetNillableRaceID sets the "race" edge to the Race entity by ID if the given value is not nil.
+func (pcc *ProficiencyChoiceCreate) SetNillableRaceID(id *int) *ProficiencyChoiceCreate {
 	if id != nil {
-		pcc = pcc.SetParentChoiceID(*id)
+		pcc = pcc.SetRaceID(*id)
 	}
 	return pcc
 }
 
-// SetParentChoice sets the "parent_choice" edge to the ProficiencyChoice entity.
-func (pcc *ProficiencyChoiceCreate) SetParentChoice(p *ProficiencyChoice) *ProficiencyChoiceCreate {
-	return pcc.SetParentChoiceID(p.ID)
+// SetRace sets the "race" edge to the Race entity.
+func (pcc *ProficiencyChoiceCreate) SetRace(r *Race) *ProficiencyChoiceCreate {
+	return pcc.SetRaceID(r.ID)
 }
 
-// AddSubChoiceIDs adds the "sub_choice" edge to the ProficiencyChoice entity by IDs.
-func (pcc *ProficiencyChoiceCreate) AddSubChoiceIDs(ids ...int) *ProficiencyChoiceCreate {
-	pcc.mutation.AddSubChoiceIDs(ids...)
+// SetClassID sets the "class" edge to the Class entity by ID.
+func (pcc *ProficiencyChoiceCreate) SetClassID(id int) *ProficiencyChoiceCreate {
+	pcc.mutation.SetClassID(id)
 	return pcc
 }
 
-// AddSubChoice adds the "sub_choice" edges to the ProficiencyChoice entity.
-func (pcc *ProficiencyChoiceCreate) AddSubChoice(p ...*ProficiencyChoice) *ProficiencyChoiceCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (pcc *ProficiencyChoiceCreate) SetNillableClassID(id *int) *ProficiencyChoiceCreate {
+	if id != nil {
+		pcc = pcc.SetClassID(*id)
 	}
-	return pcc.AddSubChoiceIDs(ids...)
-}
-
-// AddClasIDs adds the "class" edge to the Class entity by IDs.
-func (pcc *ProficiencyChoiceCreate) AddClasIDs(ids ...int) *ProficiencyChoiceCreate {
-	pcc.mutation.AddClasIDs(ids...)
 	return pcc
 }
 
-// AddClass adds the "class" edges to the Class entity.
-func (pcc *ProficiencyChoiceCreate) AddClass(c ...*Class) *ProficiencyChoiceCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return pcc.AddClasIDs(ids...)
-}
-
-// AddRaceIDs adds the "race" edge to the Race entity by IDs.
-func (pcc *ProficiencyChoiceCreate) AddRaceIDs(ids ...int) *ProficiencyChoiceCreate {
-	pcc.mutation.AddRaceIDs(ids...)
-	return pcc
-}
-
-// AddRace adds the "race" edges to the Race entity.
-func (pcc *ProficiencyChoiceCreate) AddRace(r ...*Race) *ProficiencyChoiceCreate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return pcc.AddRaceIDs(ids...)
+// SetClass sets the "class" edge to the Class entity.
+func (pcc *ProficiencyChoiceCreate) SetClass(c *Class) *ProficiencyChoiceCreate {
+	return pcc.SetClassID(c.ID)
 }
 
 // Mutation returns the ProficiencyChoiceMutation object of the builder.
@@ -158,6 +124,14 @@ func (pcc *ProficiencyChoiceCreate) check() error {
 	if _, ok := pcc.mutation.Choose(); !ok {
 		return &ValidationError{Name: "choose", err: errors.New(`ent: missing required field "ProficiencyChoice.choose"`)}
 	}
+	if v, ok := pcc.mutation.Choose(); ok {
+		if err := proficiencychoice.ChooseValidator(v); err != nil {
+			return &ValidationError{Name: "choose", err: fmt.Errorf(`ent: validator failed for field "ProficiencyChoice.choose": %w`, err)}
+		}
+	}
+	if _, ok := pcc.mutation.Desc(); !ok {
+		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "ProficiencyChoice.desc"`)}
+	}
 	return nil
 }
 
@@ -189,15 +163,15 @@ func (pcc *ProficiencyChoiceCreate) createSpec() (*ProficiencyChoice, *sqlgraph.
 		_node.Choose = value
 	}
 	if value, ok := pcc.mutation.Desc(); ok {
-		_spec.SetField(proficiencychoice.FieldDesc, field.TypeString, value)
+		_spec.SetField(proficiencychoice.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
 	}
-	if nodes := pcc.mutation.ProficiencyIDs(); len(nodes) > 0 {
+	if nodes := pcc.mutation.ProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiencychoice.ProficiencyTable,
-			Columns: proficiencychoice.ProficiencyPrimaryKey,
+			Inverse: false,
+			Table:   proficiencychoice.ProficienciesTable,
+			Columns: proficiencychoice.ProficienciesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
@@ -208,61 +182,12 @@ func (pcc *ProficiencyChoiceCreate) createSpec() (*ProficiencyChoice, *sqlgraph.
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pcc.mutation.ParentChoiceIDs(); len(nodes) > 0 {
+	if nodes := pcc.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   proficiencychoice.ParentChoiceTable,
-			Columns: []string{proficiencychoice.ParentChoiceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.proficiency_choice_sub_choice = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pcc.mutation.SubChoiceIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiencychoice.SubChoiceTable,
-			Columns: []string{proficiencychoice.SubChoiceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pcc.mutation.ClassIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiencychoice.ClassTable,
-			Columns: proficiencychoice.ClassPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pcc.mutation.RaceIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
 			Table:   proficiencychoice.RaceTable,
-			Columns: proficiencychoice.RacePrimaryKey,
+			Columns: []string{proficiencychoice.RaceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -271,6 +196,24 @@ func (pcc *ProficiencyChoiceCreate) createSpec() (*ProficiencyChoice, *sqlgraph.
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.race_starting_proficiency_options = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pcc.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ClassTable,
+			Columns: []string{proficiencychoice.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.class_proficiency_options = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -279,11 +222,15 @@ func (pcc *ProficiencyChoiceCreate) createSpec() (*ProficiencyChoice, *sqlgraph.
 // ProficiencyChoiceCreateBulk is the builder for creating many ProficiencyChoice entities in bulk.
 type ProficiencyChoiceCreateBulk struct {
 	config
+	err      error
 	builders []*ProficiencyChoiceCreate
 }
 
 // Save creates the ProficiencyChoice entities in the database.
 func (pccb *ProficiencyChoiceCreateBulk) Save(ctx context.Context) ([]*ProficiencyChoice, error) {
+	if pccb.err != nil {
+		return nil, pccb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(pccb.builders))
 	nodes := make([]*ProficiencyChoice, len(pccb.builders))
 	mutators := make([]Mutator, len(pccb.builders))

@@ -10,16 +10,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // ProficiencyUpdate is the builder for updating Proficiency entities.
@@ -41,41 +37,50 @@ func (pu *ProficiencyUpdate) SetIndx(s string) *ProficiencyUpdate {
 	return pu
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (pu *ProficiencyUpdate) SetNillableIndx(s *string) *ProficiencyUpdate {
+	if s != nil {
+		pu.SetIndx(*s)
+	}
+	return pu
+}
+
 // SetName sets the "name" field.
 func (pu *ProficiencyUpdate) SetName(s string) *ProficiencyUpdate {
 	pu.mutation.SetName(s)
 	return pu
 }
 
-// SetProficiencyCategory sets the "proficiency_category" field.
-func (pu *ProficiencyUpdate) SetProficiencyCategory(s string) *ProficiencyUpdate {
-	pu.mutation.SetProficiencyCategory(s)
-	return pu
-}
-
-// AddClassIDs adds the "classes" edge to the Class entity by IDs.
-func (pu *ProficiencyUpdate) AddClassIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.AddClassIDs(ids...)
-	return pu
-}
-
-// AddClasses adds the "classes" edges to the Class entity.
-func (pu *ProficiencyUpdate) AddClasses(c ...*Class) *ProficiencyUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// SetNillableName sets the "name" field if the given value is not nil.
+func (pu *ProficiencyUpdate) SetNillableName(s *string) *ProficiencyUpdate {
+	if s != nil {
+		pu.SetName(*s)
 	}
-	return pu.AddClassIDs(ids...)
+	return pu
 }
 
-// AddRaceIDs adds the "races" edge to the Race entity by IDs.
+// SetReference sets the "reference" field.
+func (pu *ProficiencyUpdate) SetReference(s string) *ProficiencyUpdate {
+	pu.mutation.SetReference(s)
+	return pu
+}
+
+// SetNillableReference sets the "reference" field if the given value is not nil.
+func (pu *ProficiencyUpdate) SetNillableReference(s *string) *ProficiencyUpdate {
+	if s != nil {
+		pu.SetReference(*s)
+	}
+	return pu
+}
+
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
 func (pu *ProficiencyUpdate) AddRaceIDs(ids ...int) *ProficiencyUpdate {
 	pu.mutation.AddRaceIDs(ids...)
 	return pu
 }
 
-// AddRaces adds the "races" edges to the Race entity.
-func (pu *ProficiencyUpdate) AddRaces(r ...*Race) *ProficiencyUpdate {
+// AddRace adds the "race" edges to the Race entity.
+func (pu *ProficiencyUpdate) AddRace(r ...*Race) *ProficiencyUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -83,94 +88,49 @@ func (pu *ProficiencyUpdate) AddRaces(r ...*Race) *ProficiencyUpdate {
 	return pu.AddRaceIDs(ids...)
 }
 
-// AddSubraceIDs adds the "subraces" edge to the Subrace entity by IDs.
-func (pu *ProficiencyUpdate) AddSubraceIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.AddSubraceIDs(ids...)
+// AddOptionIDs adds the "options" edge to the ProficiencyChoice entity by IDs.
+func (pu *ProficiencyUpdate) AddOptionIDs(ids ...int) *ProficiencyUpdate {
+	pu.mutation.AddOptionIDs(ids...)
 	return pu
 }
 
-// AddSubraces adds the "subraces" edges to the Subrace entity.
-func (pu *ProficiencyUpdate) AddSubraces(s ...*Subrace) *ProficiencyUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return pu.AddSubraceIDs(ids...)
-}
-
-// AddChoiceIDs adds the "choice" edge to the ProficiencyChoice entity by IDs.
-func (pu *ProficiencyUpdate) AddChoiceIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.AddChoiceIDs(ids...)
-	return pu
-}
-
-// AddChoice adds the "choice" edges to the ProficiencyChoice entity.
-func (pu *ProficiencyUpdate) AddChoice(p ...*ProficiencyChoice) *ProficiencyUpdate {
+// AddOptions adds the "options" edges to the ProficiencyChoice entity.
+func (pu *ProficiencyUpdate) AddOptions(p ...*ProficiencyChoice) *ProficiencyUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return pu.AddChoiceIDs(ids...)
+	return pu.AddOptionIDs(ids...)
 }
 
-// AddSkillIDs adds the "skill" edge to the Skill entity by IDs.
-func (pu *ProficiencyUpdate) AddSkillIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.AddSkillIDs(ids...)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (pu *ProficiencyUpdate) AddClasIDs(ids ...int) *ProficiencyUpdate {
+	pu.mutation.AddClasIDs(ids...)
 	return pu
 }
 
-// AddSkill adds the "skill" edges to the Skill entity.
-func (pu *ProficiencyUpdate) AddSkill(s ...*Skill) *ProficiencyUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// AddClass adds the "class" edges to the Class entity.
+func (pu *ProficiencyUpdate) AddClass(c ...*Class) *ProficiencyUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return pu.AddSkillIDs(ids...)
+	return pu.AddClasIDs(ids...)
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (pu *ProficiencyUpdate) AddEquipmentIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.AddEquipmentIDs(ids...)
+// AddCharacterProficiencyIDs adds the "character_proficiencies" edge to the CharacterProficiency entity by IDs.
+func (pu *ProficiencyUpdate) AddCharacterProficiencyIDs(ids ...int) *ProficiencyUpdate {
+	pu.mutation.AddCharacterProficiencyIDs(ids...)
 	return pu
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (pu *ProficiencyUpdate) AddEquipment(e ...*Equipment) *ProficiencyUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// AddCharacterProficiencies adds the "character_proficiencies" edges to the CharacterProficiency entity.
+func (pu *ProficiencyUpdate) AddCharacterProficiencies(c ...*CharacterProficiency) *ProficiencyUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return pu.AddEquipmentIDs(ids...)
-}
-
-// AddEquipmentCategoryIDs adds the "equipment_category" edge to the EquipmentCategory entity by IDs.
-func (pu *ProficiencyUpdate) AddEquipmentCategoryIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.AddEquipmentCategoryIDs(ids...)
-	return pu
-}
-
-// AddEquipmentCategory adds the "equipment_category" edges to the EquipmentCategory entity.
-func (pu *ProficiencyUpdate) AddEquipmentCategory(e ...*EquipmentCategory) *ProficiencyUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return pu.AddEquipmentCategoryIDs(ids...)
-}
-
-// AddSavingThrowIDs adds the "saving_throw" edge to the AbilityScore entity by IDs.
-func (pu *ProficiencyUpdate) AddSavingThrowIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.AddSavingThrowIDs(ids...)
-	return pu
-}
-
-// AddSavingThrow adds the "saving_throw" edges to the AbilityScore entity.
-func (pu *ProficiencyUpdate) AddSavingThrow(a ...*AbilityScore) *ProficiencyUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return pu.AddSavingThrowIDs(ids...)
+	return pu.AddCharacterProficiencyIDs(ids...)
 }
 
 // Mutation returns the ProficiencyMutation object of the builder.
@@ -178,41 +138,20 @@ func (pu *ProficiencyUpdate) Mutation() *ProficiencyMutation {
 	return pu.mutation
 }
 
-// ClearClasses clears all "classes" edges to the Class entity.
-func (pu *ProficiencyUpdate) ClearClasses() *ProficiencyUpdate {
-	pu.mutation.ClearClasses()
+// ClearRace clears all "race" edges to the Race entity.
+func (pu *ProficiencyUpdate) ClearRace() *ProficiencyUpdate {
+	pu.mutation.ClearRace()
 	return pu
 }
 
-// RemoveClassIDs removes the "classes" edge to Class entities by IDs.
-func (pu *ProficiencyUpdate) RemoveClassIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.RemoveClassIDs(ids...)
-	return pu
-}
-
-// RemoveClasses removes "classes" edges to Class entities.
-func (pu *ProficiencyUpdate) RemoveClasses(c ...*Class) *ProficiencyUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return pu.RemoveClassIDs(ids...)
-}
-
-// ClearRaces clears all "races" edges to the Race entity.
-func (pu *ProficiencyUpdate) ClearRaces() *ProficiencyUpdate {
-	pu.mutation.ClearRaces()
-	return pu
-}
-
-// RemoveRaceIDs removes the "races" edge to Race entities by IDs.
+// RemoveRaceIDs removes the "race" edge to Race entities by IDs.
 func (pu *ProficiencyUpdate) RemoveRaceIDs(ids ...int) *ProficiencyUpdate {
 	pu.mutation.RemoveRaceIDs(ids...)
 	return pu
 }
 
-// RemoveRaces removes "races" edges to Race entities.
-func (pu *ProficiencyUpdate) RemoveRaces(r ...*Race) *ProficiencyUpdate {
+// RemoveRace removes "race" edges to Race entities.
+func (pu *ProficiencyUpdate) RemoveRace(r ...*Race) *ProficiencyUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -220,130 +159,67 @@ func (pu *ProficiencyUpdate) RemoveRaces(r ...*Race) *ProficiencyUpdate {
 	return pu.RemoveRaceIDs(ids...)
 }
 
-// ClearSubraces clears all "subraces" edges to the Subrace entity.
-func (pu *ProficiencyUpdate) ClearSubraces() *ProficiencyUpdate {
-	pu.mutation.ClearSubraces()
+// ClearOptions clears all "options" edges to the ProficiencyChoice entity.
+func (pu *ProficiencyUpdate) ClearOptions() *ProficiencyUpdate {
+	pu.mutation.ClearOptions()
 	return pu
 }
 
-// RemoveSubraceIDs removes the "subraces" edge to Subrace entities by IDs.
-func (pu *ProficiencyUpdate) RemoveSubraceIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.RemoveSubraceIDs(ids...)
+// RemoveOptionIDs removes the "options" edge to ProficiencyChoice entities by IDs.
+func (pu *ProficiencyUpdate) RemoveOptionIDs(ids ...int) *ProficiencyUpdate {
+	pu.mutation.RemoveOptionIDs(ids...)
 	return pu
 }
 
-// RemoveSubraces removes "subraces" edges to Subrace entities.
-func (pu *ProficiencyUpdate) RemoveSubraces(s ...*Subrace) *ProficiencyUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return pu.RemoveSubraceIDs(ids...)
-}
-
-// ClearChoice clears all "choice" edges to the ProficiencyChoice entity.
-func (pu *ProficiencyUpdate) ClearChoice() *ProficiencyUpdate {
-	pu.mutation.ClearChoice()
-	return pu
-}
-
-// RemoveChoiceIDs removes the "choice" edge to ProficiencyChoice entities by IDs.
-func (pu *ProficiencyUpdate) RemoveChoiceIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.RemoveChoiceIDs(ids...)
-	return pu
-}
-
-// RemoveChoice removes "choice" edges to ProficiencyChoice entities.
-func (pu *ProficiencyUpdate) RemoveChoice(p ...*ProficiencyChoice) *ProficiencyUpdate {
+// RemoveOptions removes "options" edges to ProficiencyChoice entities.
+func (pu *ProficiencyUpdate) RemoveOptions(p ...*ProficiencyChoice) *ProficiencyUpdate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return pu.RemoveChoiceIDs(ids...)
+	return pu.RemoveOptionIDs(ids...)
 }
 
-// ClearSkill clears all "skill" edges to the Skill entity.
-func (pu *ProficiencyUpdate) ClearSkill() *ProficiencyUpdate {
-	pu.mutation.ClearSkill()
+// ClearClass clears all "class" edges to the Class entity.
+func (pu *ProficiencyUpdate) ClearClass() *ProficiencyUpdate {
+	pu.mutation.ClearClass()
 	return pu
 }
 
-// RemoveSkillIDs removes the "skill" edge to Skill entities by IDs.
-func (pu *ProficiencyUpdate) RemoveSkillIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.RemoveSkillIDs(ids...)
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (pu *ProficiencyUpdate) RemoveClasIDs(ids ...int) *ProficiencyUpdate {
+	pu.mutation.RemoveClasIDs(ids...)
 	return pu
 }
 
-// RemoveSkill removes "skill" edges to Skill entities.
-func (pu *ProficiencyUpdate) RemoveSkill(s ...*Skill) *ProficiencyUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// RemoveClass removes "class" edges to Class entities.
+func (pu *ProficiencyUpdate) RemoveClass(c ...*Class) *ProficiencyUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return pu.RemoveSkillIDs(ids...)
+	return pu.RemoveClasIDs(ids...)
 }
 
-// ClearEquipment clears all "equipment" edges to the Equipment entity.
-func (pu *ProficiencyUpdate) ClearEquipment() *ProficiencyUpdate {
-	pu.mutation.ClearEquipment()
+// ClearCharacterProficiencies clears all "character_proficiencies" edges to the CharacterProficiency entity.
+func (pu *ProficiencyUpdate) ClearCharacterProficiencies() *ProficiencyUpdate {
+	pu.mutation.ClearCharacterProficiencies()
 	return pu
 }
 
-// RemoveEquipmentIDs removes the "equipment" edge to Equipment entities by IDs.
-func (pu *ProficiencyUpdate) RemoveEquipmentIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.RemoveEquipmentIDs(ids...)
+// RemoveCharacterProficiencyIDs removes the "character_proficiencies" edge to CharacterProficiency entities by IDs.
+func (pu *ProficiencyUpdate) RemoveCharacterProficiencyIDs(ids ...int) *ProficiencyUpdate {
+	pu.mutation.RemoveCharacterProficiencyIDs(ids...)
 	return pu
 }
 
-// RemoveEquipment removes "equipment" edges to Equipment entities.
-func (pu *ProficiencyUpdate) RemoveEquipment(e ...*Equipment) *ProficiencyUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// RemoveCharacterProficiencies removes "character_proficiencies" edges to CharacterProficiency entities.
+func (pu *ProficiencyUpdate) RemoveCharacterProficiencies(c ...*CharacterProficiency) *ProficiencyUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return pu.RemoveEquipmentIDs(ids...)
-}
-
-// ClearEquipmentCategory clears all "equipment_category" edges to the EquipmentCategory entity.
-func (pu *ProficiencyUpdate) ClearEquipmentCategory() *ProficiencyUpdate {
-	pu.mutation.ClearEquipmentCategory()
-	return pu
-}
-
-// RemoveEquipmentCategoryIDs removes the "equipment_category" edge to EquipmentCategory entities by IDs.
-func (pu *ProficiencyUpdate) RemoveEquipmentCategoryIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.RemoveEquipmentCategoryIDs(ids...)
-	return pu
-}
-
-// RemoveEquipmentCategory removes "equipment_category" edges to EquipmentCategory entities.
-func (pu *ProficiencyUpdate) RemoveEquipmentCategory(e ...*EquipmentCategory) *ProficiencyUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return pu.RemoveEquipmentCategoryIDs(ids...)
-}
-
-// ClearSavingThrow clears all "saving_throw" edges to the AbilityScore entity.
-func (pu *ProficiencyUpdate) ClearSavingThrow() *ProficiencyUpdate {
-	pu.mutation.ClearSavingThrow()
-	return pu
-}
-
-// RemoveSavingThrowIDs removes the "saving_throw" edge to AbilityScore entities by IDs.
-func (pu *ProficiencyUpdate) RemoveSavingThrowIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.RemoveSavingThrowIDs(ids...)
-	return pu
-}
-
-// RemoveSavingThrow removes "saving_throw" edges to AbilityScore entities.
-func (pu *ProficiencyUpdate) RemoveSavingThrow(a ...*AbilityScore) *ProficiencyUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return pu.RemoveSavingThrowIDs(ids...)
+	return pu.RemoveCharacterProficiencyIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -385,6 +261,11 @@ func (pu *ProficiencyUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Proficiency.name": %w`, err)}
 		}
 	}
+	if v, ok := pu.mutation.Reference(); ok {
+		if err := proficiency.ReferenceValidator(v); err != nil {
+			return &ValidationError{Name: "reference", err: fmt.Errorf(`ent: validator failed for field "Proficiency.reference": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -406,60 +287,15 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.Name(); ok {
 		_spec.SetField(proficiency.FieldName, field.TypeString, value)
 	}
-	if value, ok := pu.mutation.ProficiencyCategory(); ok {
-		_spec.SetField(proficiency.FieldProficiencyCategory, field.TypeString, value)
+	if value, ok := pu.mutation.Reference(); ok {
+		_spec.SetField(proficiency.FieldReference, field.TypeString, value)
 	}
-	if pu.mutation.ClassesCleared() {
+	if pu.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.ClassesTable,
-			Columns: proficiency.ClassesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RemovedClassesIDs(); len(nodes) > 0 && !pu.mutation.ClassesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.ClassesTable,
-			Columns: proficiency.ClassesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.ClassesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.ClassesTable,
-			Columns: proficiency.ClassesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if pu.mutation.RacesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.RacesTable,
-			Columns: proficiency.RacesPrimaryKey,
+			Table:   proficiency.RaceTable,
+			Columns: proficiency.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -467,12 +303,12 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedRacesIDs(); len(nodes) > 0 && !pu.mutation.RacesCleared() {
+	if nodes := pu.mutation.RemovedRaceIDs(); len(nodes) > 0 && !pu.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.RacesTable,
-			Columns: proficiency.RacesPrimaryKey,
+			Table:   proficiency.RaceTable,
+			Columns: proficiency.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -483,12 +319,12 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RacesIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.RacesTable,
-			Columns: proficiency.RacesPrimaryKey,
+			Table:   proficiency.RaceTable,
+			Columns: proficiency.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -499,57 +335,12 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.SubracesCleared() {
+	if pu.mutation.OptionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.SubracesTable,
-			Columns: proficiency.SubracesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RemovedSubracesIDs(); len(nodes) > 0 && !pu.mutation.SubracesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.SubracesTable,
-			Columns: proficiency.SubracesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.SubracesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.SubracesTable,
-			Columns: proficiency.SubracesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if pu.mutation.ChoiceCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Table:   proficiency.OptionsTable,
+			Columns: proficiency.OptionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
@@ -557,12 +348,12 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedChoiceIDs(); len(nodes) > 0 && !pu.mutation.ChoiceCleared() {
+	if nodes := pu.mutation.RemovedOptionsIDs(); len(nodes) > 0 && !pu.mutation.OptionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Inverse: true,
+			Table:   proficiency.OptionsTable,
+			Columns: proficiency.OptionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
@@ -573,12 +364,12 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.ChoiceIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.OptionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Inverse: true,
+			Table:   proficiency.OptionsTable,
+			Columns: proficiency.OptionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
@@ -589,28 +380,28 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.SkillCleared() {
+	if pu.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SkillTable,
-			Columns: []string{proficiency.SkillColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.ClassTable,
+			Columns: proficiency.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedSkillIDs(); len(nodes) > 0 && !pu.mutation.SkillCleared() {
+	if nodes := pu.mutation.RemovedClassIDs(); len(nodes) > 0 && !pu.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SkillTable,
-			Columns: []string{proficiency.SkillColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.ClassTable,
+			Columns: proficiency.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -618,60 +409,15 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.SkillIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SkillTable,
-			Columns: []string{proficiency.SkillColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.ClassTable,
+			Columns: proficiency.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if pu.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentTable,
-			Columns: []string{proficiency.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !pu.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentTable,
-			Columns: []string{proficiency.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.EquipmentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentTable,
-			Columns: []string{proficiency.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -679,28 +425,28 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.EquipmentCategoryCleared() {
+	if pu.mutation.CharacterProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentCategoryTable,
-			Columns: []string{proficiency.EquipmentCategoryColumn},
+			Inverse: true,
+			Table:   proficiency.CharacterProficienciesTable,
+			Columns: []string{proficiency.CharacterProficienciesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedEquipmentCategoryIDs(); len(nodes) > 0 && !pu.mutation.EquipmentCategoryCleared() {
+	if nodes := pu.mutation.RemovedCharacterProficienciesIDs(); len(nodes) > 0 && !pu.mutation.CharacterProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentCategoryTable,
-			Columns: []string{proficiency.EquipmentCategoryColumn},
+			Inverse: true,
+			Table:   proficiency.CharacterProficienciesTable,
+			Columns: []string{proficiency.CharacterProficienciesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -708,60 +454,15 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.EquipmentCategoryIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.CharacterProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentCategoryTable,
-			Columns: []string{proficiency.EquipmentCategoryColumn},
+			Inverse: true,
+			Table:   proficiency.CharacterProficienciesTable,
+			Columns: []string{proficiency.CharacterProficienciesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if pu.mutation.SavingThrowCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SavingThrowTable,
-			Columns: []string{proficiency.SavingThrowColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RemovedSavingThrowIDs(); len(nodes) > 0 && !pu.mutation.SavingThrowCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SavingThrowTable,
-			Columns: []string{proficiency.SavingThrowColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.SavingThrowIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SavingThrowTable,
-			Columns: []string{proficiency.SavingThrowColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -795,41 +496,50 @@ func (puo *ProficiencyUpdateOne) SetIndx(s string) *ProficiencyUpdateOne {
 	return puo
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (puo *ProficiencyUpdateOne) SetNillableIndx(s *string) *ProficiencyUpdateOne {
+	if s != nil {
+		puo.SetIndx(*s)
+	}
+	return puo
+}
+
 // SetName sets the "name" field.
 func (puo *ProficiencyUpdateOne) SetName(s string) *ProficiencyUpdateOne {
 	puo.mutation.SetName(s)
 	return puo
 }
 
-// SetProficiencyCategory sets the "proficiency_category" field.
-func (puo *ProficiencyUpdateOne) SetProficiencyCategory(s string) *ProficiencyUpdateOne {
-	puo.mutation.SetProficiencyCategory(s)
-	return puo
-}
-
-// AddClassIDs adds the "classes" edge to the Class entity by IDs.
-func (puo *ProficiencyUpdateOne) AddClassIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.AddClassIDs(ids...)
-	return puo
-}
-
-// AddClasses adds the "classes" edges to the Class entity.
-func (puo *ProficiencyUpdateOne) AddClasses(c ...*Class) *ProficiencyUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// SetNillableName sets the "name" field if the given value is not nil.
+func (puo *ProficiencyUpdateOne) SetNillableName(s *string) *ProficiencyUpdateOne {
+	if s != nil {
+		puo.SetName(*s)
 	}
-	return puo.AddClassIDs(ids...)
+	return puo
 }
 
-// AddRaceIDs adds the "races" edge to the Race entity by IDs.
+// SetReference sets the "reference" field.
+func (puo *ProficiencyUpdateOne) SetReference(s string) *ProficiencyUpdateOne {
+	puo.mutation.SetReference(s)
+	return puo
+}
+
+// SetNillableReference sets the "reference" field if the given value is not nil.
+func (puo *ProficiencyUpdateOne) SetNillableReference(s *string) *ProficiencyUpdateOne {
+	if s != nil {
+		puo.SetReference(*s)
+	}
+	return puo
+}
+
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
 func (puo *ProficiencyUpdateOne) AddRaceIDs(ids ...int) *ProficiencyUpdateOne {
 	puo.mutation.AddRaceIDs(ids...)
 	return puo
 }
 
-// AddRaces adds the "races" edges to the Race entity.
-func (puo *ProficiencyUpdateOne) AddRaces(r ...*Race) *ProficiencyUpdateOne {
+// AddRace adds the "race" edges to the Race entity.
+func (puo *ProficiencyUpdateOne) AddRace(r ...*Race) *ProficiencyUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -837,94 +547,49 @@ func (puo *ProficiencyUpdateOne) AddRaces(r ...*Race) *ProficiencyUpdateOne {
 	return puo.AddRaceIDs(ids...)
 }
 
-// AddSubraceIDs adds the "subraces" edge to the Subrace entity by IDs.
-func (puo *ProficiencyUpdateOne) AddSubraceIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.AddSubraceIDs(ids...)
+// AddOptionIDs adds the "options" edge to the ProficiencyChoice entity by IDs.
+func (puo *ProficiencyUpdateOne) AddOptionIDs(ids ...int) *ProficiencyUpdateOne {
+	puo.mutation.AddOptionIDs(ids...)
 	return puo
 }
 
-// AddSubraces adds the "subraces" edges to the Subrace entity.
-func (puo *ProficiencyUpdateOne) AddSubraces(s ...*Subrace) *ProficiencyUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return puo.AddSubraceIDs(ids...)
-}
-
-// AddChoiceIDs adds the "choice" edge to the ProficiencyChoice entity by IDs.
-func (puo *ProficiencyUpdateOne) AddChoiceIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.AddChoiceIDs(ids...)
-	return puo
-}
-
-// AddChoice adds the "choice" edges to the ProficiencyChoice entity.
-func (puo *ProficiencyUpdateOne) AddChoice(p ...*ProficiencyChoice) *ProficiencyUpdateOne {
+// AddOptions adds the "options" edges to the ProficiencyChoice entity.
+func (puo *ProficiencyUpdateOne) AddOptions(p ...*ProficiencyChoice) *ProficiencyUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return puo.AddChoiceIDs(ids...)
+	return puo.AddOptionIDs(ids...)
 }
 
-// AddSkillIDs adds the "skill" edge to the Skill entity by IDs.
-func (puo *ProficiencyUpdateOne) AddSkillIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.AddSkillIDs(ids...)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (puo *ProficiencyUpdateOne) AddClasIDs(ids ...int) *ProficiencyUpdateOne {
+	puo.mutation.AddClasIDs(ids...)
 	return puo
 }
 
-// AddSkill adds the "skill" edges to the Skill entity.
-func (puo *ProficiencyUpdateOne) AddSkill(s ...*Skill) *ProficiencyUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// AddClass adds the "class" edges to the Class entity.
+func (puo *ProficiencyUpdateOne) AddClass(c ...*Class) *ProficiencyUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return puo.AddSkillIDs(ids...)
+	return puo.AddClasIDs(ids...)
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (puo *ProficiencyUpdateOne) AddEquipmentIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.AddEquipmentIDs(ids...)
+// AddCharacterProficiencyIDs adds the "character_proficiencies" edge to the CharacterProficiency entity by IDs.
+func (puo *ProficiencyUpdateOne) AddCharacterProficiencyIDs(ids ...int) *ProficiencyUpdateOne {
+	puo.mutation.AddCharacterProficiencyIDs(ids...)
 	return puo
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (puo *ProficiencyUpdateOne) AddEquipment(e ...*Equipment) *ProficiencyUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// AddCharacterProficiencies adds the "character_proficiencies" edges to the CharacterProficiency entity.
+func (puo *ProficiencyUpdateOne) AddCharacterProficiencies(c ...*CharacterProficiency) *ProficiencyUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return puo.AddEquipmentIDs(ids...)
-}
-
-// AddEquipmentCategoryIDs adds the "equipment_category" edge to the EquipmentCategory entity by IDs.
-func (puo *ProficiencyUpdateOne) AddEquipmentCategoryIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.AddEquipmentCategoryIDs(ids...)
-	return puo
-}
-
-// AddEquipmentCategory adds the "equipment_category" edges to the EquipmentCategory entity.
-func (puo *ProficiencyUpdateOne) AddEquipmentCategory(e ...*EquipmentCategory) *ProficiencyUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return puo.AddEquipmentCategoryIDs(ids...)
-}
-
-// AddSavingThrowIDs adds the "saving_throw" edge to the AbilityScore entity by IDs.
-func (puo *ProficiencyUpdateOne) AddSavingThrowIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.AddSavingThrowIDs(ids...)
-	return puo
-}
-
-// AddSavingThrow adds the "saving_throw" edges to the AbilityScore entity.
-func (puo *ProficiencyUpdateOne) AddSavingThrow(a ...*AbilityScore) *ProficiencyUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return puo.AddSavingThrowIDs(ids...)
+	return puo.AddCharacterProficiencyIDs(ids...)
 }
 
 // Mutation returns the ProficiencyMutation object of the builder.
@@ -932,41 +597,20 @@ func (puo *ProficiencyUpdateOne) Mutation() *ProficiencyMutation {
 	return puo.mutation
 }
 
-// ClearClasses clears all "classes" edges to the Class entity.
-func (puo *ProficiencyUpdateOne) ClearClasses() *ProficiencyUpdateOne {
-	puo.mutation.ClearClasses()
+// ClearRace clears all "race" edges to the Race entity.
+func (puo *ProficiencyUpdateOne) ClearRace() *ProficiencyUpdateOne {
+	puo.mutation.ClearRace()
 	return puo
 }
 
-// RemoveClassIDs removes the "classes" edge to Class entities by IDs.
-func (puo *ProficiencyUpdateOne) RemoveClassIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.RemoveClassIDs(ids...)
-	return puo
-}
-
-// RemoveClasses removes "classes" edges to Class entities.
-func (puo *ProficiencyUpdateOne) RemoveClasses(c ...*Class) *ProficiencyUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return puo.RemoveClassIDs(ids...)
-}
-
-// ClearRaces clears all "races" edges to the Race entity.
-func (puo *ProficiencyUpdateOne) ClearRaces() *ProficiencyUpdateOne {
-	puo.mutation.ClearRaces()
-	return puo
-}
-
-// RemoveRaceIDs removes the "races" edge to Race entities by IDs.
+// RemoveRaceIDs removes the "race" edge to Race entities by IDs.
 func (puo *ProficiencyUpdateOne) RemoveRaceIDs(ids ...int) *ProficiencyUpdateOne {
 	puo.mutation.RemoveRaceIDs(ids...)
 	return puo
 }
 
-// RemoveRaces removes "races" edges to Race entities.
-func (puo *ProficiencyUpdateOne) RemoveRaces(r ...*Race) *ProficiencyUpdateOne {
+// RemoveRace removes "race" edges to Race entities.
+func (puo *ProficiencyUpdateOne) RemoveRace(r ...*Race) *ProficiencyUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -974,130 +618,67 @@ func (puo *ProficiencyUpdateOne) RemoveRaces(r ...*Race) *ProficiencyUpdateOne {
 	return puo.RemoveRaceIDs(ids...)
 }
 
-// ClearSubraces clears all "subraces" edges to the Subrace entity.
-func (puo *ProficiencyUpdateOne) ClearSubraces() *ProficiencyUpdateOne {
-	puo.mutation.ClearSubraces()
+// ClearOptions clears all "options" edges to the ProficiencyChoice entity.
+func (puo *ProficiencyUpdateOne) ClearOptions() *ProficiencyUpdateOne {
+	puo.mutation.ClearOptions()
 	return puo
 }
 
-// RemoveSubraceIDs removes the "subraces" edge to Subrace entities by IDs.
-func (puo *ProficiencyUpdateOne) RemoveSubraceIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.RemoveSubraceIDs(ids...)
+// RemoveOptionIDs removes the "options" edge to ProficiencyChoice entities by IDs.
+func (puo *ProficiencyUpdateOne) RemoveOptionIDs(ids ...int) *ProficiencyUpdateOne {
+	puo.mutation.RemoveOptionIDs(ids...)
 	return puo
 }
 
-// RemoveSubraces removes "subraces" edges to Subrace entities.
-func (puo *ProficiencyUpdateOne) RemoveSubraces(s ...*Subrace) *ProficiencyUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return puo.RemoveSubraceIDs(ids...)
-}
-
-// ClearChoice clears all "choice" edges to the ProficiencyChoice entity.
-func (puo *ProficiencyUpdateOne) ClearChoice() *ProficiencyUpdateOne {
-	puo.mutation.ClearChoice()
-	return puo
-}
-
-// RemoveChoiceIDs removes the "choice" edge to ProficiencyChoice entities by IDs.
-func (puo *ProficiencyUpdateOne) RemoveChoiceIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.RemoveChoiceIDs(ids...)
-	return puo
-}
-
-// RemoveChoice removes "choice" edges to ProficiencyChoice entities.
-func (puo *ProficiencyUpdateOne) RemoveChoice(p ...*ProficiencyChoice) *ProficiencyUpdateOne {
+// RemoveOptions removes "options" edges to ProficiencyChoice entities.
+func (puo *ProficiencyUpdateOne) RemoveOptions(p ...*ProficiencyChoice) *ProficiencyUpdateOne {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return puo.RemoveChoiceIDs(ids...)
+	return puo.RemoveOptionIDs(ids...)
 }
 
-// ClearSkill clears all "skill" edges to the Skill entity.
-func (puo *ProficiencyUpdateOne) ClearSkill() *ProficiencyUpdateOne {
-	puo.mutation.ClearSkill()
+// ClearClass clears all "class" edges to the Class entity.
+func (puo *ProficiencyUpdateOne) ClearClass() *ProficiencyUpdateOne {
+	puo.mutation.ClearClass()
 	return puo
 }
 
-// RemoveSkillIDs removes the "skill" edge to Skill entities by IDs.
-func (puo *ProficiencyUpdateOne) RemoveSkillIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.RemoveSkillIDs(ids...)
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (puo *ProficiencyUpdateOne) RemoveClasIDs(ids ...int) *ProficiencyUpdateOne {
+	puo.mutation.RemoveClasIDs(ids...)
 	return puo
 }
 
-// RemoveSkill removes "skill" edges to Skill entities.
-func (puo *ProficiencyUpdateOne) RemoveSkill(s ...*Skill) *ProficiencyUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// RemoveClass removes "class" edges to Class entities.
+func (puo *ProficiencyUpdateOne) RemoveClass(c ...*Class) *ProficiencyUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return puo.RemoveSkillIDs(ids...)
+	return puo.RemoveClasIDs(ids...)
 }
 
-// ClearEquipment clears all "equipment" edges to the Equipment entity.
-func (puo *ProficiencyUpdateOne) ClearEquipment() *ProficiencyUpdateOne {
-	puo.mutation.ClearEquipment()
+// ClearCharacterProficiencies clears all "character_proficiencies" edges to the CharacterProficiency entity.
+func (puo *ProficiencyUpdateOne) ClearCharacterProficiencies() *ProficiencyUpdateOne {
+	puo.mutation.ClearCharacterProficiencies()
 	return puo
 }
 
-// RemoveEquipmentIDs removes the "equipment" edge to Equipment entities by IDs.
-func (puo *ProficiencyUpdateOne) RemoveEquipmentIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.RemoveEquipmentIDs(ids...)
+// RemoveCharacterProficiencyIDs removes the "character_proficiencies" edge to CharacterProficiency entities by IDs.
+func (puo *ProficiencyUpdateOne) RemoveCharacterProficiencyIDs(ids ...int) *ProficiencyUpdateOne {
+	puo.mutation.RemoveCharacterProficiencyIDs(ids...)
 	return puo
 }
 
-// RemoveEquipment removes "equipment" edges to Equipment entities.
-func (puo *ProficiencyUpdateOne) RemoveEquipment(e ...*Equipment) *ProficiencyUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// RemoveCharacterProficiencies removes "character_proficiencies" edges to CharacterProficiency entities.
+func (puo *ProficiencyUpdateOne) RemoveCharacterProficiencies(c ...*CharacterProficiency) *ProficiencyUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return puo.RemoveEquipmentIDs(ids...)
-}
-
-// ClearEquipmentCategory clears all "equipment_category" edges to the EquipmentCategory entity.
-func (puo *ProficiencyUpdateOne) ClearEquipmentCategory() *ProficiencyUpdateOne {
-	puo.mutation.ClearEquipmentCategory()
-	return puo
-}
-
-// RemoveEquipmentCategoryIDs removes the "equipment_category" edge to EquipmentCategory entities by IDs.
-func (puo *ProficiencyUpdateOne) RemoveEquipmentCategoryIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.RemoveEquipmentCategoryIDs(ids...)
-	return puo
-}
-
-// RemoveEquipmentCategory removes "equipment_category" edges to EquipmentCategory entities.
-func (puo *ProficiencyUpdateOne) RemoveEquipmentCategory(e ...*EquipmentCategory) *ProficiencyUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return puo.RemoveEquipmentCategoryIDs(ids...)
-}
-
-// ClearSavingThrow clears all "saving_throw" edges to the AbilityScore entity.
-func (puo *ProficiencyUpdateOne) ClearSavingThrow() *ProficiencyUpdateOne {
-	puo.mutation.ClearSavingThrow()
-	return puo
-}
-
-// RemoveSavingThrowIDs removes the "saving_throw" edge to AbilityScore entities by IDs.
-func (puo *ProficiencyUpdateOne) RemoveSavingThrowIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.RemoveSavingThrowIDs(ids...)
-	return puo
-}
-
-// RemoveSavingThrow removes "saving_throw" edges to AbilityScore entities.
-func (puo *ProficiencyUpdateOne) RemoveSavingThrow(a ...*AbilityScore) *ProficiencyUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return puo.RemoveSavingThrowIDs(ids...)
+	return puo.RemoveCharacterProficiencyIDs(ids...)
 }
 
 // Where appends a list predicates to the ProficiencyUpdate builder.
@@ -1152,6 +733,11 @@ func (puo *ProficiencyUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Proficiency.name": %w`, err)}
 		}
 	}
+	if v, ok := puo.mutation.Reference(); ok {
+		if err := proficiency.ReferenceValidator(v); err != nil {
+			return &ValidationError{Name: "reference", err: fmt.Errorf(`ent: validator failed for field "Proficiency.reference": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -1190,60 +776,15 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 	if value, ok := puo.mutation.Name(); ok {
 		_spec.SetField(proficiency.FieldName, field.TypeString, value)
 	}
-	if value, ok := puo.mutation.ProficiencyCategory(); ok {
-		_spec.SetField(proficiency.FieldProficiencyCategory, field.TypeString, value)
+	if value, ok := puo.mutation.Reference(); ok {
+		_spec.SetField(proficiency.FieldReference, field.TypeString, value)
 	}
-	if puo.mutation.ClassesCleared() {
+	if puo.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.ClassesTable,
-			Columns: proficiency.ClassesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RemovedClassesIDs(); len(nodes) > 0 && !puo.mutation.ClassesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.ClassesTable,
-			Columns: proficiency.ClassesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.ClassesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.ClassesTable,
-			Columns: proficiency.ClassesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if puo.mutation.RacesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.RacesTable,
-			Columns: proficiency.RacesPrimaryKey,
+			Table:   proficiency.RaceTable,
+			Columns: proficiency.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -1251,12 +792,12 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedRacesIDs(); len(nodes) > 0 && !puo.mutation.RacesCleared() {
+	if nodes := puo.mutation.RemovedRaceIDs(); len(nodes) > 0 && !puo.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.RacesTable,
-			Columns: proficiency.RacesPrimaryKey,
+			Table:   proficiency.RaceTable,
+			Columns: proficiency.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -1267,12 +808,12 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RacesIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.RacesTable,
-			Columns: proficiency.RacesPrimaryKey,
+			Table:   proficiency.RaceTable,
+			Columns: proficiency.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -1283,57 +824,12 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.SubracesCleared() {
+	if puo.mutation.OptionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.SubracesTable,
-			Columns: proficiency.SubracesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RemovedSubracesIDs(); len(nodes) > 0 && !puo.mutation.SubracesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.SubracesTable,
-			Columns: proficiency.SubracesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.SubracesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.SubracesTable,
-			Columns: proficiency.SubracesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if puo.mutation.ChoiceCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Table:   proficiency.OptionsTable,
+			Columns: proficiency.OptionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
@@ -1341,12 +837,12 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedChoiceIDs(); len(nodes) > 0 && !puo.mutation.ChoiceCleared() {
+	if nodes := puo.mutation.RemovedOptionsIDs(); len(nodes) > 0 && !puo.mutation.OptionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Inverse: true,
+			Table:   proficiency.OptionsTable,
+			Columns: proficiency.OptionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
@@ -1357,12 +853,12 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.ChoiceIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.OptionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Inverse: true,
+			Table:   proficiency.OptionsTable,
+			Columns: proficiency.OptionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
@@ -1373,28 +869,28 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.SkillCleared() {
+	if puo.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SkillTable,
-			Columns: []string{proficiency.SkillColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.ClassTable,
+			Columns: proficiency.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedSkillIDs(); len(nodes) > 0 && !puo.mutation.SkillCleared() {
+	if nodes := puo.mutation.RemovedClassIDs(); len(nodes) > 0 && !puo.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SkillTable,
-			Columns: []string{proficiency.SkillColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.ClassTable,
+			Columns: proficiency.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1402,60 +898,15 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.SkillIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SkillTable,
-			Columns: []string{proficiency.SkillColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.ClassTable,
+			Columns: proficiency.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if puo.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentTable,
-			Columns: []string{proficiency.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !puo.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentTable,
-			Columns: []string{proficiency.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.EquipmentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentTable,
-			Columns: []string{proficiency.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1463,28 +914,28 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.EquipmentCategoryCleared() {
+	if puo.mutation.CharacterProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentCategoryTable,
-			Columns: []string{proficiency.EquipmentCategoryColumn},
+			Inverse: true,
+			Table:   proficiency.CharacterProficienciesTable,
+			Columns: []string{proficiency.CharacterProficienciesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedEquipmentCategoryIDs(); len(nodes) > 0 && !puo.mutation.EquipmentCategoryCleared() {
+	if nodes := puo.mutation.RemovedCharacterProficienciesIDs(); len(nodes) > 0 && !puo.mutation.CharacterProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentCategoryTable,
-			Columns: []string{proficiency.EquipmentCategoryColumn},
+			Inverse: true,
+			Table:   proficiency.CharacterProficienciesTable,
+			Columns: []string{proficiency.CharacterProficienciesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1492,60 +943,15 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.EquipmentCategoryIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.CharacterProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentCategoryTable,
-			Columns: []string{proficiency.EquipmentCategoryColumn},
+			Inverse: true,
+			Table:   proficiency.CharacterProficienciesTable,
+			Columns: []string{proficiency.CharacterProficienciesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if puo.mutation.SavingThrowCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SavingThrowTable,
-			Columns: []string{proficiency.SavingThrowColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RemovedSavingThrowIDs(); len(nodes) > 0 && !puo.mutation.SavingThrowCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SavingThrowTable,
-			Columns: []string{proficiency.SavingThrowColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.SavingThrowIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SavingThrowTable,
-			Columns: []string{proficiency.SavingThrowColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

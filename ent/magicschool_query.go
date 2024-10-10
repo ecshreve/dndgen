@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -62,7 +63,7 @@ func (msq *MagicSchoolQuery) Order(o ...magicschool.OrderOption) *MagicSchoolQue
 // First returns the first MagicSchool entity from the query.
 // Returns a *NotFoundError when no MagicSchool was found.
 func (msq *MagicSchoolQuery) First(ctx context.Context) (*MagicSchool, error) {
-	nodes, err := msq.Limit(1).All(setContextOp(ctx, msq.ctx, "First"))
+	nodes, err := msq.Limit(1).All(setContextOp(ctx, msq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +86,7 @@ func (msq *MagicSchoolQuery) FirstX(ctx context.Context) *MagicSchool {
 // Returns a *NotFoundError when no MagicSchool ID was found.
 func (msq *MagicSchoolQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = msq.Limit(1).IDs(setContextOp(ctx, msq.ctx, "FirstID")); err != nil {
+	if ids, err = msq.Limit(1).IDs(setContextOp(ctx, msq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -108,7 +109,7 @@ func (msq *MagicSchoolQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one MagicSchool entity is found.
 // Returns a *NotFoundError when no MagicSchool entities are found.
 func (msq *MagicSchoolQuery) Only(ctx context.Context) (*MagicSchool, error) {
-	nodes, err := msq.Limit(2).All(setContextOp(ctx, msq.ctx, "Only"))
+	nodes, err := msq.Limit(2).All(setContextOp(ctx, msq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +137,7 @@ func (msq *MagicSchoolQuery) OnlyX(ctx context.Context) *MagicSchool {
 // Returns a *NotFoundError when no entities are found.
 func (msq *MagicSchoolQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = msq.Limit(2).IDs(setContextOp(ctx, msq.ctx, "OnlyID")); err != nil {
+	if ids, err = msq.Limit(2).IDs(setContextOp(ctx, msq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -161,7 +162,7 @@ func (msq *MagicSchoolQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of MagicSchools.
 func (msq *MagicSchoolQuery) All(ctx context.Context) ([]*MagicSchool, error) {
-	ctx = setContextOp(ctx, msq.ctx, "All")
+	ctx = setContextOp(ctx, msq.ctx, ent.OpQueryAll)
 	if err := msq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -183,7 +184,7 @@ func (msq *MagicSchoolQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if msq.ctx.Unique == nil && msq.path != nil {
 		msq.Unique(true)
 	}
-	ctx = setContextOp(ctx, msq.ctx, "IDs")
+	ctx = setContextOp(ctx, msq.ctx, ent.OpQueryIDs)
 	if err = msq.Select(magicschool.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -201,7 +202,7 @@ func (msq *MagicSchoolQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (msq *MagicSchoolQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, msq.ctx, "Count")
+	ctx = setContextOp(ctx, msq.ctx, ent.OpQueryCount)
 	if err := msq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -219,7 +220,7 @@ func (msq *MagicSchoolQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (msq *MagicSchoolQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, msq.ctx, "Exist")
+	ctx = setContextOp(ctx, msq.ctx, ent.OpQueryExist)
 	switch _, err := msq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -462,7 +463,7 @@ func (msgb *MagicSchoolGroupBy) Aggregate(fns ...AggregateFunc) *MagicSchoolGrou
 
 // Scan applies the selector query and scans the result into the given value.
 func (msgb *MagicSchoolGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, msgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, msgb.build.ctx, ent.OpQueryGroupBy)
 	if err := msgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -510,7 +511,7 @@ func (mss *MagicSchoolSelect) Aggregate(fns ...AggregateFunc) *MagicSchoolSelect
 
 // Scan applies the selector query and scans the result into the given value.
 func (mss *MagicSchoolSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mss.ctx, "Select")
+	ctx = setContextOp(ctx, mss.ctx, ent.OpQuerySelect)
 	if err := mss.prepareQuery(ctx); err != nil {
 		return err
 	}

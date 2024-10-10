@@ -18,18 +18,15 @@ type Tool struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Indx holds the value of the "indx" field.
-	Indx string `json:"index"`
-	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
 	// ToolCategory holds the value of the "tool_category" field.
 	ToolCategory string `json:"tool_category,omitempty"`
-	// EquipmentID holds the value of the "equipment_id" field.
-	EquipmentID int `json:"equipment_id,omitempty"`
+	// Desc holds the value of the "desc" field.
+	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ToolQuery when eager-loading is set.
-	Edges        ToolEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges          ToolEdges `json:"-"`
+	equipment_tool *int
+	selectValues   sql.SelectValues
 }
 
 // ToolEdges holds the relations/edges for other nodes in the graph.
@@ -46,12 +43,10 @@ type ToolEdges struct {
 // EquipmentOrErr returns the Equipment value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ToolEdges) EquipmentOrErr() (*Equipment, error) {
-	if e.loadedTypes[0] {
-		if e.Equipment == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: equipment.Label}
-		}
+	if e.Equipment != nil {
 		return e.Equipment, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: equipment.Label}
 	}
 	return nil, &NotLoadedError{edge: "equipment"}
 }
@@ -61,10 +56,14 @@ func (*Tool) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case tool.FieldID, tool.FieldEquipmentID:
+		case tool.FieldDesc:
+			values[i] = new([]byte)
+		case tool.FieldID:
 			values[i] = new(sql.NullInt64)
-		case tool.FieldIndx, tool.FieldName, tool.FieldToolCategory:
+		case tool.FieldToolCategory:
 			values[i] = new(sql.NullString)
+		case tool.ForeignKeys[0]: // equipment_tool
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -86,29 +85,26 @@ func (t *Tool) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			t.ID = int(value.Int64)
-		case tool.FieldIndx:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field indx", values[i])
-			} else if value.Valid {
-				t.Indx = value.String
-			}
-		case tool.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field name", values[i])
-			} else if value.Valid {
-				t.Name = value.String
-			}
 		case tool.FieldToolCategory:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field tool_category", values[i])
 			} else if value.Valid {
 				t.ToolCategory = value.String
 			}
-		case tool.FieldEquipmentID:
+		case tool.FieldDesc:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field desc", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &t.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
+			}
+		case tool.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field equipment_id", values[i])
+				return fmt.Errorf("unexpected type %T for edge-field equipment_tool", value)
 			} else if value.Valid {
-				t.EquipmentID = int(value.Int64)
+				t.equipment_tool = new(int)
+				*t.equipment_tool = int(value.Int64)
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])
@@ -151,17 +147,11 @@ func (t *Tool) String() string {
 	var builder strings.Builder
 	builder.WriteString("Tool(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", t.ID))
-	builder.WriteString("indx=")
-	builder.WriteString(t.Indx)
-	builder.WriteString(", ")
-	builder.WriteString("name=")
-	builder.WriteString(t.Name)
-	builder.WriteString(", ")
 	builder.WriteString("tool_category=")
 	builder.WriteString(t.ToolCategory)
 	builder.WriteString(", ")
-	builder.WriteString("equipment_id=")
-	builder.WriteString(fmt.Sprintf("%v", t.EquipmentID))
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", t.Desc))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -197,10 +187,8 @@ func (t *Tool) UnmarshalJSON(data []byte) error {
 }
 
 func (tc *ToolCreate) SetTool(input *Tool) *ToolCreate {
-	tc.SetIndx(input.Indx)
-	tc.SetName(input.Name)
 	tc.SetToolCategory(input.ToolCategory)
-	tc.SetEquipmentID(input.EquipmentID)
+	tc.SetDesc(input.Desc)
 	return tc
 }
 

@@ -33,24 +33,28 @@ func (rsc *RuleSectionCreate) SetName(s string) *RuleSectionCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (rsc *RuleSectionCreate) SetDesc(s string) *RuleSectionCreate {
+func (rsc *RuleSectionCreate) SetDesc(s []string) *RuleSectionCreate {
 	rsc.mutation.SetDesc(s)
 	return rsc
 }
 
-// AddRuleIDs adds the "rules" edge to the Rule entity by IDs.
-func (rsc *RuleSectionCreate) AddRuleIDs(ids ...int) *RuleSectionCreate {
-	rsc.mutation.AddRuleIDs(ids...)
+// SetRuleID sets the "rule" edge to the Rule entity by ID.
+func (rsc *RuleSectionCreate) SetRuleID(id int) *RuleSectionCreate {
+	rsc.mutation.SetRuleID(id)
 	return rsc
 }
 
-// AddRules adds the "rules" edges to the Rule entity.
-func (rsc *RuleSectionCreate) AddRules(r ...*Rule) *RuleSectionCreate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+// SetNillableRuleID sets the "rule" edge to the Rule entity by ID if the given value is not nil.
+func (rsc *RuleSectionCreate) SetNillableRuleID(id *int) *RuleSectionCreate {
+	if id != nil {
+		rsc = rsc.SetRuleID(*id)
 	}
-	return rsc.AddRuleIDs(ids...)
+	return rsc
+}
+
+// SetRule sets the "rule" edge to the Rule entity.
+func (rsc *RuleSectionCreate) SetRule(r *Rule) *RuleSectionCreate {
+	return rsc.SetRuleID(r.ID)
 }
 
 // Mutation returns the RuleSectionMutation object of the builder.
@@ -103,9 +107,6 @@ func (rsc *RuleSectionCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "RuleSection.name": %w`, err)}
 		}
 	}
-	if _, ok := rsc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "RuleSection.desc"`)}
-	}
 	return nil
 }
 
@@ -141,15 +142,15 @@ func (rsc *RuleSectionCreate) createSpec() (*RuleSection, *sqlgraph.CreateSpec) 
 		_node.Name = value
 	}
 	if value, ok := rsc.mutation.Desc(); ok {
-		_spec.SetField(rulesection.FieldDesc, field.TypeString, value)
+		_spec.SetField(rulesection.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
 	}
-	if nodes := rsc.mutation.RulesIDs(); len(nodes) > 0 {
+	if nodes := rsc.mutation.RuleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   rulesection.RulesTable,
-			Columns: rulesection.RulesPrimaryKey,
+			Table:   rulesection.RuleTable,
+			Columns: []string{rulesection.RuleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(rule.FieldID, field.TypeInt),
@@ -158,6 +159,7 @@ func (rsc *RuleSectionCreate) createSpec() (*RuleSection, *sqlgraph.CreateSpec) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.rule_id = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -166,11 +168,15 @@ func (rsc *RuleSectionCreate) createSpec() (*RuleSection, *sqlgraph.CreateSpec) 
 // RuleSectionCreateBulk is the builder for creating many RuleSection entities in bulk.
 type RuleSectionCreateBulk struct {
 	config
+	err      error
 	builders []*RuleSectionCreate
 }
 
 // Save creates the RuleSection entities in the database.
 func (rscb *RuleSectionCreateBulk) Save(ctx context.Context) ([]*RuleSection, error) {
+	if rscb.err != nil {
+		return nil, rscb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(rscb.builders))
 	nodes := make([]*RuleSection, len(rscb.builders))
 	mutators := make([]Mutator, len(rscb.builders))

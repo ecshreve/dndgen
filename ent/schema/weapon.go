@@ -1,80 +1,54 @@
 package schema
 
 import (
-	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
-	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
-type WeaponProperty struct {
-	ent.Schema
-}
-
-func (WeaponProperty) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		CommonMixin{},
-	}
-}
-
-func (WeaponProperty) Fields() []ent.Field {
-	return []ent.Field{
-		field.Strings("desc"),
-	}
-}
-
-func (WeaponProperty) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("weapons", Weapon.Type).
-			Ref("weapon_properties"),
-	}
-}
-
-func (WeaponProperty) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
-	}
-}
-
-//==========================================================
-// Weapon
-//==========================================================
-
+// Weapon holds the schema definition for the Weapon entity.
 type Weapon struct {
 	ent.Schema
 }
 
-// Mixin of the Weapon.
-func (Weapon) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		CommonMixin{},
-	}
-}
-
+// Fields of the Weapon.
 func (Weapon) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("equipment_id").Annotations(
-			entgql.Skip(),
-		),
-		field.String("weapon_category"),
-		field.String("weapon_range"),
+		field.Enum("weapon_category").
+			Values(
+				"simple",
+				"martial",
+				"exotic",
+				"other",
+			),
+		field.Enum("weapon_subcategory").
+			Values(
+				"melee",
+				"ranged",
+				"other",
+			),
+		field.Int("range_normal").
+			Optional(),
+		field.Int("range_long").
+			Optional(),
+		field.Int("throw_range_normal").
+			Optional(),
+		field.Int("throw_range_long").
+			Optional(),
+		field.String("damage_dice").
+			Optional(),
 	}
 }
 
+// Edges of the Weapon.
 func (Weapon) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.To("properties", Property.Type),
+		edge.To("damage_type", DamageType.Type).
+			Unique(),
 		edge.From("equipment", Equipment.Type).
 			Ref("weapon").
-			Unique().Required().
-			Field("equipment_id"),
-		edge.To("weapon_damage", WeaponDamage.Type),
-		edge.To("weapon_properties", WeaponProperty.Type),
-	}
-}
-
-func (Weapon) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
+			Unique().
+			Required(),
 	}
 }

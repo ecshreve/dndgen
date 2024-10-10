@@ -9,15 +9,11 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // ProficiencyCreate is the builder for creating a Proficiency entity.
@@ -39,35 +35,20 @@ func (pc *ProficiencyCreate) SetName(s string) *ProficiencyCreate {
 	return pc
 }
 
-// SetProficiencyCategory sets the "proficiency_category" field.
-func (pc *ProficiencyCreate) SetProficiencyCategory(s string) *ProficiencyCreate {
-	pc.mutation.SetProficiencyCategory(s)
+// SetReference sets the "reference" field.
+func (pc *ProficiencyCreate) SetReference(s string) *ProficiencyCreate {
+	pc.mutation.SetReference(s)
 	return pc
 }
 
-// AddClassIDs adds the "classes" edge to the Class entity by IDs.
-func (pc *ProficiencyCreate) AddClassIDs(ids ...int) *ProficiencyCreate {
-	pc.mutation.AddClassIDs(ids...)
-	return pc
-}
-
-// AddClasses adds the "classes" edges to the Class entity.
-func (pc *ProficiencyCreate) AddClasses(c ...*Class) *ProficiencyCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return pc.AddClassIDs(ids...)
-}
-
-// AddRaceIDs adds the "races" edge to the Race entity by IDs.
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
 func (pc *ProficiencyCreate) AddRaceIDs(ids ...int) *ProficiencyCreate {
 	pc.mutation.AddRaceIDs(ids...)
 	return pc
 }
 
-// AddRaces adds the "races" edges to the Race entity.
-func (pc *ProficiencyCreate) AddRaces(r ...*Race) *ProficiencyCreate {
+// AddRace adds the "race" edges to the Race entity.
+func (pc *ProficiencyCreate) AddRace(r ...*Race) *ProficiencyCreate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -75,94 +56,49 @@ func (pc *ProficiencyCreate) AddRaces(r ...*Race) *ProficiencyCreate {
 	return pc.AddRaceIDs(ids...)
 }
 
-// AddSubraceIDs adds the "subraces" edge to the Subrace entity by IDs.
-func (pc *ProficiencyCreate) AddSubraceIDs(ids ...int) *ProficiencyCreate {
-	pc.mutation.AddSubraceIDs(ids...)
+// AddOptionIDs adds the "options" edge to the ProficiencyChoice entity by IDs.
+func (pc *ProficiencyCreate) AddOptionIDs(ids ...int) *ProficiencyCreate {
+	pc.mutation.AddOptionIDs(ids...)
 	return pc
 }
 
-// AddSubraces adds the "subraces" edges to the Subrace entity.
-func (pc *ProficiencyCreate) AddSubraces(s ...*Subrace) *ProficiencyCreate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return pc.AddSubraceIDs(ids...)
-}
-
-// AddChoiceIDs adds the "choice" edge to the ProficiencyChoice entity by IDs.
-func (pc *ProficiencyCreate) AddChoiceIDs(ids ...int) *ProficiencyCreate {
-	pc.mutation.AddChoiceIDs(ids...)
-	return pc
-}
-
-// AddChoice adds the "choice" edges to the ProficiencyChoice entity.
-func (pc *ProficiencyCreate) AddChoice(p ...*ProficiencyChoice) *ProficiencyCreate {
+// AddOptions adds the "options" edges to the ProficiencyChoice entity.
+func (pc *ProficiencyCreate) AddOptions(p ...*ProficiencyChoice) *ProficiencyCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return pc.AddChoiceIDs(ids...)
+	return pc.AddOptionIDs(ids...)
 }
 
-// AddSkillIDs adds the "skill" edge to the Skill entity by IDs.
-func (pc *ProficiencyCreate) AddSkillIDs(ids ...int) *ProficiencyCreate {
-	pc.mutation.AddSkillIDs(ids...)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (pc *ProficiencyCreate) AddClasIDs(ids ...int) *ProficiencyCreate {
+	pc.mutation.AddClasIDs(ids...)
 	return pc
 }
 
-// AddSkill adds the "skill" edges to the Skill entity.
-func (pc *ProficiencyCreate) AddSkill(s ...*Skill) *ProficiencyCreate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// AddClass adds the "class" edges to the Class entity.
+func (pc *ProficiencyCreate) AddClass(c ...*Class) *ProficiencyCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return pc.AddSkillIDs(ids...)
+	return pc.AddClasIDs(ids...)
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (pc *ProficiencyCreate) AddEquipmentIDs(ids ...int) *ProficiencyCreate {
-	pc.mutation.AddEquipmentIDs(ids...)
+// AddCharacterProficiencyIDs adds the "character_proficiencies" edge to the CharacterProficiency entity by IDs.
+func (pc *ProficiencyCreate) AddCharacterProficiencyIDs(ids ...int) *ProficiencyCreate {
+	pc.mutation.AddCharacterProficiencyIDs(ids...)
 	return pc
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (pc *ProficiencyCreate) AddEquipment(e ...*Equipment) *ProficiencyCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// AddCharacterProficiencies adds the "character_proficiencies" edges to the CharacterProficiency entity.
+func (pc *ProficiencyCreate) AddCharacterProficiencies(c ...*CharacterProficiency) *ProficiencyCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return pc.AddEquipmentIDs(ids...)
-}
-
-// AddEquipmentCategoryIDs adds the "equipment_category" edge to the EquipmentCategory entity by IDs.
-func (pc *ProficiencyCreate) AddEquipmentCategoryIDs(ids ...int) *ProficiencyCreate {
-	pc.mutation.AddEquipmentCategoryIDs(ids...)
-	return pc
-}
-
-// AddEquipmentCategory adds the "equipment_category" edges to the EquipmentCategory entity.
-func (pc *ProficiencyCreate) AddEquipmentCategory(e ...*EquipmentCategory) *ProficiencyCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return pc.AddEquipmentCategoryIDs(ids...)
-}
-
-// AddSavingThrowIDs adds the "saving_throw" edge to the AbilityScore entity by IDs.
-func (pc *ProficiencyCreate) AddSavingThrowIDs(ids ...int) *ProficiencyCreate {
-	pc.mutation.AddSavingThrowIDs(ids...)
-	return pc
-}
-
-// AddSavingThrow adds the "saving_throw" edges to the AbilityScore entity.
-func (pc *ProficiencyCreate) AddSavingThrow(a ...*AbilityScore) *ProficiencyCreate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return pc.AddSavingThrowIDs(ids...)
+	return pc.AddCharacterProficiencyIDs(ids...)
 }
 
 // Mutation returns the ProficiencyMutation object of the builder.
@@ -215,8 +151,13 @@ func (pc *ProficiencyCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Proficiency.name": %w`, err)}
 		}
 	}
-	if _, ok := pc.mutation.ProficiencyCategory(); !ok {
-		return &ValidationError{Name: "proficiency_category", err: errors.New(`ent: missing required field "Proficiency.proficiency_category"`)}
+	if _, ok := pc.mutation.Reference(); !ok {
+		return &ValidationError{Name: "reference", err: errors.New(`ent: missing required field "Proficiency.reference"`)}
+	}
+	if v, ok := pc.mutation.Reference(); ok {
+		if err := proficiency.ReferenceValidator(v); err != nil {
+			return &ValidationError{Name: "reference", err: fmt.Errorf(`ent: validator failed for field "Proficiency.reference": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -252,32 +193,16 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 		_spec.SetField(proficiency.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := pc.mutation.ProficiencyCategory(); ok {
-		_spec.SetField(proficiency.FieldProficiencyCategory, field.TypeString, value)
-		_node.ProficiencyCategory = value
+	if value, ok := pc.mutation.Reference(); ok {
+		_spec.SetField(proficiency.FieldReference, field.TypeString, value)
+		_node.Reference = value
 	}
-	if nodes := pc.mutation.ClassesIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.ClassesTable,
-			Columns: proficiency.ClassesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pc.mutation.RacesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.RacesTable,
-			Columns: proficiency.RacesPrimaryKey,
+			Table:   proficiency.RaceTable,
+			Columns: proficiency.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -288,28 +213,12 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.SubracesIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.OptionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.SubracesTable,
-			Columns: proficiency.SubracesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pc.mutation.ChoiceIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Table:   proficiency.OptionsTable,
+			Columns: proficiency.OptionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
@@ -320,15 +229,15 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.SkillIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SkillTable,
-			Columns: []string{proficiency.SkillColumn},
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.ClassTable,
+			Columns: proficiency.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -336,47 +245,15 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.EquipmentIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.CharacterProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentTable,
-			Columns: []string{proficiency.EquipmentColumn},
+			Inverse: true,
+			Table:   proficiency.CharacterProficienciesTable,
+			Columns: []string{proficiency.CharacterProficienciesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pc.mutation.EquipmentCategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.EquipmentCategoryTable,
-			Columns: []string{proficiency.EquipmentCategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pc.mutation.SavingThrowIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiency.SavingThrowTable,
-			Columns: []string{proficiency.SavingThrowColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -390,11 +267,15 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 // ProficiencyCreateBulk is the builder for creating many Proficiency entities in bulk.
 type ProficiencyCreateBulk struct {
 	config
+	err      error
 	builders []*ProficiencyCreate
 }
 
 // Save creates the Proficiency entities in the database.
 func (pcb *ProficiencyCreateBulk) Save(ctx context.Context) ([]*Proficiency, error) {
+	if pcb.err != nil {
+		return nil, pcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(pcb.builders))
 	nodes := make([]*Proficiency, len(pcb.builders))
 	mutators := make([]Mutator, len(pcb.builders))

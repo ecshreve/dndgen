@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/charmbracelet/log"
 
@@ -14,29 +13,30 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-//go:generate go run gen.go
-
 // Popper is a populator for the ent database.
 type Popper struct {
 	Client   *ent.Client
-	Reader   *ent.Client
+	DataDir  string
 	IdToIndx map[int]string
 	IndxToId map[string]int
-	Context  *context.Context
 }
 
 // NewPopper creates a new Popper configured to populate data from JSON files in
 // the popper/data directory into a database via the given ent client.
-func NewPopper(ctx context.Context, client *ent.Client) *Popper {
+func NewPopper(ctx context.Context, client *ent.Client, dataDir string) *Popper {
 	if client == nil {
-		client, _ = ent.Open(dialect.SQLite, "file:dev.db?_fk=1")
+		log.Fatal("client is nil")
+	}
+
+	if dataDir == "" {
+		dataDir = "data"
 	}
 
 	return &Popper{
 		Client:   client,
+		DataDir:  dataDir,
 		IdToIndx: map[int]string{},
 		IndxToId: map[string]int{},
-		Context:  &ctx,
 	}
 }
 
@@ -54,99 +54,13 @@ func NewTestPopper(ctx context.Context) *Popper {
 
 	return &Popper{
 		Client:   client,
-		Reader:   client,
 		IdToIndx: map[int]string{},
 		IndxToId: map[string]int{},
 	}
 }
 
-// PopulateAll calls entity specific populators in the order they should be populated.
-func (p *Popper) PopulateAll(ctx context.Context) error {
-	_, err := p.PopulateCoin(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate Coin entities: %w", err)
-	}
-	_, err = p.PopulateAbilityScore(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate AbilityScore entities: %w", err)
-	}
-
-	_, err = p.PopulateSkill(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate Skill entities: %w", err)
-	}
-
-	_, err = p.PopulateLanguage(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate Language entities: %w", err)
-	}
-
-	_, err = p.PopulateDamageType(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate DamageType entities: %w", err)
-	}
-
-	_, err = p.PopulateWeaponProperty(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate WeaponProperty entities: %w", err)
-	}
-
-	_, err = p.PopulateEquipment(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate Equipment entities: %w", err)
-	}
-
-	_, err = p.PopulateClass(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate Class entities: %w", err)
-	}
-
-	_, err = p.PopulateRace(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate Race entities: %w", err)
-	}
-
-	_, err = p.PopulateSubrace(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate Subrace entities: %w", err)
-	}
-
-	_, err = p.PopulateProficiency(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate Proficiency entities: %w", err)
-	}
-
-	_, err = p.PopulateMagicSchool(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate MagicSchool entities: %w", err)
-	}
-
-	_, err = p.PopulateRuleSection(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate RuleSection entities: %w", err)
-	}
-
-	_, err = p.PopulateRule(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate Rule entities: %w", err)
-	}
-
-	_, err = p.PopulateTrait(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate Trait entities: %w", err)
-	}
-
-	err = p.PopulateStartingProficiencyOptions(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate StartingProficiencyOptions entities: %w", err)
-	}
-
-	_, err = p.PopulateProficiencyChoices(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to populate ProficiencyProficiencyChoices entities: %w", err)
-	}
-
-	return nil
+type IndxWrapper struct {
+	Indx string `json:"index"`
 }
 
 // GetIDsFromIndxWrapperString gets the IDs from the given JSON string.
@@ -167,4 +81,45 @@ func (p *Popper) GetIDsFromIndxWrappers(indxs []IndxWrapper) []int {
 	}
 
 	return ids
+}
+
+// PopulateCustom populates custom entities.
+func (p *Popper) PopulateCustom(ctx context.Context) error {
+	if err := p.PopulateRuleEdges(ctx); err != nil {
+		return fmt.Errorf("error populating rule edges: %w", err)
+	}
+	if err := p.PopulateSkillEdges(ctx); err != nil {
+		return fmt.Errorf("error populating skill edges: %w", err)
+	}
+
+	equipmentPopulator := NewEquipmentPopulator(p)
+	if err := equipmentPopulator.Populate(ctx); err != nil {
+		return fmt.Errorf("error populating equipment: %w", err)
+	}
+
+	proficiencyPopulator := NewProficiencyPopulator(p, "data/Proficiency.json")
+	if err := proficiencyPopulator.Populate(ctx); err != nil {
+		return fmt.Errorf("error populating proficiencies: %w", err)
+	}
+
+	racePopulator := NewRacePopulator(p, "data/Race.json")
+	if err := racePopulator.Populate(ctx); err != nil {
+		return fmt.Errorf("error populating races: %w", err)
+	}
+
+	// subracePopulator := NewRacePopulator(p, "data/Subrace.json")
+	// if err := subracePopulator.PopulateSubraces(ctx); err != nil {
+	// 	return fmt.Errorf("error populating subraces: %w", err)
+	// }
+
+	classPopulator := NewClassPopulator(p)
+	if err := classPopulator.Populate(ctx); err != nil {
+		return fmt.Errorf("error populating classes: %w", err)
+	}
+
+	// if err := p.PopulateFeatureEdges(ctx); err != nil {
+	// 	return fmt.Errorf("error populating feature edges: %w", err)
+	// }
+
+	return nil
 }

@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 )
 
@@ -22,33 +23,34 @@ type RuleSection struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RuleSectionQuery when eager-loading is set.
 	Edges        RuleSectionEdges `json:"-"`
+	rule_id      *int
 	selectValues sql.SelectValues
 }
 
 // RuleSectionEdges holds the relations/edges for other nodes in the graph.
 type RuleSectionEdges struct {
-	// Rules holds the value of the rules edge.
-	Rules []*Rule `json:"rules,omitempty"`
+	// Rule holds the value of the rule edge.
+	Rule *Rule `json:"rule,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
-
-	namedRules map[string][]*Rule
 }
 
-// RulesOrErr returns the Rules value or an error if the edge
-// was not loaded in eager-loading.
-func (e RuleSectionEdges) RulesOrErr() ([]*Rule, error) {
-	if e.loadedTypes[0] {
-		return e.Rules, nil
+// RuleOrErr returns the Rule value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RuleSectionEdges) RuleOrErr() (*Rule, error) {
+	if e.Rule != nil {
+		return e.Rule, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: rule.Label}
 	}
-	return nil, &NotLoadedError{edge: "rules"}
+	return nil, &NotLoadedError{edge: "rule"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -56,10 +58,14 @@ func (*RuleSection) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case rulesection.FieldDesc:
+			values[i] = new([]byte)
 		case rulesection.FieldID:
 			values[i] = new(sql.NullInt64)
-		case rulesection.FieldIndx, rulesection.FieldName, rulesection.FieldDesc:
+		case rulesection.FieldIndx, rulesection.FieldName:
 			values[i] = new(sql.NullString)
+		case rulesection.ForeignKeys[0]: // rule_id
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -94,10 +100,19 @@ func (rs *RuleSection) assignValues(columns []string, values []any) error {
 				rs.Name = value.String
 			}
 		case rulesection.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &rs.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
+			}
+		case rulesection.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field rule_id", value)
 			} else if value.Valid {
-				rs.Desc = value.String
+				rs.rule_id = new(int)
+				*rs.rule_id = int(value.Int64)
 			}
 		default:
 			rs.selectValues.Set(columns[i], values[i])
@@ -112,9 +127,9 @@ func (rs *RuleSection) Value(name string) (ent.Value, error) {
 	return rs.selectValues.Get(name)
 }
 
-// QueryRules queries the "rules" edge of the RuleSection entity.
-func (rs *RuleSection) QueryRules() *RuleQuery {
-	return NewRuleSectionClient(rs.config).QueryRules(rs)
+// QueryRule queries the "rule" edge of the RuleSection entity.
+func (rs *RuleSection) QueryRule() *RuleQuery {
+	return NewRuleSectionClient(rs.config).QueryRule(rs)
 }
 
 // Update returns a builder for updating this RuleSection.
@@ -147,7 +162,7 @@ func (rs *RuleSection) String() string {
 	builder.WriteString(rs.Name)
 	builder.WriteString(", ")
 	builder.WriteString("desc=")
-	builder.WriteString(rs.Desc)
+	builder.WriteString(fmt.Sprintf("%v", rs.Desc))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -187,30 +202,6 @@ func (rsc *RuleSectionCreate) SetRuleSection(input *RuleSection) *RuleSectionCre
 	rsc.SetName(input.Name)
 	rsc.SetDesc(input.Desc)
 	return rsc
-}
-
-// NamedRules returns the Rules named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (rs *RuleSection) NamedRules(name string) ([]*Rule, error) {
-	if rs.Edges.namedRules == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := rs.Edges.namedRules[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (rs *RuleSection) appendNamedRules(name string, edges ...*Rule) {
-	if rs.Edges.namedRules == nil {
-		rs.Edges.namedRules = make(map[string][]*Rule)
-	}
-	if len(edges) == 0 {
-		rs.Edges.namedRules[name] = []*Rule{}
-	} else {
-		rs.Edges.namedRules[name] = append(rs.Edges.namedRules[name], edges...)
-	}
 }
 
 // RuleSections is a parsable slice of RuleSection.

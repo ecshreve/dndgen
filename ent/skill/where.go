@@ -193,12 +193,22 @@ func NameContainsFold(v string) predicate.Skill {
 	return predicate.Skill(sql.FieldContainsFold(FieldName, v))
 }
 
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.Skill {
+	return predicate.Skill(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.Skill {
+	return predicate.Skill(sql.FieldNotNull(FieldDesc))
+}
+
 // HasAbilityScore applies the HasEdge predicate on the "ability_score" edge.
 func HasAbilityScore() predicate.Skill {
 	return predicate.Skill(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, AbilityScoreTable, AbilityScoreColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -216,34 +226,40 @@ func HasAbilityScoreWith(preds ...predicate.AbilityScore) predicate.Skill {
 	})
 }
 
+// HasCharacterSkill applies the HasEdge predicate on the "character_skill" edge.
+func HasCharacterSkill() predicate.Skill {
+	return predicate.Skill(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CharacterSkillTable, CharacterSkillColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCharacterSkillWith applies the HasEdge predicate on the "character_skill" edge with a given conditions (other predicates).
+func HasCharacterSkillWith(preds ...predicate.CharacterSkill) predicate.Skill {
+	return predicate.Skill(func(s *sql.Selector) {
+		step := newCharacterSkillStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Skill) predicate.Skill {
-	return predicate.Skill(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Skill(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Skill) predicate.Skill {
-	return predicate.Skill(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Skill(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Skill) predicate.Skill {
-	return predicate.Skill(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Skill(sql.NotPredicates(p))
 }

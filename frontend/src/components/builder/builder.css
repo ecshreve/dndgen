@@ -1,0 +1,12 @@
+.ability-modifier {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    color: black;
+    font-weight: bold;
+    border: 1px solid black;
+}

@@ -198,6 +198,16 @@ func NameContainsFold(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldContainsFold(FieldName, v))
 }
 
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldNotNull(FieldDesc))
+}
+
 // FullNameEQ applies the EQ predicate on the "full_name" field.
 func FullNameEQ(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldEQ(FieldFullName, v))
@@ -268,7 +278,7 @@ func HasSkills() predicate.AbilityScore {
 	return predicate.AbilityScore(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, SkillsTable, SkillsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, SkillsTable, SkillsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -286,21 +296,90 @@ func HasSkillsWith(preds ...predicate.Skill) predicate.AbilityScore {
 	})
 }
 
-// HasAbilityBonuses applies the HasEdge predicate on the "ability_bonuses" edge.
-func HasAbilityBonuses() predicate.AbilityScore {
+// HasCharacterAbilityScore applies the HasEdge predicate on the "character_ability_score" edge.
+func HasCharacterAbilityScore() predicate.AbilityScore {
 	return predicate.AbilityScore(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, CharacterAbilityScoreTable, CharacterAbilityScoreColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasAbilityBonusesWith applies the HasEdge predicate on the "ability_bonuses" edge with a given conditions (other predicates).
-func HasAbilityBonusesWith(preds ...predicate.AbilityBonus) predicate.AbilityScore {
+// HasCharacterAbilityScoreWith applies the HasEdge predicate on the "character_ability_score" edge with a given conditions (other predicates).
+func HasCharacterAbilityScoreWith(preds ...predicate.CharacterAbilityScore) predicate.AbilityScore {
 	return predicate.AbilityScore(func(s *sql.Selector) {
-		step := newAbilityBonusesStep()
+		step := newCharacterAbilityScoreStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasClasses applies the HasEdge predicate on the "classes" edge.
+func HasClasses() predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasClassesWith applies the HasEdge predicate on the "classes" edge with a given conditions (other predicates).
+func HasClassesWith(preds ...predicate.Class) predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := newClassesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRace applies the HasEdge predicate on the "race" edge.
+func HasRace() predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRaceWith applies the HasEdge predicate on the "race" edge with a given conditions (other predicates).
+func HasRaceWith(preds ...predicate.Race) predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := newRaceStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRaceAbilityBonuses applies the HasEdge predicate on the "race_ability_bonuses" edge.
+func HasRaceAbilityBonuses() predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, RaceAbilityBonusesTable, RaceAbilityBonusesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRaceAbilityBonusesWith applies the HasEdge predicate on the "race_ability_bonuses" edge with a given conditions (other predicates).
+func HasRaceAbilityBonusesWith(preds ...predicate.AbilityBonus) predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := newRaceAbilityBonusesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -311,32 +390,15 @@ func HasAbilityBonusesWith(preds ...predicate.AbilityBonus) predicate.AbilitySco
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.AbilityScore) predicate.AbilityScore {
-	return predicate.AbilityScore(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.AbilityScore(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.AbilityScore) predicate.AbilityScore {
-	return predicate.AbilityScore(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.AbilityScore(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.AbilityScore) predicate.AbilityScore {
-	return predicate.AbilityScore(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.AbilityScore(sql.NotPredicates(p))
 }

@@ -3,9 +3,12 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 )
 
 // IntOrDefault returns the value of the given integer pointer if it is not nil,
@@ -46,4 +49,51 @@ func LoadJSONFile(fpath string, v interface{}) error {
 	}
 
 	return nil
+}
+
+// AbilityScoreModifier returns the modifier for the given ability score.
+func AbilityScoreModifier(score int) int {
+	if score < 1 {
+		return -5
+	}
+
+	if score > 30 {
+		return 10
+	}
+
+	return int(math.Floor(float64(score-10) / 2))
+}
+
+func LevelProficiencyBonus(level int) int {
+	if level < 1 {
+		return 0
+	}
+
+	if level < 5 {
+		return 2
+	}
+
+	if level < 9 {
+		return 3
+	}
+
+	if level < 13 {
+		return 4
+	}
+
+	if level < 17 {
+		return 5
+	}
+
+	return 6
+}
+
+func GetProficiencyTypeFromReference(reference string) characterproficiency.ProficiencyType {
+	profType := strings.TrimPrefix(reference, "/api/")
+	profType = strings.ToUpper(strings.ReplaceAll(strings.Split(profType, "/")[0], "-", "_"))
+	profType = strings.ReplaceAll(profType, "IES", "Y")
+	profType = strings.TrimSuffix(profType, "S")
+	profType = strings.ReplaceAll(profType, "ABILITY_SCORE", "SAVING_THROW")
+
+	return characterproficiency.ProficiencyType(profType)
 }

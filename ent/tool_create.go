@@ -20,27 +20,21 @@ type ToolCreate struct {
 	hooks    []Hook
 }
 
-// SetIndx sets the "indx" field.
-func (tc *ToolCreate) SetIndx(s string) *ToolCreate {
-	tc.mutation.SetIndx(s)
-	return tc
-}
-
-// SetName sets the "name" field.
-func (tc *ToolCreate) SetName(s string) *ToolCreate {
-	tc.mutation.SetName(s)
-	return tc
-}
-
 // SetToolCategory sets the "tool_category" field.
 func (tc *ToolCreate) SetToolCategory(s string) *ToolCreate {
 	tc.mutation.SetToolCategory(s)
 	return tc
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (tc *ToolCreate) SetEquipmentID(i int) *ToolCreate {
-	tc.mutation.SetEquipmentID(i)
+// SetDesc sets the "desc" field.
+func (tc *ToolCreate) SetDesc(s []string) *ToolCreate {
+	tc.mutation.SetDesc(s)
+	return tc
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (tc *ToolCreate) SetEquipmentID(id int) *ToolCreate {
+	tc.mutation.SetEquipmentID(id)
 	return tc
 }
 
@@ -83,29 +77,10 @@ func (tc *ToolCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tc *ToolCreate) check() error {
-	if _, ok := tc.mutation.Indx(); !ok {
-		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Tool.indx"`)}
-	}
-	if v, ok := tc.mutation.Indx(); ok {
-		if err := tool.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Tool.indx": %w`, err)}
-		}
-	}
-	if _, ok := tc.mutation.Name(); !ok {
-		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Tool.name"`)}
-	}
-	if v, ok := tc.mutation.Name(); ok {
-		if err := tool.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Tool.name": %w`, err)}
-		}
-	}
 	if _, ok := tc.mutation.ToolCategory(); !ok {
 		return &ValidationError{Name: "tool_category", err: errors.New(`ent: missing required field "Tool.tool_category"`)}
 	}
-	if _, ok := tc.mutation.EquipmentID(); !ok {
-		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "Tool.equipment_id"`)}
-	}
-	if _, ok := tc.mutation.EquipmentID(); !ok {
+	if len(tc.mutation.EquipmentIDs()) == 0 {
 		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Tool.equipment"`)}
 	}
 	return nil
@@ -134,17 +109,13 @@ func (tc *ToolCreate) createSpec() (*Tool, *sqlgraph.CreateSpec) {
 		_node = &Tool{config: tc.config}
 		_spec = sqlgraph.NewCreateSpec(tool.Table, sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt))
 	)
-	if value, ok := tc.mutation.Indx(); ok {
-		_spec.SetField(tool.FieldIndx, field.TypeString, value)
-		_node.Indx = value
-	}
-	if value, ok := tc.mutation.Name(); ok {
-		_spec.SetField(tool.FieldName, field.TypeString, value)
-		_node.Name = value
-	}
 	if value, ok := tc.mutation.ToolCategory(); ok {
 		_spec.SetField(tool.FieldToolCategory, field.TypeString, value)
 		_node.ToolCategory = value
+	}
+	if value, ok := tc.mutation.Desc(); ok {
+		_spec.SetField(tool.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if nodes := tc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -160,7 +131,7 @@ func (tc *ToolCreate) createSpec() (*Tool, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.EquipmentID = nodes[0]
+		_node.equipment_tool = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -169,11 +140,15 @@ func (tc *ToolCreate) createSpec() (*Tool, *sqlgraph.CreateSpec) {
 // ToolCreateBulk is the builder for creating many Tool entities in bulk.
 type ToolCreateBulk struct {
 	config
+	err      error
 	builders []*ToolCreate
 }
 
 // Save creates the Tool entities in the database.
 func (tcb *ToolCreateBulk) Save(ctx context.Context) ([]*Tool, error) {
+	if tcb.err != nil {
+		return nil, tcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(tcb.builders))
 	nodes := make([]*Tool, len(tcb.builders))
 	mutators := make([]Mutator, len(tcb.builders))

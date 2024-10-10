@@ -1,0 +1,137 @@
+[
+  {
+    "index": "lang-common",
+    "name": "Common",
+    "type": "STANDARD",
+    "typical_speakers": ["Humans"],
+    "script": "Common",
+    "url": "/api/languages/common"
+  },
+  {
+    "index": "lang-dwarvish",
+    "name": "Dwarvish",
+    "desc": ["Dwarvish is full of hard consonants and guttural sounds."],
+    "type": "STANDARD",
+    "typical_speakers": ["Dwarves"],
+    "script": "Dwarvish",
+    "url": "/api/languages/dwarvish"
+  },
+  {
+    "index": "lang-elvish",
+    "name": "Elvish",
+    "desc": ["Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires."],
+    "type": "STANDARD",
+    "typical_speakers": ["Elves"],
+    "script": "Elvish",
+    "url": "/api/languages/elvish"
+  },
+  {
+    "index": "lang-giant",
+    "name": "Giant",
+    "type": "STANDARD",
+    "typical_speakers": ["Ogres", "Giants"],
+    "script": "Dwarvish",
+    "url": "/api/languages/giant"
+  },
+  {
+    "index": "lang-gnomish",
+    "name": "Gnomish",
+    "desc": ["The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world."],
+    "type": "STANDARD",
+    "typical_speakers": ["Gnomes"],
+    "script": "Dwarvish",
+    "url": "/api/languages/gnomish"
+  },
+  {
+    "index": "lang-goblin",
+    "name": "Goblin",
+    "type": "STANDARD",
+    "typical_speakers": ["Goblinoids"],
+    "script": "Dwarvish",
+    "url": "/api/languages/goblin"
+  },
+  {
+    "index": "lang-halfling",
+    "name": "Halfling",
+    "desc": ["The Halfling language isn't secret, but halflings are loath to share it with others. They write very little, so they don't have a rich body of literature. Their oral tradition, however, is very strong."],
+    "type": "STANDARD",
+    "typical_speakers": ["Halflings"],
+    "script": "Common",
+    "url": "/api/languages/halfling"
+  },
+  {
+    "index": "lang-orc",
+    "name": "Orc",
+    "desc": ["Orc is a harsh, grating language with hard consonants. It has no script of its own but is written in the Dwarvish script."],
+    "type": "STANDARD",
+    "typical_speakers": ["Orcs"],
+    "script": "Dwarvish",
+    "url": "/api/languages/orc"
+  },
+  {
+    "index": "lang-abyssal",
+    "name": "Abyssal",
+    "type": "EXOTIC",
+    "typical_speakers": ["Demons"],
+    "script": "Infernal",
+    "url": "/api/languages/abyssal"
+  },
+  {
+    "index": "lang-celestial",
+    "name": "Celestial",
+    "type": "EXOTIC",
+    "typical_speakers": ["Celestials"],
+    "script": "Celestial",
+    "url": "/api/languages/celestial"
+  },
+  {
+    "index": "lang-draconic",
+    "name": "Draconic",
+    "desc": ["Draconic is thought to be one of the oldest languages and is often used in the study of magic. The language sounds harsh to most other creatures and includes numerous hard consonants and sibilants."],
+    "type": "EXOTIC",
+    "typical_speakers": ["Dragons", "Dragonborn"],
+    "script": "Draconic",
+    "url": "/api/languages/draconic"
+  },
+  {
+    "index": "lang-deep-speech",
+    "name": "Deep Speech",
+    "desc": ["An eerie tongue, Deep Speech is a clicking language with unsettling vocalizations that can almost sound like noise. Vibrating, creaking, and trembling sounds complement this mode of communication, making it hard for humanoid vocal cords to mimic."],
+    "type": "EXOTIC",
+    "script": "Other",
+    "typical_speakers": ["Aboleths", "Cloakers"],
+    "url": "/api/languages/deep-speech"
+  },
+  {
+    "index": "lang-infernal",
+    "name": "Infernal",
+    "type": "EXOTIC",
+    "typical_speakers": ["Devils"],
+    "script": "Infernal",
+    "url": "/api/languages/infernal"
+  },
+  {
+    "index": "lang-primordial",
+    "name": "Primordial",
+    "type": "EXOTIC",
+    "typical_speakers": ["Elementals"],
+    "script": "Dwarvish",
+    "url": "/api/languages/primordial"
+  },
+  {
+    "index": "lang-sylvan",
+    "name": "Sylvan",
+    "type": "EXOTIC",
+    "typical_speakers": ["Fey creatures"],
+    "script": "Elvish",
+    "url": "/api/languages/sylvan"
+  },
+  {
+    "index": "lang-undercommon",
+    "name": "Undercommon",
+    "type": "EXOTIC",
+    "typical_speakers": ["Underdark traders"],
+    "script": "Elvish",
+    "url": "/api/languages/undercommon"
+  }
+]

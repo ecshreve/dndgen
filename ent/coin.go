@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,10 +22,33 @@ type Coin struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
 	// GoldConversionRate holds the value of the "gold_conversion_rate" field.
 	GoldConversionRate float64 `json:"gold_conversion_rate,omitempty"`
-	selectValues       sql.SelectValues
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the CoinQuery when eager-loading is set.
+	Edges        CoinEdges `json:"-"`
+	selectValues sql.SelectValues
+}
+
+// CoinEdges holds the relations/edges for other nodes in the graph.
+type CoinEdges struct {
+	// Costs holds the value of the costs edge.
+	Costs []*Cost `json:"costs,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+
+	namedCosts map[string][]*Cost
+}
+
+// CostsOrErr returns the Costs value or an error if the edge
+// was not loaded in eager-loading.
+func (e CoinEdges) CostsOrErr() ([]*Cost, error) {
+	if e.loadedTypes[0] {
+		return e.Costs, nil
+	}
+	return nil, &NotLoadedError{edge: "costs"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,11 +56,13 @@ func (*Coin) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case coin.FieldDesc:
+			values[i] = new([]byte)
 		case coin.FieldGoldConversionRate:
 			values[i] = new(sql.NullFloat64)
 		case coin.FieldID:
 			values[i] = new(sql.NullInt64)
-		case coin.FieldIndx, coin.FieldName, coin.FieldDesc:
+		case coin.FieldIndx, coin.FieldName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -72,10 +98,12 @@ func (c *Coin) assignValues(columns []string, values []any) error {
 				c.Name = value.String
 			}
 		case coin.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				c.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case coin.FieldGoldConversionRate:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -94,6 +122,11 @@ func (c *Coin) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (c *Coin) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
+}
+
+// QueryCosts queries the "costs" edge of the Coin entity.
+func (c *Coin) QueryCosts() *CostQuery {
+	return NewCoinClient(c.config).QueryCosts(c)
 }
 
 // Update returns a builder for updating this Coin.
@@ -126,12 +159,42 @@ func (c *Coin) String() string {
 	builder.WriteString(c.Name)
 	builder.WriteString(", ")
 	builder.WriteString("desc=")
-	builder.WriteString(c.Desc)
+	builder.WriteString(fmt.Sprintf("%v", c.Desc))
 	builder.WriteString(", ")
 	builder.WriteString("gold_conversion_rate=")
 	builder.WriteString(fmt.Sprintf("%v", c.GoldConversionRate))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (c *Coin) MarshalJSON() ([]byte, error) {
+	type Alias Coin
+	return json.Marshal(&struct {
+		*Alias
+		CoinEdges
+	}{
+		Alias:     (*Alias)(c),
+		CoinEdges: c.Edges,
+	})
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (c *Coin) UnmarshalJSON(data []byte) error {
+	type Alias Coin
+	aux := &struct {
+		*Alias
+		CoinEdges
+	}{
+		Alias: (*Alias)(c),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	c.Edges = aux.CoinEdges
+	return nil
 }
 
 func (cc *CoinCreate) SetCoin(input *Coin) *CoinCreate {
@@ -140,6 +203,30 @@ func (cc *CoinCreate) SetCoin(input *Coin) *CoinCreate {
 	cc.SetDesc(input.Desc)
 	cc.SetGoldConversionRate(input.GoldConversionRate)
 	return cc
+}
+
+// NamedCosts returns the Costs named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Coin) NamedCosts(name string) ([]*Cost, error) {
+	if c.Edges.namedCosts == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedCosts[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Coin) appendNamedCosts(name string, edges ...*Cost) {
+	if c.Edges.namedCosts == nil {
+		c.Edges.namedCosts = make(map[string][]*Cost)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedCosts[name] = []*Cost{}
+	} else {
+		c.Edges.namedCosts[name] = append(c.Edges.namedCosts[name], edges...)
+	}
 }
 
 // Coins is a parsable slice of Coin.

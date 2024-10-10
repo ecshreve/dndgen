@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"reflect"
 
 	"github.com/ecshreve/dndgen/ent/migrate"
 
@@ -16,32 +17,37 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
-	"github.com/ecshreve/dndgen/ent/armorclass"
+	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/classequipment"
 	"github.com/ecshreve/dndgen/ent/coin"
+	"github.com/ecshreve/dndgen/ent/condition"
+	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentcategory"
-	"github.com/ecshreve/dndgen/ent/equipmentchoice"
-	"github.com/ecshreve/dndgen/ent/equipmentcost"
+	"github.com/ecshreve/dndgen/ent/equipmententry"
+	"github.com/ecshreve/dndgen/ent/feat"
+	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
+	"github.com/ecshreve/dndgen/ent/prerequisite"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
+	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weapondamage"
-	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
 // Client is the client that holds all ent builders.
@@ -53,36 +59,52 @@ type Client struct {
 	AbilityBonus *AbilityBonusClient
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
+	// Alignment is the client for interacting with the Alignment builders.
+	Alignment *AlignmentClient
 	// Armor is the client for interacting with the Armor builders.
 	Armor *ArmorClient
-	// ArmorClass is the client for interacting with the ArmorClass builders.
-	ArmorClass *ArmorClassClient
+	// Character is the client for interacting with the Character builders.
+	Character *CharacterClient
+	// CharacterAbilityScore is the client for interacting with the CharacterAbilityScore builders.
+	CharacterAbilityScore *CharacterAbilityScoreClient
+	// CharacterProficiency is the client for interacting with the CharacterProficiency builders.
+	CharacterProficiency *CharacterProficiencyClient
+	// CharacterSkill is the client for interacting with the CharacterSkill builders.
+	CharacterSkill *CharacterSkillClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
-	// ClassEquipment is the client for interacting with the ClassEquipment builders.
-	ClassEquipment *ClassEquipmentClient
 	// Coin is the client for interacting with the Coin builders.
 	Coin *CoinClient
+	// Condition is the client for interacting with the Condition builders.
+	Condition *ConditionClient
+	// Cost is the client for interacting with the Cost builders.
+	Cost *CostClient
 	// DamageType is the client for interacting with the DamageType builders.
 	DamageType *DamageTypeClient
 	// Equipment is the client for interacting with the Equipment builders.
 	Equipment *EquipmentClient
-	// EquipmentCategory is the client for interacting with the EquipmentCategory builders.
-	EquipmentCategory *EquipmentCategoryClient
-	// EquipmentChoice is the client for interacting with the EquipmentChoice builders.
-	EquipmentChoice *EquipmentChoiceClient
-	// EquipmentCost is the client for interacting with the EquipmentCost builders.
-	EquipmentCost *EquipmentCostClient
+	// EquipmentEntry is the client for interacting with the EquipmentEntry builders.
+	EquipmentEntry *EquipmentEntryClient
+	// Feat is the client for interacting with the Feat builders.
+	Feat *FeatClient
+	// Feature is the client for interacting with the Feature builders.
+	Feature *FeatureClient
 	// Gear is the client for interacting with the Gear builders.
 	Gear *GearClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
+	// LanguageChoice is the client for interacting with the LanguageChoice builders.
+	LanguageChoice *LanguageChoiceClient
 	// MagicSchool is the client for interacting with the MagicSchool builders.
 	MagicSchool *MagicSchoolClient
+	// Prerequisite is the client for interacting with the Prerequisite builders.
+	Prerequisite *PrerequisiteClient
 	// Proficiency is the client for interacting with the Proficiency builders.
 	Proficiency *ProficiencyClient
 	// ProficiencyChoice is the client for interacting with the ProficiencyChoice builders.
 	ProficiencyChoice *ProficiencyChoiceClient
+	// Property is the client for interacting with the Property builders.
+	Property *PropertyClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
 	// Rule is the client for interacting with the Rule builders.
@@ -91,8 +113,6 @@ type Client struct {
 	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
-	// Subrace is the client for interacting with the Subrace builders.
-	Subrace *SubraceClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
 	// Trait is the client for interacting with the Trait builders.
@@ -101,19 +121,13 @@ type Client struct {
 	Vehicle *VehicleClient
 	// Weapon is the client for interacting with the Weapon builders.
 	Weapon *WeaponClient
-	// WeaponDamage is the client for interacting with the WeaponDamage builders.
-	WeaponDamage *WeaponDamageClient
-	// WeaponProperty is the client for interacting with the WeaponProperty builders.
-	WeaponProperty *WeaponPropertyClient
 	// additional fields for node api
 	tables tables
 }
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
-	cfg.options(opts...)
-	client := &Client{config: cfg}
+	client := &Client{config: newConfig(opts...)}
 	client.init()
 	return client
 }
@@ -122,32 +136,37 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AbilityBonus = NewAbilityBonusClient(c.config)
 	c.AbilityScore = NewAbilityScoreClient(c.config)
+	c.Alignment = NewAlignmentClient(c.config)
 	c.Armor = NewArmorClient(c.config)
-	c.ArmorClass = NewArmorClassClient(c.config)
+	c.Character = NewCharacterClient(c.config)
+	c.CharacterAbilityScore = NewCharacterAbilityScoreClient(c.config)
+	c.CharacterProficiency = NewCharacterProficiencyClient(c.config)
+	c.CharacterSkill = NewCharacterSkillClient(c.config)
 	c.Class = NewClassClient(c.config)
-	c.ClassEquipment = NewClassEquipmentClient(c.config)
 	c.Coin = NewCoinClient(c.config)
+	c.Condition = NewConditionClient(c.config)
+	c.Cost = NewCostClient(c.config)
 	c.DamageType = NewDamageTypeClient(c.config)
 	c.Equipment = NewEquipmentClient(c.config)
-	c.EquipmentCategory = NewEquipmentCategoryClient(c.config)
-	c.EquipmentChoice = NewEquipmentChoiceClient(c.config)
-	c.EquipmentCost = NewEquipmentCostClient(c.config)
+	c.EquipmentEntry = NewEquipmentEntryClient(c.config)
+	c.Feat = NewFeatClient(c.config)
+	c.Feature = NewFeatureClient(c.config)
 	c.Gear = NewGearClient(c.config)
 	c.Language = NewLanguageClient(c.config)
+	c.LanguageChoice = NewLanguageChoiceClient(c.config)
 	c.MagicSchool = NewMagicSchoolClient(c.config)
+	c.Prerequisite = NewPrerequisiteClient(c.config)
 	c.Proficiency = NewProficiencyClient(c.config)
 	c.ProficiencyChoice = NewProficiencyChoiceClient(c.config)
+	c.Property = NewPropertyClient(c.config)
 	c.Race = NewRaceClient(c.config)
 	c.Rule = NewRuleClient(c.config)
 	c.RuleSection = NewRuleSectionClient(c.config)
 	c.Skill = NewSkillClient(c.config)
-	c.Subrace = NewSubraceClient(c.config)
 	c.Tool = NewToolClient(c.config)
 	c.Trait = NewTraitClient(c.config)
 	c.Vehicle = NewVehicleClient(c.config)
 	c.Weapon = NewWeaponClient(c.config)
-	c.WeaponDamage = NewWeaponDamageClient(c.config)
-	c.WeaponProperty = NewWeaponPropertyClient(c.config)
 }
 
 type (
@@ -167,6 +186,13 @@ type (
 	// Option function to configure the client.
 	Option func(*config)
 )
+
+// newConfig creates a new config for the client.
+func newConfig(opts ...Option) config {
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
+	cfg.options(opts...)
+	return cfg
+}
 
 // options applies the options on the config object.
 func (c *config) options(opts ...Option) {
@@ -215,11 +241,14 @@ func Open(driverName, dataSourceName string, options ...Option) (*Client, error)
 	}
 }
 
+// ErrTxStarted is returned when trying to start a new transaction from a transactional client.
+var ErrTxStarted = errors.New("ent: cannot start a transaction within a transaction")
+
 // Tx returns a new transactional client. The provided context
 // is used until the transaction is committed or rolled back.
 func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	if _, ok := c.driver.(*txDriver); ok {
-		return nil, errors.New("ent: cannot start a transaction within a transaction")
+		return nil, ErrTxStarted
 	}
 	tx, err := newTx(ctx, c.driver)
 	if err != nil {
@@ -228,36 +257,41 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:               ctx,
-		config:            cfg,
-		AbilityBonus:      NewAbilityBonusClient(cfg),
-		AbilityScore:      NewAbilityScoreClient(cfg),
-		Armor:             NewArmorClient(cfg),
-		ArmorClass:        NewArmorClassClient(cfg),
-		Class:             NewClassClient(cfg),
-		ClassEquipment:    NewClassEquipmentClient(cfg),
-		Coin:              NewCoinClient(cfg),
-		DamageType:        NewDamageTypeClient(cfg),
-		Equipment:         NewEquipmentClient(cfg),
-		EquipmentCategory: NewEquipmentCategoryClient(cfg),
-		EquipmentChoice:   NewEquipmentChoiceClient(cfg),
-		EquipmentCost:     NewEquipmentCostClient(cfg),
-		Gear:              NewGearClient(cfg),
-		Language:          NewLanguageClient(cfg),
-		MagicSchool:       NewMagicSchoolClient(cfg),
-		Proficiency:       NewProficiencyClient(cfg),
-		ProficiencyChoice: NewProficiencyChoiceClient(cfg),
-		Race:              NewRaceClient(cfg),
-		Rule:              NewRuleClient(cfg),
-		RuleSection:       NewRuleSectionClient(cfg),
-		Skill:             NewSkillClient(cfg),
-		Subrace:           NewSubraceClient(cfg),
-		Tool:              NewToolClient(cfg),
-		Trait:             NewTraitClient(cfg),
-		Vehicle:           NewVehicleClient(cfg),
-		Weapon:            NewWeaponClient(cfg),
-		WeaponDamage:      NewWeaponDamageClient(cfg),
-		WeaponProperty:    NewWeaponPropertyClient(cfg),
+		ctx:                   ctx,
+		config:                cfg,
+		AbilityBonus:          NewAbilityBonusClient(cfg),
+		AbilityScore:          NewAbilityScoreClient(cfg),
+		Alignment:             NewAlignmentClient(cfg),
+		Armor:                 NewArmorClient(cfg),
+		Character:             NewCharacterClient(cfg),
+		CharacterAbilityScore: NewCharacterAbilityScoreClient(cfg),
+		CharacterProficiency:  NewCharacterProficiencyClient(cfg),
+		CharacterSkill:        NewCharacterSkillClient(cfg),
+		Class:                 NewClassClient(cfg),
+		Coin:                  NewCoinClient(cfg),
+		Condition:             NewConditionClient(cfg),
+		Cost:                  NewCostClient(cfg),
+		DamageType:            NewDamageTypeClient(cfg),
+		Equipment:             NewEquipmentClient(cfg),
+		EquipmentEntry:        NewEquipmentEntryClient(cfg),
+		Feat:                  NewFeatClient(cfg),
+		Feature:               NewFeatureClient(cfg),
+		Gear:                  NewGearClient(cfg),
+		Language:              NewLanguageClient(cfg),
+		LanguageChoice:        NewLanguageChoiceClient(cfg),
+		MagicSchool:           NewMagicSchoolClient(cfg),
+		Prerequisite:          NewPrerequisiteClient(cfg),
+		Proficiency:           NewProficiencyClient(cfg),
+		ProficiencyChoice:     NewProficiencyChoiceClient(cfg),
+		Property:              NewPropertyClient(cfg),
+		Race:                  NewRaceClient(cfg),
+		Rule:                  NewRuleClient(cfg),
+		RuleSection:           NewRuleSectionClient(cfg),
+		Skill:                 NewSkillClient(cfg),
+		Tool:                  NewToolClient(cfg),
+		Trait:                 NewTraitClient(cfg),
+		Vehicle:               NewVehicleClient(cfg),
+		Weapon:                NewWeaponClient(cfg),
 	}, nil
 }
 
@@ -275,36 +309,41 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:               ctx,
-		config:            cfg,
-		AbilityBonus:      NewAbilityBonusClient(cfg),
-		AbilityScore:      NewAbilityScoreClient(cfg),
-		Armor:             NewArmorClient(cfg),
-		ArmorClass:        NewArmorClassClient(cfg),
-		Class:             NewClassClient(cfg),
-		ClassEquipment:    NewClassEquipmentClient(cfg),
-		Coin:              NewCoinClient(cfg),
-		DamageType:        NewDamageTypeClient(cfg),
-		Equipment:         NewEquipmentClient(cfg),
-		EquipmentCategory: NewEquipmentCategoryClient(cfg),
-		EquipmentChoice:   NewEquipmentChoiceClient(cfg),
-		EquipmentCost:     NewEquipmentCostClient(cfg),
-		Gear:              NewGearClient(cfg),
-		Language:          NewLanguageClient(cfg),
-		MagicSchool:       NewMagicSchoolClient(cfg),
-		Proficiency:       NewProficiencyClient(cfg),
-		ProficiencyChoice: NewProficiencyChoiceClient(cfg),
-		Race:              NewRaceClient(cfg),
-		Rule:              NewRuleClient(cfg),
-		RuleSection:       NewRuleSectionClient(cfg),
-		Skill:             NewSkillClient(cfg),
-		Subrace:           NewSubraceClient(cfg),
-		Tool:              NewToolClient(cfg),
-		Trait:             NewTraitClient(cfg),
-		Vehicle:           NewVehicleClient(cfg),
-		Weapon:            NewWeaponClient(cfg),
-		WeaponDamage:      NewWeaponDamageClient(cfg),
-		WeaponProperty:    NewWeaponPropertyClient(cfg),
+		ctx:                   ctx,
+		config:                cfg,
+		AbilityBonus:          NewAbilityBonusClient(cfg),
+		AbilityScore:          NewAbilityScoreClient(cfg),
+		Alignment:             NewAlignmentClient(cfg),
+		Armor:                 NewArmorClient(cfg),
+		Character:             NewCharacterClient(cfg),
+		CharacterAbilityScore: NewCharacterAbilityScoreClient(cfg),
+		CharacterProficiency:  NewCharacterProficiencyClient(cfg),
+		CharacterSkill:        NewCharacterSkillClient(cfg),
+		Class:                 NewClassClient(cfg),
+		Coin:                  NewCoinClient(cfg),
+		Condition:             NewConditionClient(cfg),
+		Cost:                  NewCostClient(cfg),
+		DamageType:            NewDamageTypeClient(cfg),
+		Equipment:             NewEquipmentClient(cfg),
+		EquipmentEntry:        NewEquipmentEntryClient(cfg),
+		Feat:                  NewFeatClient(cfg),
+		Feature:               NewFeatureClient(cfg),
+		Gear:                  NewGearClient(cfg),
+		Language:              NewLanguageClient(cfg),
+		LanguageChoice:        NewLanguageChoiceClient(cfg),
+		MagicSchool:           NewMagicSchoolClient(cfg),
+		Prerequisite:          NewPrerequisiteClient(cfg),
+		Proficiency:           NewProficiencyClient(cfg),
+		ProficiencyChoice:     NewProficiencyChoiceClient(cfg),
+		Property:              NewPropertyClient(cfg),
+		Race:                  NewRaceClient(cfg),
+		Rule:                  NewRuleClient(cfg),
+		RuleSection:           NewRuleSectionClient(cfg),
+		Skill:                 NewSkillClient(cfg),
+		Tool:                  NewToolClient(cfg),
+		Trait:                 NewTraitClient(cfg),
+		Vehicle:               NewVehicleClient(cfg),
+		Weapon:                NewWeaponClient(cfg),
 	}, nil
 }
 
@@ -334,12 +373,12 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AbilityBonus, c.AbilityScore, c.Armor, c.ArmorClass, c.Class,
-		c.ClassEquipment, c.Coin, c.DamageType, c.Equipment, c.EquipmentCategory,
-		c.EquipmentChoice, c.EquipmentCost, c.Gear, c.Language, c.MagicSchool,
-		c.Proficiency, c.ProficiencyChoice, c.Race, c.Rule, c.RuleSection, c.Skill,
-		c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon, c.WeaponDamage,
-		c.WeaponProperty,
+		c.AbilityBonus, c.AbilityScore, c.Alignment, c.Armor, c.Character,
+		c.CharacterAbilityScore, c.CharacterProficiency, c.CharacterSkill, c.Class,
+		c.Coin, c.Condition, c.Cost, c.DamageType, c.Equipment, c.EquipmentEntry,
+		c.Feat, c.Feature, c.Gear, c.Language, c.LanguageChoice, c.MagicSchool,
+		c.Prerequisite, c.Proficiency, c.ProficiencyChoice, c.Property, c.Race, c.Rule,
+		c.RuleSection, c.Skill, c.Tool, c.Trait, c.Vehicle, c.Weapon,
 	} {
 		n.Use(hooks...)
 	}
@@ -349,12 +388,12 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AbilityBonus, c.AbilityScore, c.Armor, c.ArmorClass, c.Class,
-		c.ClassEquipment, c.Coin, c.DamageType, c.Equipment, c.EquipmentCategory,
-		c.EquipmentChoice, c.EquipmentCost, c.Gear, c.Language, c.MagicSchool,
-		c.Proficiency, c.ProficiencyChoice, c.Race, c.Rule, c.RuleSection, c.Skill,
-		c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon, c.WeaponDamage,
-		c.WeaponProperty,
+		c.AbilityBonus, c.AbilityScore, c.Alignment, c.Armor, c.Character,
+		c.CharacterAbilityScore, c.CharacterProficiency, c.CharacterSkill, c.Class,
+		c.Coin, c.Condition, c.Cost, c.DamageType, c.Equipment, c.EquipmentEntry,
+		c.Feat, c.Feature, c.Gear, c.Language, c.LanguageChoice, c.MagicSchool,
+		c.Prerequisite, c.Proficiency, c.ProficiencyChoice, c.Property, c.Race, c.Rule,
+		c.RuleSection, c.Skill, c.Tool, c.Trait, c.Vehicle, c.Weapon,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -367,36 +406,52 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AbilityBonus.mutate(ctx, m)
 	case *AbilityScoreMutation:
 		return c.AbilityScore.mutate(ctx, m)
+	case *AlignmentMutation:
+		return c.Alignment.mutate(ctx, m)
 	case *ArmorMutation:
 		return c.Armor.mutate(ctx, m)
-	case *ArmorClassMutation:
-		return c.ArmorClass.mutate(ctx, m)
+	case *CharacterMutation:
+		return c.Character.mutate(ctx, m)
+	case *CharacterAbilityScoreMutation:
+		return c.CharacterAbilityScore.mutate(ctx, m)
+	case *CharacterProficiencyMutation:
+		return c.CharacterProficiency.mutate(ctx, m)
+	case *CharacterSkillMutation:
+		return c.CharacterSkill.mutate(ctx, m)
 	case *ClassMutation:
 		return c.Class.mutate(ctx, m)
-	case *ClassEquipmentMutation:
-		return c.ClassEquipment.mutate(ctx, m)
 	case *CoinMutation:
 		return c.Coin.mutate(ctx, m)
+	case *ConditionMutation:
+		return c.Condition.mutate(ctx, m)
+	case *CostMutation:
+		return c.Cost.mutate(ctx, m)
 	case *DamageTypeMutation:
 		return c.DamageType.mutate(ctx, m)
 	case *EquipmentMutation:
 		return c.Equipment.mutate(ctx, m)
-	case *EquipmentCategoryMutation:
-		return c.EquipmentCategory.mutate(ctx, m)
-	case *EquipmentChoiceMutation:
-		return c.EquipmentChoice.mutate(ctx, m)
-	case *EquipmentCostMutation:
-		return c.EquipmentCost.mutate(ctx, m)
+	case *EquipmentEntryMutation:
+		return c.EquipmentEntry.mutate(ctx, m)
+	case *FeatMutation:
+		return c.Feat.mutate(ctx, m)
+	case *FeatureMutation:
+		return c.Feature.mutate(ctx, m)
 	case *GearMutation:
 		return c.Gear.mutate(ctx, m)
 	case *LanguageMutation:
 		return c.Language.mutate(ctx, m)
+	case *LanguageChoiceMutation:
+		return c.LanguageChoice.mutate(ctx, m)
 	case *MagicSchoolMutation:
 		return c.MagicSchool.mutate(ctx, m)
+	case *PrerequisiteMutation:
+		return c.Prerequisite.mutate(ctx, m)
 	case *ProficiencyMutation:
 		return c.Proficiency.mutate(ctx, m)
 	case *ProficiencyChoiceMutation:
 		return c.ProficiencyChoice.mutate(ctx, m)
+	case *PropertyMutation:
+		return c.Property.mutate(ctx, m)
 	case *RaceMutation:
 		return c.Race.mutate(ctx, m)
 	case *RuleMutation:
@@ -405,8 +460,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.RuleSection.mutate(ctx, m)
 	case *SkillMutation:
 		return c.Skill.mutate(ctx, m)
-	case *SubraceMutation:
-		return c.Subrace.mutate(ctx, m)
 	case *ToolMutation:
 		return c.Tool.mutate(ctx, m)
 	case *TraitMutation:
@@ -415,10 +468,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Vehicle.mutate(ctx, m)
 	case *WeaponMutation:
 		return c.Weapon.mutate(ctx, m)
-	case *WeaponDamageMutation:
-		return c.WeaponDamage.mutate(ctx, m)
-	case *WeaponPropertyMutation:
-		return c.WeaponProperty.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -457,6 +506,21 @@ func (c *AbilityBonusClient) CreateBulk(builders ...*AbilityBonusCreate) *Abilit
 	return &AbilityBonusCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AbilityBonusClient) MapCreateBulk(slice any, setFunc func(*AbilityBonusCreate, int)) *AbilityBonusCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AbilityBonusCreateBulk{err: fmt.Errorf("calling to AbilityBonusClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AbilityBonusCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AbilityBonusCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for AbilityBonus.
 func (c *AbilityBonusClient) Update() *AbilityBonusUpdate {
 	mutation := newAbilityBonusMutation(c.config, OpUpdate)
@@ -465,13 +529,9 @@ func (c *AbilityBonusClient) Update() *AbilityBonusUpdate {
 
 // UpdateOne returns an update builder for the given entity.
 func (c *AbilityBonusClient) UpdateOne(ab *AbilityBonus) *AbilityBonusUpdateOne {
-	mutation := newAbilityBonusMutation(c.config, OpUpdateOne, withAbilityBonus(ab))
-	return &AbilityBonusUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *AbilityBonusClient) UpdateOneID(id int) *AbilityBonusUpdateOne {
-	mutation := newAbilityBonusMutation(c.config, OpUpdateOne, withAbilityBonusID(id))
+	mutation := newAbilityBonusMutation(c.config, OpUpdateOne)
+	mutation.race = &ab.RaceID
+	mutation.ability_score = &ab.AbilityScoreID
 	return &AbilityBonusUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -479,19 +539,6 @@ func (c *AbilityBonusClient) UpdateOneID(id int) *AbilityBonusUpdateOne {
 func (c *AbilityBonusClient) Delete() *AbilityBonusDelete {
 	mutation := newAbilityBonusMutation(c.config, OpDelete)
 	return &AbilityBonusDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *AbilityBonusClient) DeleteOne(ab *AbilityBonus) *AbilityBonusDeleteOne {
-	return c.DeleteOneID(ab.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *AbilityBonusClient) DeleteOneID(id int) *AbilityBonusDeleteOne {
-	builder := c.Delete().Where(abilitybonus.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &AbilityBonusDeleteOne{builder}
 }
 
 // Query returns a query builder for AbilityBonus.
@@ -503,66 +550,18 @@ func (c *AbilityBonusClient) Query() *AbilityBonusQuery {
 	}
 }
 
-// Get returns a AbilityBonus entity by its id.
-func (c *AbilityBonusClient) Get(ctx context.Context, id int) (*AbilityBonus, error) {
-	return c.Query().Where(abilitybonus.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *AbilityBonusClient) GetX(ctx context.Context, id int) *AbilityBonus {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
+// QueryRace queries the race edge of a AbilityBonus.
+func (c *AbilityBonusClient) QueryRace(ab *AbilityBonus) *RaceQuery {
+	return c.Query().
+		Where(abilitybonus.RaceID(ab.RaceID), abilitybonus.AbilityScoreID(ab.AbilityScoreID)).
+		QueryRace()
 }
 
 // QueryAbilityScore queries the ability_score edge of a AbilityBonus.
 func (c *AbilityBonusClient) QueryAbilityScore(ab *AbilityBonus) *AbilityScoreQuery {
-	query := (&AbilityScoreClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ab.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
-			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, abilitybonus.AbilityScoreTable, abilitybonus.AbilityScoreColumn),
-		)
-		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryRace queries the race edge of a AbilityBonus.
-func (c *AbilityBonusClient) QueryRace(ab *AbilityBonus) *RaceQuery {
-	query := (&RaceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ab.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
-			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, abilitybonus.RaceTable, abilitybonus.RaceColumn),
-		)
-		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySubrace queries the subrace edge of a AbilityBonus.
-func (c *AbilityBonusClient) QuerySubrace(ab *AbilityBonus) *SubraceQuery {
-	query := (&SubraceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ab.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, abilitybonus.SubraceTable, abilitybonus.SubraceColumn),
-		)
-		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
+	return c.Query().
+		Where(abilitybonus.RaceID(ab.RaceID), abilitybonus.AbilityScoreID(ab.AbilityScoreID)).
+		QueryAbilityScore()
 }
 
 // Hooks returns the client hooks.
@@ -620,6 +619,21 @@ func (c *AbilityScoreClient) Create() *AbilityScoreCreate {
 
 // CreateBulk returns a builder for creating a bulk of AbilityScore entities.
 func (c *AbilityScoreClient) CreateBulk(builders ...*AbilityScoreCreate) *AbilityScoreCreateBulk {
+	return &AbilityScoreCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AbilityScoreClient) MapCreateBulk(slice any, setFunc func(*AbilityScoreCreate, int)) *AbilityScoreCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AbilityScoreCreateBulk{err: fmt.Errorf("calling to AbilityScoreClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AbilityScoreCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &AbilityScoreCreateBulk{config: c.config, builders: builders}
 }
 
@@ -691,7 +705,7 @@ func (c *AbilityScoreClient) QuerySkills(as *AbilityScore) *SkillQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
 			sqlgraph.To(skill.Table, skill.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, abilityscore.SkillsTable, abilityscore.SkillsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, abilityscore.SkillsTable, abilityscore.SkillsColumn),
 		)
 		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
 		return fromV, nil
@@ -699,15 +713,63 @@ func (c *AbilityScoreClient) QuerySkills(as *AbilityScore) *SkillQuery {
 	return query
 }
 
-// QueryAbilityBonuses queries the ability_bonuses edge of a AbilityScore.
-func (c *AbilityScoreClient) QueryAbilityBonuses(as *AbilityScore) *AbilityBonusQuery {
+// QueryCharacterAbilityScore queries the character_ability_score edge of a AbilityScore.
+func (c *AbilityScoreClient) QueryCharacterAbilityScore(as *AbilityScore) *CharacterAbilityScoreQuery {
+	query := (&CharacterAbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := as.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
+			sqlgraph.To(characterabilityscore.Table, characterabilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, abilityscore.CharacterAbilityScoreTable, abilityscore.CharacterAbilityScoreColumn),
+		)
+		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryClasses queries the classes edge of a AbilityScore.
+func (c *AbilityScoreClient) QueryClasses(as *AbilityScore) *ClassQuery {
+	query := (&ClassClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := as.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
+			sqlgraph.To(class.Table, class.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, abilityscore.ClassesTable, abilityscore.ClassesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRace queries the race edge of a AbilityScore.
+func (c *AbilityScoreClient) QueryRace(as *AbilityScore) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := as.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, abilityscore.RaceTable, abilityscore.RacePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRaceAbilityBonuses queries the race_ability_bonuses edge of a AbilityScore.
+func (c *AbilityScoreClient) QueryRaceAbilityBonuses(as *AbilityScore) *AbilityBonusQuery {
 	query := (&AbilityBonusClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := as.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
-			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, abilityscore.AbilityBonusesTable, abilityscore.AbilityBonusesColumn),
+			sqlgraph.To(abilitybonus.Table, abilitybonus.AbilityScoreColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, abilityscore.RaceAbilityBonusesTable, abilityscore.RaceAbilityBonusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
 		return fromV, nil
@@ -737,6 +799,139 @@ func (c *AbilityScoreClient) mutate(ctx context.Context, m *AbilityScoreMutation
 		return (&AbilityScoreDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AbilityScore mutation op: %q", m.Op())
+	}
+}
+
+// AlignmentClient is a client for the Alignment schema.
+type AlignmentClient struct {
+	config
+}
+
+// NewAlignmentClient returns a client for the Alignment from the given config.
+func NewAlignmentClient(c config) *AlignmentClient {
+	return &AlignmentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `alignment.Hooks(f(g(h())))`.
+func (c *AlignmentClient) Use(hooks ...Hook) {
+	c.hooks.Alignment = append(c.hooks.Alignment, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `alignment.Intercept(f(g(h())))`.
+func (c *AlignmentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Alignment = append(c.inters.Alignment, interceptors...)
+}
+
+// Create returns a builder for creating a Alignment entity.
+func (c *AlignmentClient) Create() *AlignmentCreate {
+	mutation := newAlignmentMutation(c.config, OpCreate)
+	return &AlignmentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Alignment entities.
+func (c *AlignmentClient) CreateBulk(builders ...*AlignmentCreate) *AlignmentCreateBulk {
+	return &AlignmentCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AlignmentClient) MapCreateBulk(slice any, setFunc func(*AlignmentCreate, int)) *AlignmentCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AlignmentCreateBulk{err: fmt.Errorf("calling to AlignmentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AlignmentCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AlignmentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Alignment.
+func (c *AlignmentClient) Update() *AlignmentUpdate {
+	mutation := newAlignmentMutation(c.config, OpUpdate)
+	return &AlignmentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AlignmentClient) UpdateOne(a *Alignment) *AlignmentUpdateOne {
+	mutation := newAlignmentMutation(c.config, OpUpdateOne, withAlignment(a))
+	return &AlignmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AlignmentClient) UpdateOneID(id int) *AlignmentUpdateOne {
+	mutation := newAlignmentMutation(c.config, OpUpdateOne, withAlignmentID(id))
+	return &AlignmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Alignment.
+func (c *AlignmentClient) Delete() *AlignmentDelete {
+	mutation := newAlignmentMutation(c.config, OpDelete)
+	return &AlignmentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AlignmentClient) DeleteOne(a *Alignment) *AlignmentDeleteOne {
+	return c.DeleteOneID(a.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AlignmentClient) DeleteOneID(id int) *AlignmentDeleteOne {
+	builder := c.Delete().Where(alignment.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AlignmentDeleteOne{builder}
+}
+
+// Query returns a query builder for Alignment.
+func (c *AlignmentClient) Query() *AlignmentQuery {
+	return &AlignmentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAlignment},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Alignment entity by its id.
+func (c *AlignmentClient) Get(ctx context.Context, id int) (*Alignment, error) {
+	return c.Query().Where(alignment.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AlignmentClient) GetX(ctx context.Context, id int) *Alignment {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AlignmentClient) Hooks() []Hook {
+	return c.hooks.Alignment
+}
+
+// Interceptors returns the client interceptors.
+func (c *AlignmentClient) Interceptors() []Interceptor {
+	return c.inters.Alignment
+}
+
+func (c *AlignmentClient) mutate(ctx context.Context, m *AlignmentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AlignmentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AlignmentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AlignmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AlignmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Alignment mutation op: %q", m.Op())
 	}
 }
 
@@ -770,6 +965,21 @@ func (c *ArmorClient) Create() *ArmorCreate {
 
 // CreateBulk returns a builder for creating a bulk of Armor entities.
 func (c *ArmorClient) CreateBulk(builders ...*ArmorCreate) *ArmorCreateBulk {
+	return &ArmorCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ArmorClient) MapCreateBulk(slice any, setFunc func(*ArmorCreate, int)) *ArmorCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ArmorCreateBulk{err: fmt.Errorf("calling to ArmorClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ArmorCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &ArmorCreateBulk{config: c.config, builders: builders}
 }
 
@@ -849,22 +1059,6 @@ func (c *ArmorClient) QueryEquipment(a *Armor) *EquipmentQuery {
 	return query
 }
 
-// QueryArmorClass queries the armor_class edge of a Armor.
-func (c *ArmorClient) QueryArmorClass(a *Armor) *ArmorClassQuery {
-	query := (&ArmorClassClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := a.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(armor.Table, armor.FieldID, id),
-			sqlgraph.To(armorclass.Table, armorclass.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, armor.ArmorClassTable, armor.ArmorClassColumn),
-		)
-		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
 func (c *ArmorClient) Hooks() []Hook {
 	return c.hooks.Armor
@@ -890,92 +1084,107 @@ func (c *ArmorClient) mutate(ctx context.Context, m *ArmorMutation) (Value, erro
 	}
 }
 
-// ArmorClassClient is a client for the ArmorClass schema.
-type ArmorClassClient struct {
+// CharacterClient is a client for the Character schema.
+type CharacterClient struct {
 	config
 }
 
-// NewArmorClassClient returns a client for the ArmorClass from the given config.
-func NewArmorClassClient(c config) *ArmorClassClient {
-	return &ArmorClassClient{config: c}
+// NewCharacterClient returns a client for the Character from the given config.
+func NewCharacterClient(c config) *CharacterClient {
+	return &CharacterClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `armorclass.Hooks(f(g(h())))`.
-func (c *ArmorClassClient) Use(hooks ...Hook) {
-	c.hooks.ArmorClass = append(c.hooks.ArmorClass, hooks...)
+// A call to `Use(f, g, h)` equals to `character.Hooks(f(g(h())))`.
+func (c *CharacterClient) Use(hooks ...Hook) {
+	c.hooks.Character = append(c.hooks.Character, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `armorclass.Intercept(f(g(h())))`.
-func (c *ArmorClassClient) Intercept(interceptors ...Interceptor) {
-	c.inters.ArmorClass = append(c.inters.ArmorClass, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `character.Intercept(f(g(h())))`.
+func (c *CharacterClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Character = append(c.inters.Character, interceptors...)
 }
 
-// Create returns a builder for creating a ArmorClass entity.
-func (c *ArmorClassClient) Create() *ArmorClassCreate {
-	mutation := newArmorClassMutation(c.config, OpCreate)
-	return &ArmorClassCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Character entity.
+func (c *CharacterClient) Create() *CharacterCreate {
+	mutation := newCharacterMutation(c.config, OpCreate)
+	return &CharacterCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of ArmorClass entities.
-func (c *ArmorClassClient) CreateBulk(builders ...*ArmorClassCreate) *ArmorClassCreateBulk {
-	return &ArmorClassCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Character entities.
+func (c *CharacterClient) CreateBulk(builders ...*CharacterCreate) *CharacterCreateBulk {
+	return &CharacterCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for ArmorClass.
-func (c *ArmorClassClient) Update() *ArmorClassUpdate {
-	mutation := newArmorClassMutation(c.config, OpUpdate)
-	return &ArmorClassUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CharacterClient) MapCreateBulk(slice any, setFunc func(*CharacterCreate, int)) *CharacterCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CharacterCreateBulk{err: fmt.Errorf("calling to CharacterClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CharacterCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CharacterCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Character.
+func (c *CharacterClient) Update() *CharacterUpdate {
+	mutation := newCharacterMutation(c.config, OpUpdate)
+	return &CharacterUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *ArmorClassClient) UpdateOne(ac *ArmorClass) *ArmorClassUpdateOne {
-	mutation := newArmorClassMutation(c.config, OpUpdateOne, withArmorClass(ac))
-	return &ArmorClassUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *CharacterClient) UpdateOne(ch *Character) *CharacterUpdateOne {
+	mutation := newCharacterMutation(c.config, OpUpdateOne, withCharacter(ch))
+	return &CharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ArmorClassClient) UpdateOneID(id int) *ArmorClassUpdateOne {
-	mutation := newArmorClassMutation(c.config, OpUpdateOne, withArmorClassID(id))
-	return &ArmorClassUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *CharacterClient) UpdateOneID(id int) *CharacterUpdateOne {
+	mutation := newCharacterMutation(c.config, OpUpdateOne, withCharacterID(id))
+	return &CharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for ArmorClass.
-func (c *ArmorClassClient) Delete() *ArmorClassDelete {
-	mutation := newArmorClassMutation(c.config, OpDelete)
-	return &ArmorClassDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Character.
+func (c *CharacterClient) Delete() *CharacterDelete {
+	mutation := newCharacterMutation(c.config, OpDelete)
+	return &CharacterDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *ArmorClassClient) DeleteOne(ac *ArmorClass) *ArmorClassDeleteOne {
-	return c.DeleteOneID(ac.ID)
+func (c *CharacterClient) DeleteOne(ch *Character) *CharacterDeleteOne {
+	return c.DeleteOneID(ch.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ArmorClassClient) DeleteOneID(id int) *ArmorClassDeleteOne {
-	builder := c.Delete().Where(armorclass.ID(id))
+func (c *CharacterClient) DeleteOneID(id int) *CharacterDeleteOne {
+	builder := c.Delete().Where(character.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &ArmorClassDeleteOne{builder}
+	return &CharacterDeleteOne{builder}
 }
 
-// Query returns a query builder for ArmorClass.
-func (c *ArmorClassClient) Query() *ArmorClassQuery {
-	return &ArmorClassQuery{
+// Query returns a query builder for Character.
+func (c *CharacterClient) Query() *CharacterQuery {
+	return &CharacterQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeArmorClass},
+		ctx:    &QueryContext{Type: TypeCharacter},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a ArmorClass entity by its id.
-func (c *ArmorClassClient) Get(ctx context.Context, id int) (*ArmorClass, error) {
-	return c.Query().Where(armorclass.ID(id)).Only(ctx)
+// Get returns a Character entity by its id.
+func (c *CharacterClient) Get(ctx context.Context, id int) (*Character, error) {
+	return c.Query().Where(character.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ArmorClassClient) GetX(ctx context.Context, id int) *ArmorClass {
+func (c *CharacterClient) GetX(ctx context.Context, id int) *Character {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -983,28 +1192,686 @@ func (c *ArmorClassClient) GetX(ctx context.Context, id int) *ArmorClass {
 	return obj
 }
 
+// QueryRace queries the race edge of a Character.
+func (c *CharacterClient) QueryRace(ch *Character) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, character.RaceTable, character.RaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryClass queries the class edge of a Character.
+func (c *CharacterClient) QueryClass(ch *Character) *ClassQuery {
+	query := (&ClassClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, id),
+			sqlgraph.To(class.Table, class.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, character.ClassTable, character.ClassColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAlignment queries the alignment edge of a Character.
+func (c *CharacterClient) QueryAlignment(ch *Character) *AlignmentQuery {
+	query := (&AlignmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, id),
+			sqlgraph.To(alignment.Table, alignment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, character.AlignmentTable, character.AlignmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterAbilityScores queries the character_ability_scores edge of a Character.
+func (c *CharacterClient) QueryCharacterAbilityScores(ch *Character) *CharacterAbilityScoreQuery {
+	query := (&CharacterAbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, id),
+			sqlgraph.To(characterabilityscore.Table, characterabilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, character.CharacterAbilityScoresTable, character.CharacterAbilityScoresColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterSkills queries the character_skills edge of a Character.
+func (c *CharacterClient) QueryCharacterSkills(ch *Character) *CharacterSkillQuery {
+	query := (&CharacterSkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, id),
+			sqlgraph.To(characterskill.Table, characterskill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, character.CharacterSkillsTable, character.CharacterSkillsColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterProficiencies queries the character_proficiencies edge of a Character.
+func (c *CharacterClient) QueryCharacterProficiencies(ch *Character) *CharacterProficiencyQuery {
+	query := (&CharacterProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, id),
+			sqlgraph.To(characterproficiency.Table, characterproficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, character.CharacterProficienciesTable, character.CharacterProficienciesColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
-func (c *ArmorClassClient) Hooks() []Hook {
-	return c.hooks.ArmorClass
+func (c *CharacterClient) Hooks() []Hook {
+	hooks := c.hooks.Character
+	return append(hooks[:len(hooks):len(hooks)], character.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
-func (c *ArmorClassClient) Interceptors() []Interceptor {
-	return c.inters.ArmorClass
+func (c *CharacterClient) Interceptors() []Interceptor {
+	return c.inters.Character
 }
 
-func (c *ArmorClassClient) mutate(ctx context.Context, m *ArmorClassMutation) (Value, error) {
+func (c *CharacterClient) mutate(ctx context.Context, m *CharacterMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&ArmorClassCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CharacterCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&ArmorClassUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CharacterUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&ArmorClassUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&ArmorClassDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&CharacterDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown ArmorClass mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Character mutation op: %q", m.Op())
+	}
+}
+
+// CharacterAbilityScoreClient is a client for the CharacterAbilityScore schema.
+type CharacterAbilityScoreClient struct {
+	config
+}
+
+// NewCharacterAbilityScoreClient returns a client for the CharacterAbilityScore from the given config.
+func NewCharacterAbilityScoreClient(c config) *CharacterAbilityScoreClient {
+	return &CharacterAbilityScoreClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `characterabilityscore.Hooks(f(g(h())))`.
+func (c *CharacterAbilityScoreClient) Use(hooks ...Hook) {
+	c.hooks.CharacterAbilityScore = append(c.hooks.CharacterAbilityScore, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `characterabilityscore.Intercept(f(g(h())))`.
+func (c *CharacterAbilityScoreClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CharacterAbilityScore = append(c.inters.CharacterAbilityScore, interceptors...)
+}
+
+// Create returns a builder for creating a CharacterAbilityScore entity.
+func (c *CharacterAbilityScoreClient) Create() *CharacterAbilityScoreCreate {
+	mutation := newCharacterAbilityScoreMutation(c.config, OpCreate)
+	return &CharacterAbilityScoreCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CharacterAbilityScore entities.
+func (c *CharacterAbilityScoreClient) CreateBulk(builders ...*CharacterAbilityScoreCreate) *CharacterAbilityScoreCreateBulk {
+	return &CharacterAbilityScoreCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CharacterAbilityScoreClient) MapCreateBulk(slice any, setFunc func(*CharacterAbilityScoreCreate, int)) *CharacterAbilityScoreCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CharacterAbilityScoreCreateBulk{err: fmt.Errorf("calling to CharacterAbilityScoreClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CharacterAbilityScoreCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CharacterAbilityScoreCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CharacterAbilityScore.
+func (c *CharacterAbilityScoreClient) Update() *CharacterAbilityScoreUpdate {
+	mutation := newCharacterAbilityScoreMutation(c.config, OpUpdate)
+	return &CharacterAbilityScoreUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CharacterAbilityScoreClient) UpdateOne(cas *CharacterAbilityScore) *CharacterAbilityScoreUpdateOne {
+	mutation := newCharacterAbilityScoreMutation(c.config, OpUpdateOne, withCharacterAbilityScore(cas))
+	return &CharacterAbilityScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CharacterAbilityScoreClient) UpdateOneID(id int) *CharacterAbilityScoreUpdateOne {
+	mutation := newCharacterAbilityScoreMutation(c.config, OpUpdateOne, withCharacterAbilityScoreID(id))
+	return &CharacterAbilityScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CharacterAbilityScore.
+func (c *CharacterAbilityScoreClient) Delete() *CharacterAbilityScoreDelete {
+	mutation := newCharacterAbilityScoreMutation(c.config, OpDelete)
+	return &CharacterAbilityScoreDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CharacterAbilityScoreClient) DeleteOne(cas *CharacterAbilityScore) *CharacterAbilityScoreDeleteOne {
+	return c.DeleteOneID(cas.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CharacterAbilityScoreClient) DeleteOneID(id int) *CharacterAbilityScoreDeleteOne {
+	builder := c.Delete().Where(characterabilityscore.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CharacterAbilityScoreDeleteOne{builder}
+}
+
+// Query returns a query builder for CharacterAbilityScore.
+func (c *CharacterAbilityScoreClient) Query() *CharacterAbilityScoreQuery {
+	return &CharacterAbilityScoreQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCharacterAbilityScore},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a CharacterAbilityScore entity by its id.
+func (c *CharacterAbilityScoreClient) Get(ctx context.Context, id int) (*CharacterAbilityScore, error) {
+	return c.Query().Where(characterabilityscore.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CharacterAbilityScoreClient) GetX(ctx context.Context, id int) *CharacterAbilityScore {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCharacter queries the character edge of a CharacterAbilityScore.
+func (c *CharacterAbilityScoreClient) QueryCharacter(cas *CharacterAbilityScore) *CharacterQuery {
+	query := (&CharacterClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cas.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, id),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, characterabilityscore.CharacterTable, characterabilityscore.CharacterColumn),
+		)
+		fromV = sqlgraph.Neighbors(cas.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAbilityScore queries the ability_score edge of a CharacterAbilityScore.
+func (c *CharacterAbilityScoreClient) QueryAbilityScore(cas *CharacterAbilityScore) *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cas.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, id),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, characterabilityscore.AbilityScoreTable, characterabilityscore.AbilityScoreColumn),
+		)
+		fromV = sqlgraph.Neighbors(cas.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterSkills queries the character_skills edge of a CharacterAbilityScore.
+func (c *CharacterAbilityScoreClient) QueryCharacterSkills(cas *CharacterAbilityScore) *CharacterSkillQuery {
+	query := (&CharacterSkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cas.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, id),
+			sqlgraph.To(characterskill.Table, characterskill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, characterabilityscore.CharacterSkillsTable, characterabilityscore.CharacterSkillsColumn),
+		)
+		fromV = sqlgraph.Neighbors(cas.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CharacterAbilityScoreClient) Hooks() []Hook {
+	hooks := c.hooks.CharacterAbilityScore
+	return append(hooks[:len(hooks):len(hooks)], characterabilityscore.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *CharacterAbilityScoreClient) Interceptors() []Interceptor {
+	return c.inters.CharacterAbilityScore
+}
+
+func (c *CharacterAbilityScoreClient) mutate(ctx context.Context, m *CharacterAbilityScoreMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CharacterAbilityScoreCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CharacterAbilityScoreUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CharacterAbilityScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CharacterAbilityScoreDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CharacterAbilityScore mutation op: %q", m.Op())
+	}
+}
+
+// CharacterProficiencyClient is a client for the CharacterProficiency schema.
+type CharacterProficiencyClient struct {
+	config
+}
+
+// NewCharacterProficiencyClient returns a client for the CharacterProficiency from the given config.
+func NewCharacterProficiencyClient(c config) *CharacterProficiencyClient {
+	return &CharacterProficiencyClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `characterproficiency.Hooks(f(g(h())))`.
+func (c *CharacterProficiencyClient) Use(hooks ...Hook) {
+	c.hooks.CharacterProficiency = append(c.hooks.CharacterProficiency, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `characterproficiency.Intercept(f(g(h())))`.
+func (c *CharacterProficiencyClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CharacterProficiency = append(c.inters.CharacterProficiency, interceptors...)
+}
+
+// Create returns a builder for creating a CharacterProficiency entity.
+func (c *CharacterProficiencyClient) Create() *CharacterProficiencyCreate {
+	mutation := newCharacterProficiencyMutation(c.config, OpCreate)
+	return &CharacterProficiencyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CharacterProficiency entities.
+func (c *CharacterProficiencyClient) CreateBulk(builders ...*CharacterProficiencyCreate) *CharacterProficiencyCreateBulk {
+	return &CharacterProficiencyCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CharacterProficiencyClient) MapCreateBulk(slice any, setFunc func(*CharacterProficiencyCreate, int)) *CharacterProficiencyCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CharacterProficiencyCreateBulk{err: fmt.Errorf("calling to CharacterProficiencyClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CharacterProficiencyCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CharacterProficiencyCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CharacterProficiency.
+func (c *CharacterProficiencyClient) Update() *CharacterProficiencyUpdate {
+	mutation := newCharacterProficiencyMutation(c.config, OpUpdate)
+	return &CharacterProficiencyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CharacterProficiencyClient) UpdateOne(cp *CharacterProficiency) *CharacterProficiencyUpdateOne {
+	mutation := newCharacterProficiencyMutation(c.config, OpUpdateOne, withCharacterProficiency(cp))
+	return &CharacterProficiencyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CharacterProficiencyClient) UpdateOneID(id int) *CharacterProficiencyUpdateOne {
+	mutation := newCharacterProficiencyMutation(c.config, OpUpdateOne, withCharacterProficiencyID(id))
+	return &CharacterProficiencyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CharacterProficiency.
+func (c *CharacterProficiencyClient) Delete() *CharacterProficiencyDelete {
+	mutation := newCharacterProficiencyMutation(c.config, OpDelete)
+	return &CharacterProficiencyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CharacterProficiencyClient) DeleteOne(cp *CharacterProficiency) *CharacterProficiencyDeleteOne {
+	return c.DeleteOneID(cp.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CharacterProficiencyClient) DeleteOneID(id int) *CharacterProficiencyDeleteOne {
+	builder := c.Delete().Where(characterproficiency.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CharacterProficiencyDeleteOne{builder}
+}
+
+// Query returns a query builder for CharacterProficiency.
+func (c *CharacterProficiencyClient) Query() *CharacterProficiencyQuery {
+	return &CharacterProficiencyQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCharacterProficiency},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a CharacterProficiency entity by its id.
+func (c *CharacterProficiencyClient) Get(ctx context.Context, id int) (*CharacterProficiency, error) {
+	return c.Query().Where(characterproficiency.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CharacterProficiencyClient) GetX(ctx context.Context, id int) *CharacterProficiency {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCharacter queries the character edge of a CharacterProficiency.
+func (c *CharacterProficiencyClient) QueryCharacter(cp *CharacterProficiency) *CharacterQuery {
+	query := (&CharacterClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterproficiency.Table, characterproficiency.FieldID, id),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, characterproficiency.CharacterTable, characterproficiency.CharacterColumn),
+		)
+		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryProficiency queries the proficiency edge of a CharacterProficiency.
+func (c *CharacterProficiencyClient) QueryProficiency(cp *CharacterProficiency) *ProficiencyQuery {
+	query := (&ProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterproficiency.Table, characterproficiency.FieldID, id),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, characterproficiency.ProficiencyTable, characterproficiency.ProficiencyColumn),
+		)
+		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterSkill queries the character_skill edge of a CharacterProficiency.
+func (c *CharacterProficiencyClient) QueryCharacterSkill(cp *CharacterProficiency) *CharacterSkillQuery {
+	query := (&CharacterSkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterproficiency.Table, characterproficiency.FieldID, id),
+			sqlgraph.To(characterskill.Table, characterskill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, characterproficiency.CharacterSkillTable, characterproficiency.CharacterSkillColumn),
+		)
+		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CharacterProficiencyClient) Hooks() []Hook {
+	return c.hooks.CharacterProficiency
+}
+
+// Interceptors returns the client interceptors.
+func (c *CharacterProficiencyClient) Interceptors() []Interceptor {
+	return c.inters.CharacterProficiency
+}
+
+func (c *CharacterProficiencyClient) mutate(ctx context.Context, m *CharacterProficiencyMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CharacterProficiencyCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CharacterProficiencyUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CharacterProficiencyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CharacterProficiencyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CharacterProficiency mutation op: %q", m.Op())
+	}
+}
+
+// CharacterSkillClient is a client for the CharacterSkill schema.
+type CharacterSkillClient struct {
+	config
+}
+
+// NewCharacterSkillClient returns a client for the CharacterSkill from the given config.
+func NewCharacterSkillClient(c config) *CharacterSkillClient {
+	return &CharacterSkillClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `characterskill.Hooks(f(g(h())))`.
+func (c *CharacterSkillClient) Use(hooks ...Hook) {
+	c.hooks.CharacterSkill = append(c.hooks.CharacterSkill, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `characterskill.Intercept(f(g(h())))`.
+func (c *CharacterSkillClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CharacterSkill = append(c.inters.CharacterSkill, interceptors...)
+}
+
+// Create returns a builder for creating a CharacterSkill entity.
+func (c *CharacterSkillClient) Create() *CharacterSkillCreate {
+	mutation := newCharacterSkillMutation(c.config, OpCreate)
+	return &CharacterSkillCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CharacterSkill entities.
+func (c *CharacterSkillClient) CreateBulk(builders ...*CharacterSkillCreate) *CharacterSkillCreateBulk {
+	return &CharacterSkillCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CharacterSkillClient) MapCreateBulk(slice any, setFunc func(*CharacterSkillCreate, int)) *CharacterSkillCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CharacterSkillCreateBulk{err: fmt.Errorf("calling to CharacterSkillClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CharacterSkillCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CharacterSkillCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CharacterSkill.
+func (c *CharacterSkillClient) Update() *CharacterSkillUpdate {
+	mutation := newCharacterSkillMutation(c.config, OpUpdate)
+	return &CharacterSkillUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CharacterSkillClient) UpdateOne(cs *CharacterSkill) *CharacterSkillUpdateOne {
+	mutation := newCharacterSkillMutation(c.config, OpUpdateOne, withCharacterSkill(cs))
+	return &CharacterSkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CharacterSkillClient) UpdateOneID(id int) *CharacterSkillUpdateOne {
+	mutation := newCharacterSkillMutation(c.config, OpUpdateOne, withCharacterSkillID(id))
+	return &CharacterSkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CharacterSkill.
+func (c *CharacterSkillClient) Delete() *CharacterSkillDelete {
+	mutation := newCharacterSkillMutation(c.config, OpDelete)
+	return &CharacterSkillDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CharacterSkillClient) DeleteOne(cs *CharacterSkill) *CharacterSkillDeleteOne {
+	return c.DeleteOneID(cs.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CharacterSkillClient) DeleteOneID(id int) *CharacterSkillDeleteOne {
+	builder := c.Delete().Where(characterskill.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CharacterSkillDeleteOne{builder}
+}
+
+// Query returns a query builder for CharacterSkill.
+func (c *CharacterSkillClient) Query() *CharacterSkillQuery {
+	return &CharacterSkillQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCharacterSkill},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a CharacterSkill entity by its id.
+func (c *CharacterSkillClient) Get(ctx context.Context, id int) (*CharacterSkill, error) {
+	return c.Query().Where(characterskill.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CharacterSkillClient) GetX(ctx context.Context, id int) *CharacterSkill {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCharacter queries the character edge of a CharacterSkill.
+func (c *CharacterSkillClient) QueryCharacter(cs *CharacterSkill) *CharacterQuery {
+	query := (&CharacterClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterskill.Table, characterskill.FieldID, id),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, characterskill.CharacterTable, characterskill.CharacterColumn),
+		)
+		fromV = sqlgraph.Neighbors(cs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySkill queries the skill edge of a CharacterSkill.
+func (c *CharacterSkillClient) QuerySkill(cs *CharacterSkill) *SkillQuery {
+	query := (&SkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterskill.Table, characterskill.FieldID, id),
+			sqlgraph.To(skill.Table, skill.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, characterskill.SkillTable, characterskill.SkillColumn),
+		)
+		fromV = sqlgraph.Neighbors(cs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterAbilityScore queries the character_ability_score edge of a CharacterSkill.
+func (c *CharacterSkillClient) QueryCharacterAbilityScore(cs *CharacterSkill) *CharacterAbilityScoreQuery {
+	query := (&CharacterAbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterskill.Table, characterskill.FieldID, id),
+			sqlgraph.To(characterabilityscore.Table, characterabilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, characterskill.CharacterAbilityScoreTable, characterskill.CharacterAbilityScoreColumn),
+		)
+		fromV = sqlgraph.Neighbors(cs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterProficiency queries the character_proficiency edge of a CharacterSkill.
+func (c *CharacterSkillClient) QueryCharacterProficiency(cs *CharacterSkill) *CharacterProficiencyQuery {
+	query := (&CharacterProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterskill.Table, characterskill.FieldID, id),
+			sqlgraph.To(characterproficiency.Table, characterproficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, characterskill.CharacterProficiencyTable, characterskill.CharacterProficiencyColumn),
+		)
+		fromV = sqlgraph.Neighbors(cs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CharacterSkillClient) Hooks() []Hook {
+	hooks := c.hooks.CharacterSkill
+	return append(hooks[:len(hooks):len(hooks)], characterskill.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *CharacterSkillClient) Interceptors() []Interceptor {
+	return c.inters.CharacterSkill
+}
+
+func (c *CharacterSkillClient) mutate(ctx context.Context, m *CharacterSkillMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CharacterSkillCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CharacterSkillUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CharacterSkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CharacterSkillDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CharacterSkill mutation op: %q", m.Op())
 	}
 }
 
@@ -1038,6 +1905,21 @@ func (c *ClassClient) Create() *ClassCreate {
 
 // CreateBulk returns a builder for creating a bulk of Class entities.
 func (c *ClassClient) CreateBulk(builders ...*ClassCreate) *ClassCreateBulk {
+	return &ClassCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ClassClient) MapCreateBulk(slice any, setFunc func(*ClassCreate, int)) *ClassCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ClassCreateBulk{err: fmt.Errorf("calling to ClassClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ClassCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &ClassCreateBulk{config: c.config, builders: builders}
 }
 
@@ -1117,15 +1999,15 @@ func (c *ClassClient) QueryProficiencies(cl *Class) *ProficiencyQuery {
 	return query
 }
 
-// QueryProficiencyChoices queries the proficiency_choices edge of a Class.
-func (c *ClassClient) QueryProficiencyChoices(cl *Class) *ProficiencyChoiceQuery {
+// QueryProficiencyOptions queries the proficiency_options edge of a Class.
+func (c *ClassClient) QueryProficiencyOptions(cl *Class) *ProficiencyChoiceQuery {
 	query := (&ProficiencyChoiceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cl.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, id),
 			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, class.ProficiencyChoicesTable, class.ProficiencyChoicesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, class.ProficiencyOptionsTable, class.ProficiencyOptionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
 		return fromV, nil
@@ -1133,15 +2015,15 @@ func (c *ClassClient) QueryProficiencyChoices(cl *Class) *ProficiencyChoiceQuery
 	return query
 }
 
-// QueryEquipment queries the equipment edge of a Class.
-func (c *ClassClient) QueryEquipment(cl *Class) *EquipmentQuery {
-	query := (&EquipmentClient{config: c.config}).Query()
+// QueryStartingEquipment queries the starting_equipment edge of a Class.
+func (c *ClassClient) QueryStartingEquipment(cl *Class) *EquipmentEntryQuery {
+	query := (&EquipmentEntryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cl.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, id),
-			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, class.EquipmentTable, class.EquipmentPrimaryKey...),
+			sqlgraph.To(equipmententry.Table, equipmententry.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, class.StartingEquipmentTable, class.StartingEquipmentPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
 		return fromV, nil
@@ -1149,15 +2031,15 @@ func (c *ClassClient) QueryEquipment(cl *Class) *EquipmentQuery {
 	return query
 }
 
-// QueryEquipmentChoices queries the equipment_choices edge of a Class.
-func (c *ClassClient) QueryEquipmentChoices(cl *Class) *EquipmentChoiceQuery {
-	query := (&EquipmentChoiceClient{config: c.config}).Query()
+// QuerySavingThrows queries the saving_throws edge of a Class.
+func (c *ClassClient) QuerySavingThrows(cl *Class) *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cl.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, id),
-			sqlgraph.To(equipmentchoice.Table, equipmentchoice.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, class.EquipmentChoicesTable, class.EquipmentChoicesPrimaryKey...),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, class.SavingThrowsTable, class.SavingThrowsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
 		return fromV, nil
@@ -1165,15 +2047,15 @@ func (c *ClassClient) QueryEquipmentChoices(cl *Class) *EquipmentChoiceQuery {
 	return query
 }
 
-// QueryClassEquipment queries the class_equipment edge of a Class.
-func (c *ClassClient) QueryClassEquipment(cl *Class) *ClassEquipmentQuery {
-	query := (&ClassEquipmentClient{config: c.config}).Query()
+// QueryCharacters queries the characters edge of a Class.
+func (c *ClassClient) QueryCharacters(cl *Class) *CharacterQuery {
+	query := (&CharacterClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cl.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, id),
-			sqlgraph.To(classequipment.Table, classequipment.ClassColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, class.ClassEquipmentTable, class.ClassEquipmentColumn),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, class.CharactersTable, class.CharactersColumn),
 		)
 		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
 		return fromV, nil
@@ -1203,107 +2085,6 @@ func (c *ClassClient) mutate(ctx context.Context, m *ClassMutation) (Value, erro
 		return (&ClassDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Class mutation op: %q", m.Op())
-	}
-}
-
-// ClassEquipmentClient is a client for the ClassEquipment schema.
-type ClassEquipmentClient struct {
-	config
-}
-
-// NewClassEquipmentClient returns a client for the ClassEquipment from the given config.
-func NewClassEquipmentClient(c config) *ClassEquipmentClient {
-	return &ClassEquipmentClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `classequipment.Hooks(f(g(h())))`.
-func (c *ClassEquipmentClient) Use(hooks ...Hook) {
-	c.hooks.ClassEquipment = append(c.hooks.ClassEquipment, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `classequipment.Intercept(f(g(h())))`.
-func (c *ClassEquipmentClient) Intercept(interceptors ...Interceptor) {
-	c.inters.ClassEquipment = append(c.inters.ClassEquipment, interceptors...)
-}
-
-// Create returns a builder for creating a ClassEquipment entity.
-func (c *ClassEquipmentClient) Create() *ClassEquipmentCreate {
-	mutation := newClassEquipmentMutation(c.config, OpCreate)
-	return &ClassEquipmentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of ClassEquipment entities.
-func (c *ClassEquipmentClient) CreateBulk(builders ...*ClassEquipmentCreate) *ClassEquipmentCreateBulk {
-	return &ClassEquipmentCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for ClassEquipment.
-func (c *ClassEquipmentClient) Update() *ClassEquipmentUpdate {
-	mutation := newClassEquipmentMutation(c.config, OpUpdate)
-	return &ClassEquipmentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *ClassEquipmentClient) UpdateOne(ce *ClassEquipment) *ClassEquipmentUpdateOne {
-	mutation := newClassEquipmentMutation(c.config, OpUpdateOne)
-	mutation.class = &ce.ClassID
-	mutation.equipment = &ce.EquipmentID
-	return &ClassEquipmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for ClassEquipment.
-func (c *ClassEquipmentClient) Delete() *ClassEquipmentDelete {
-	mutation := newClassEquipmentMutation(c.config, OpDelete)
-	return &ClassEquipmentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Query returns a query builder for ClassEquipment.
-func (c *ClassEquipmentClient) Query() *ClassEquipmentQuery {
-	return &ClassEquipmentQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeClassEquipment},
-		inters: c.Interceptors(),
-	}
-}
-
-// QueryClass queries the class edge of a ClassEquipment.
-func (c *ClassEquipmentClient) QueryClass(ce *ClassEquipment) *ClassQuery {
-	return c.Query().
-		Where(classequipment.ClassID(ce.ClassID), classequipment.EquipmentID(ce.EquipmentID)).
-		QueryClass()
-}
-
-// QueryEquipment queries the equipment edge of a ClassEquipment.
-func (c *ClassEquipmentClient) QueryEquipment(ce *ClassEquipment) *EquipmentQuery {
-	return c.Query().
-		Where(classequipment.ClassID(ce.ClassID), classequipment.EquipmentID(ce.EquipmentID)).
-		QueryEquipment()
-}
-
-// Hooks returns the client hooks.
-func (c *ClassEquipmentClient) Hooks() []Hook {
-	return c.hooks.ClassEquipment
-}
-
-// Interceptors returns the client interceptors.
-func (c *ClassEquipmentClient) Interceptors() []Interceptor {
-	return c.inters.ClassEquipment
-}
-
-func (c *ClassEquipmentClient) mutate(ctx context.Context, m *ClassEquipmentMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&ClassEquipmentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&ClassEquipmentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&ClassEquipmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&ClassEquipmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown ClassEquipment mutation op: %q", m.Op())
 	}
 }
 
@@ -1337,6 +2118,21 @@ func (c *CoinClient) Create() *CoinCreate {
 
 // CreateBulk returns a builder for creating a bulk of Coin entities.
 func (c *CoinClient) CreateBulk(builders ...*CoinCreate) *CoinCreateBulk {
+	return &CoinCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CoinClient) MapCreateBulk(slice any, setFunc func(*CoinCreate, int)) *CoinCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CoinCreateBulk{err: fmt.Errorf("calling to CoinClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CoinCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &CoinCreateBulk{config: c.config, builders: builders}
 }
 
@@ -1400,6 +2196,22 @@ func (c *CoinClient) GetX(ctx context.Context, id int) *Coin {
 	return obj
 }
 
+// QueryCosts queries the costs edge of a Coin.
+func (c *CoinClient) QueryCosts(co *Coin) *CostQuery {
+	query := (&CostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(coin.Table, coin.FieldID, id),
+			sqlgraph.To(cost.Table, cost.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, coin.CostsTable, coin.CostsColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *CoinClient) Hooks() []Hook {
 	return c.hooks.Coin
@@ -1422,6 +2234,304 @@ func (c *CoinClient) mutate(ctx context.Context, m *CoinMutation) (Value, error)
 		return (&CoinDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Coin mutation op: %q", m.Op())
+	}
+}
+
+// ConditionClient is a client for the Condition schema.
+type ConditionClient struct {
+	config
+}
+
+// NewConditionClient returns a client for the Condition from the given config.
+func NewConditionClient(c config) *ConditionClient {
+	return &ConditionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `condition.Hooks(f(g(h())))`.
+func (c *ConditionClient) Use(hooks ...Hook) {
+	c.hooks.Condition = append(c.hooks.Condition, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `condition.Intercept(f(g(h())))`.
+func (c *ConditionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Condition = append(c.inters.Condition, interceptors...)
+}
+
+// Create returns a builder for creating a Condition entity.
+func (c *ConditionClient) Create() *ConditionCreate {
+	mutation := newConditionMutation(c.config, OpCreate)
+	return &ConditionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Condition entities.
+func (c *ConditionClient) CreateBulk(builders ...*ConditionCreate) *ConditionCreateBulk {
+	return &ConditionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ConditionClient) MapCreateBulk(slice any, setFunc func(*ConditionCreate, int)) *ConditionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ConditionCreateBulk{err: fmt.Errorf("calling to ConditionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ConditionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ConditionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Condition.
+func (c *ConditionClient) Update() *ConditionUpdate {
+	mutation := newConditionMutation(c.config, OpUpdate)
+	return &ConditionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ConditionClient) UpdateOne(co *Condition) *ConditionUpdateOne {
+	mutation := newConditionMutation(c.config, OpUpdateOne, withCondition(co))
+	return &ConditionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ConditionClient) UpdateOneID(id int) *ConditionUpdateOne {
+	mutation := newConditionMutation(c.config, OpUpdateOne, withConditionID(id))
+	return &ConditionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Condition.
+func (c *ConditionClient) Delete() *ConditionDelete {
+	mutation := newConditionMutation(c.config, OpDelete)
+	return &ConditionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ConditionClient) DeleteOne(co *Condition) *ConditionDeleteOne {
+	return c.DeleteOneID(co.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ConditionClient) DeleteOneID(id int) *ConditionDeleteOne {
+	builder := c.Delete().Where(condition.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ConditionDeleteOne{builder}
+}
+
+// Query returns a query builder for Condition.
+func (c *ConditionClient) Query() *ConditionQuery {
+	return &ConditionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCondition},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Condition entity by its id.
+func (c *ConditionClient) Get(ctx context.Context, id int) (*Condition, error) {
+	return c.Query().Where(condition.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ConditionClient) GetX(ctx context.Context, id int) *Condition {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ConditionClient) Hooks() []Hook {
+	return c.hooks.Condition
+}
+
+// Interceptors returns the client interceptors.
+func (c *ConditionClient) Interceptors() []Interceptor {
+	return c.inters.Condition
+}
+
+func (c *ConditionClient) mutate(ctx context.Context, m *ConditionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ConditionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ConditionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ConditionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ConditionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Condition mutation op: %q", m.Op())
+	}
+}
+
+// CostClient is a client for the Cost schema.
+type CostClient struct {
+	config
+}
+
+// NewCostClient returns a client for the Cost from the given config.
+func NewCostClient(c config) *CostClient {
+	return &CostClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `cost.Hooks(f(g(h())))`.
+func (c *CostClient) Use(hooks ...Hook) {
+	c.hooks.Cost = append(c.hooks.Cost, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `cost.Intercept(f(g(h())))`.
+func (c *CostClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Cost = append(c.inters.Cost, interceptors...)
+}
+
+// Create returns a builder for creating a Cost entity.
+func (c *CostClient) Create() *CostCreate {
+	mutation := newCostMutation(c.config, OpCreate)
+	return &CostCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Cost entities.
+func (c *CostClient) CreateBulk(builders ...*CostCreate) *CostCreateBulk {
+	return &CostCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CostClient) MapCreateBulk(slice any, setFunc func(*CostCreate, int)) *CostCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CostCreateBulk{err: fmt.Errorf("calling to CostClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CostCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CostCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Cost.
+func (c *CostClient) Update() *CostUpdate {
+	mutation := newCostMutation(c.config, OpUpdate)
+	return &CostUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CostClient) UpdateOne(co *Cost) *CostUpdateOne {
+	mutation := newCostMutation(c.config, OpUpdateOne, withCost(co))
+	return &CostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CostClient) UpdateOneID(id int) *CostUpdateOne {
+	mutation := newCostMutation(c.config, OpUpdateOne, withCostID(id))
+	return &CostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Cost.
+func (c *CostClient) Delete() *CostDelete {
+	mutation := newCostMutation(c.config, OpDelete)
+	return &CostDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CostClient) DeleteOne(co *Cost) *CostDeleteOne {
+	return c.DeleteOneID(co.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CostClient) DeleteOneID(id int) *CostDeleteOne {
+	builder := c.Delete().Where(cost.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CostDeleteOne{builder}
+}
+
+// Query returns a query builder for Cost.
+func (c *CostClient) Query() *CostQuery {
+	return &CostQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCost},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Cost entity by its id.
+func (c *CostClient) Get(ctx context.Context, id int) (*Cost, error) {
+	return c.Query().Where(cost.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CostClient) GetX(ctx context.Context, id int) *Cost {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCoin queries the coin edge of a Cost.
+func (c *CostClient) QueryCoin(co *Cost) *CoinQuery {
+	query := (&CoinClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cost.Table, cost.FieldID, id),
+			sqlgraph.To(coin.Table, coin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, cost.CoinTable, cost.CoinColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEquipment queries the equipment edge of a Cost.
+func (c *CostClient) QueryEquipment(co *Cost) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cost.Table, cost.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, cost.EquipmentTable, cost.EquipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CostClient) Hooks() []Hook {
+	return c.hooks.Cost
+}
+
+// Interceptors returns the client interceptors.
+func (c *CostClient) Interceptors() []Interceptor {
+	return c.inters.Cost
+}
+
+func (c *CostClient) mutate(ctx context.Context, m *CostMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CostCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CostUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CostDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Cost mutation op: %q", m.Op())
 	}
 }
 
@@ -1455,6 +2565,21 @@ func (c *DamageTypeClient) Create() *DamageTypeCreate {
 
 // CreateBulk returns a builder for creating a bulk of DamageType entities.
 func (c *DamageTypeClient) CreateBulk(builders ...*DamageTypeCreate) *DamageTypeCreateBulk {
+	return &DamageTypeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DamageTypeClient) MapCreateBulk(slice any, setFunc func(*DamageTypeCreate, int)) *DamageTypeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DamageTypeCreateBulk{err: fmt.Errorf("calling to DamageTypeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DamageTypeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &DamageTypeCreateBulk{config: c.config, builders: builders}
 }
 
@@ -1518,15 +2643,15 @@ func (c *DamageTypeClient) GetX(ctx context.Context, id int) *DamageType {
 	return obj
 }
 
-// QueryWeaponDamage queries the weapon_damage edge of a DamageType.
-func (c *DamageTypeClient) QueryWeaponDamage(dt *DamageType) *WeaponDamageQuery {
-	query := (&WeaponDamageClient{config: c.config}).Query()
+// QueryWeapons queries the weapons edge of a DamageType.
+func (c *DamageTypeClient) QueryWeapons(dt *DamageType) *WeaponQuery {
+	query := (&WeaponClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := dt.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(damagetype.Table, damagetype.FieldID, id),
-			sqlgraph.To(weapondamage.Table, weapondamage.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, damagetype.WeaponDamageTable, damagetype.WeaponDamageColumn),
+			sqlgraph.To(weapon.Table, weapon.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, damagetype.WeaponsTable, damagetype.WeaponsColumn),
 		)
 		fromV = sqlgraph.Neighbors(dt.driver.Dialect(), step)
 		return fromV, nil
@@ -1592,6 +2717,21 @@ func (c *EquipmentClient) CreateBulk(builders ...*EquipmentCreate) *EquipmentCre
 	return &EquipmentCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EquipmentClient) MapCreateBulk(slice any, setFunc func(*EquipmentCreate, int)) *EquipmentCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EquipmentCreateBulk{err: fmt.Errorf("calling to EquipmentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EquipmentCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EquipmentCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for Equipment.
 func (c *EquipmentClient) Update() *EquipmentUpdate {
 	mutation := newEquipmentMutation(c.config, OpUpdate)
@@ -1652,63 +2792,15 @@ func (c *EquipmentClient) GetX(ctx context.Context, id int) *Equipment {
 	return obj
 }
 
-// QueryEquipmentCategory queries the equipment_category edge of a Equipment.
-func (c *EquipmentClient) QueryEquipmentCategory(e *Equipment) *EquipmentCategoryQuery {
-	query := (&EquipmentCategoryClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(equipment.Table, equipment.FieldID, id),
-			sqlgraph.To(equipmentcategory.Table, equipmentcategory.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.EquipmentCategoryTable, equipment.EquipmentCategoryColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryCost queries the cost edge of a Equipment.
-func (c *EquipmentClient) QueryCost(e *Equipment) *EquipmentCostQuery {
-	query := (&EquipmentCostClient{config: c.config}).Query()
+func (c *EquipmentClient) QueryCost(e *Equipment) *CostQuery {
+	query := (&CostClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
-			sqlgraph.To(equipmentcost.Table, equipmentcost.FieldID),
+			sqlgraph.To(cost.Table, cost.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, equipment.CostTable, equipment.CostColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryWeapon queries the weapon edge of a Equipment.
-func (c *EquipmentClient) QueryWeapon(e *Equipment) *WeaponQuery {
-	query := (&WeaponClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(equipment.Table, equipment.FieldID, id),
-			sqlgraph.To(weapon.Table, weapon.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, equipment.WeaponTable, equipment.WeaponColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryArmor queries the armor edge of a Equipment.
-func (c *EquipmentClient) QueryArmor(e *Equipment) *ArmorQuery {
-	query := (&ArmorClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(equipment.Table, equipment.FieldID, id),
-			sqlgraph.To(armor.Table, armor.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ArmorTable, equipment.ArmorColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1748,6 +2840,22 @@ func (c *EquipmentClient) QueryTool(e *Equipment) *ToolQuery {
 	return query
 }
 
+// QueryWeapon queries the weapon edge of a Equipment.
+func (c *EquipmentClient) QueryWeapon(e *Equipment) *WeaponQuery {
+	query := (&WeaponClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, id),
+			sqlgraph.To(weapon.Table, weapon.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.WeaponTable, equipment.WeaponColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryVehicle queries the vehicle edge of a Equipment.
 func (c *EquipmentClient) QueryVehicle(e *Equipment) *VehicleQuery {
 	query := (&VehicleClient{config: c.config}).Query()
@@ -1764,15 +2872,15 @@ func (c *EquipmentClient) QueryVehicle(e *Equipment) *VehicleQuery {
 	return query
 }
 
-// QueryClass queries the class edge of a Equipment.
-func (c *EquipmentClient) QueryClass(e *Equipment) *ClassQuery {
-	query := (&ClassClient{config: c.config}).Query()
+// QueryArmor queries the armor edge of a Equipment.
+func (c *EquipmentClient) QueryArmor(e *Equipment) *ArmorQuery {
+	query := (&ArmorClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, equipment.ClassTable, equipment.ClassPrimaryKey...),
+			sqlgraph.To(armor.Table, armor.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ArmorTable, equipment.ArmorColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1780,31 +2888,15 @@ func (c *EquipmentClient) QueryClass(e *Equipment) *ClassQuery {
 	return query
 }
 
-// QueryChoice queries the choice edge of a Equipment.
-func (c *EquipmentClient) QueryChoice(e *Equipment) *EquipmentChoiceQuery {
-	query := (&EquipmentChoiceClient{config: c.config}).Query()
+// QueryEquipmentEntries queries the equipment_entries edge of a Equipment.
+func (c *EquipmentClient) QueryEquipmentEntries(e *Equipment) *EquipmentEntryQuery {
+	query := (&EquipmentEntryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
-			sqlgraph.To(equipmentchoice.Table, equipmentchoice.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, equipment.ChoiceTable, equipment.ChoicePrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryClassEquipment queries the class_equipment edge of a Equipment.
-func (c *EquipmentClient) QueryClassEquipment(e *Equipment) *ClassEquipmentQuery {
-	query := (&ClassEquipmentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(equipment.Table, equipment.FieldID, id),
-			sqlgraph.To(classequipment.Table, classequipment.EquipmentColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, equipment.ClassEquipmentTable, equipment.ClassEquipmentColumn),
+			sqlgraph.To(equipmententry.Table, equipmententry.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, equipment.EquipmentEntriesTable, equipment.EquipmentEntriesColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1837,92 +2929,107 @@ func (c *EquipmentClient) mutate(ctx context.Context, m *EquipmentMutation) (Val
 	}
 }
 
-// EquipmentCategoryClient is a client for the EquipmentCategory schema.
-type EquipmentCategoryClient struct {
+// EquipmentEntryClient is a client for the EquipmentEntry schema.
+type EquipmentEntryClient struct {
 	config
 }
 
-// NewEquipmentCategoryClient returns a client for the EquipmentCategory from the given config.
-func NewEquipmentCategoryClient(c config) *EquipmentCategoryClient {
-	return &EquipmentCategoryClient{config: c}
+// NewEquipmentEntryClient returns a client for the EquipmentEntry from the given config.
+func NewEquipmentEntryClient(c config) *EquipmentEntryClient {
+	return &EquipmentEntryClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `equipmentcategory.Hooks(f(g(h())))`.
-func (c *EquipmentCategoryClient) Use(hooks ...Hook) {
-	c.hooks.EquipmentCategory = append(c.hooks.EquipmentCategory, hooks...)
+// A call to `Use(f, g, h)` equals to `equipmententry.Hooks(f(g(h())))`.
+func (c *EquipmentEntryClient) Use(hooks ...Hook) {
+	c.hooks.EquipmentEntry = append(c.hooks.EquipmentEntry, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `equipmentcategory.Intercept(f(g(h())))`.
-func (c *EquipmentCategoryClient) Intercept(interceptors ...Interceptor) {
-	c.inters.EquipmentCategory = append(c.inters.EquipmentCategory, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `equipmententry.Intercept(f(g(h())))`.
+func (c *EquipmentEntryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EquipmentEntry = append(c.inters.EquipmentEntry, interceptors...)
 }
 
-// Create returns a builder for creating a EquipmentCategory entity.
-func (c *EquipmentCategoryClient) Create() *EquipmentCategoryCreate {
-	mutation := newEquipmentCategoryMutation(c.config, OpCreate)
-	return &EquipmentCategoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a EquipmentEntry entity.
+func (c *EquipmentEntryClient) Create() *EquipmentEntryCreate {
+	mutation := newEquipmentEntryMutation(c.config, OpCreate)
+	return &EquipmentEntryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of EquipmentCategory entities.
-func (c *EquipmentCategoryClient) CreateBulk(builders ...*EquipmentCategoryCreate) *EquipmentCategoryCreateBulk {
-	return &EquipmentCategoryCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of EquipmentEntry entities.
+func (c *EquipmentEntryClient) CreateBulk(builders ...*EquipmentEntryCreate) *EquipmentEntryCreateBulk {
+	return &EquipmentEntryCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for EquipmentCategory.
-func (c *EquipmentCategoryClient) Update() *EquipmentCategoryUpdate {
-	mutation := newEquipmentCategoryMutation(c.config, OpUpdate)
-	return &EquipmentCategoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EquipmentEntryClient) MapCreateBulk(slice any, setFunc func(*EquipmentEntryCreate, int)) *EquipmentEntryCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EquipmentEntryCreateBulk{err: fmt.Errorf("calling to EquipmentEntryClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EquipmentEntryCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EquipmentEntryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EquipmentEntry.
+func (c *EquipmentEntryClient) Update() *EquipmentEntryUpdate {
+	mutation := newEquipmentEntryMutation(c.config, OpUpdate)
+	return &EquipmentEntryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *EquipmentCategoryClient) UpdateOne(ec *EquipmentCategory) *EquipmentCategoryUpdateOne {
-	mutation := newEquipmentCategoryMutation(c.config, OpUpdateOne, withEquipmentCategory(ec))
-	return &EquipmentCategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EquipmentEntryClient) UpdateOne(ee *EquipmentEntry) *EquipmentEntryUpdateOne {
+	mutation := newEquipmentEntryMutation(c.config, OpUpdateOne, withEquipmentEntry(ee))
+	return &EquipmentEntryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *EquipmentCategoryClient) UpdateOneID(id int) *EquipmentCategoryUpdateOne {
-	mutation := newEquipmentCategoryMutation(c.config, OpUpdateOne, withEquipmentCategoryID(id))
-	return &EquipmentCategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EquipmentEntryClient) UpdateOneID(id int) *EquipmentEntryUpdateOne {
+	mutation := newEquipmentEntryMutation(c.config, OpUpdateOne, withEquipmentEntryID(id))
+	return &EquipmentEntryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for EquipmentCategory.
-func (c *EquipmentCategoryClient) Delete() *EquipmentCategoryDelete {
-	mutation := newEquipmentCategoryMutation(c.config, OpDelete)
-	return &EquipmentCategoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for EquipmentEntry.
+func (c *EquipmentEntryClient) Delete() *EquipmentEntryDelete {
+	mutation := newEquipmentEntryMutation(c.config, OpDelete)
+	return &EquipmentEntryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *EquipmentCategoryClient) DeleteOne(ec *EquipmentCategory) *EquipmentCategoryDeleteOne {
-	return c.DeleteOneID(ec.ID)
+func (c *EquipmentEntryClient) DeleteOne(ee *EquipmentEntry) *EquipmentEntryDeleteOne {
+	return c.DeleteOneID(ee.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *EquipmentCategoryClient) DeleteOneID(id int) *EquipmentCategoryDeleteOne {
-	builder := c.Delete().Where(equipmentcategory.ID(id))
+func (c *EquipmentEntryClient) DeleteOneID(id int) *EquipmentEntryDeleteOne {
+	builder := c.Delete().Where(equipmententry.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &EquipmentCategoryDeleteOne{builder}
+	return &EquipmentEntryDeleteOne{builder}
 }
 
-// Query returns a query builder for EquipmentCategory.
-func (c *EquipmentCategoryClient) Query() *EquipmentCategoryQuery {
-	return &EquipmentCategoryQuery{
+// Query returns a query builder for EquipmentEntry.
+func (c *EquipmentEntryClient) Query() *EquipmentEntryQuery {
+	return &EquipmentEntryQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeEquipmentCategory},
+		ctx:    &QueryContext{Type: TypeEquipmentEntry},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a EquipmentCategory entity by its id.
-func (c *EquipmentCategoryClient) Get(ctx context.Context, id int) (*EquipmentCategory, error) {
-	return c.Query().Where(equipmentcategory.ID(id)).Only(ctx)
+// Get returns a EquipmentEntry entity by its id.
+func (c *EquipmentEntryClient) Get(ctx context.Context, id int) (*EquipmentEntry, error) {
+	return c.Query().Where(equipmententry.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *EquipmentCategoryClient) GetX(ctx context.Context, id int) *EquipmentCategory {
+func (c *EquipmentEntryClient) GetX(ctx context.Context, id int) *EquipmentEntry {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1930,315 +3037,164 @@ func (c *EquipmentCategoryClient) GetX(ctx context.Context, id int) *EquipmentCa
 	return obj
 }
 
-// QueryParent queries the parent edge of a EquipmentCategory.
-func (c *EquipmentCategoryClient) QueryParent(ec *EquipmentCategory) *EquipmentCategoryQuery {
-	query := (&EquipmentCategoryClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ec.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(equipmentcategory.Table, equipmentcategory.FieldID, id),
-			sqlgraph.To(equipmentcategory.Table, equipmentcategory.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, equipmentcategory.ParentTable, equipmentcategory.ParentColumn),
-		)
-		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryChildren queries the children edge of a EquipmentCategory.
-func (c *EquipmentCategoryClient) QueryChildren(ec *EquipmentCategory) *EquipmentCategoryQuery {
-	query := (&EquipmentCategoryClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ec.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(equipmentcategory.Table, equipmentcategory.FieldID, id),
-			sqlgraph.To(equipmentcategory.Table, equipmentcategory.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, equipmentcategory.ChildrenTable, equipmentcategory.ChildrenColumn),
-		)
-		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryEquipment queries the equipment edge of a EquipmentCategory.
-func (c *EquipmentCategoryClient) QueryEquipment(ec *EquipmentCategory) *EquipmentQuery {
-	query := (&EquipmentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ec.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(equipmentcategory.Table, equipmentcategory.FieldID, id),
-			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, equipmentcategory.EquipmentTable, equipmentcategory.EquipmentColumn),
-		)
-		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *EquipmentCategoryClient) Hooks() []Hook {
-	return c.hooks.EquipmentCategory
-}
-
-// Interceptors returns the client interceptors.
-func (c *EquipmentCategoryClient) Interceptors() []Interceptor {
-	return c.inters.EquipmentCategory
-}
-
-func (c *EquipmentCategoryClient) mutate(ctx context.Context, m *EquipmentCategoryMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&EquipmentCategoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&EquipmentCategoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&EquipmentCategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&EquipmentCategoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown EquipmentCategory mutation op: %q", m.Op())
-	}
-}
-
-// EquipmentChoiceClient is a client for the EquipmentChoice schema.
-type EquipmentChoiceClient struct {
-	config
-}
-
-// NewEquipmentChoiceClient returns a client for the EquipmentChoice from the given config.
-func NewEquipmentChoiceClient(c config) *EquipmentChoiceClient {
-	return &EquipmentChoiceClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `equipmentchoice.Hooks(f(g(h())))`.
-func (c *EquipmentChoiceClient) Use(hooks ...Hook) {
-	c.hooks.EquipmentChoice = append(c.hooks.EquipmentChoice, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `equipmentchoice.Intercept(f(g(h())))`.
-func (c *EquipmentChoiceClient) Intercept(interceptors ...Interceptor) {
-	c.inters.EquipmentChoice = append(c.inters.EquipmentChoice, interceptors...)
-}
-
-// Create returns a builder for creating a EquipmentChoice entity.
-func (c *EquipmentChoiceClient) Create() *EquipmentChoiceCreate {
-	mutation := newEquipmentChoiceMutation(c.config, OpCreate)
-	return &EquipmentChoiceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of EquipmentChoice entities.
-func (c *EquipmentChoiceClient) CreateBulk(builders ...*EquipmentChoiceCreate) *EquipmentChoiceCreateBulk {
-	return &EquipmentChoiceCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for EquipmentChoice.
-func (c *EquipmentChoiceClient) Update() *EquipmentChoiceUpdate {
-	mutation := newEquipmentChoiceMutation(c.config, OpUpdate)
-	return &EquipmentChoiceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *EquipmentChoiceClient) UpdateOne(ec *EquipmentChoice) *EquipmentChoiceUpdateOne {
-	mutation := newEquipmentChoiceMutation(c.config, OpUpdateOne, withEquipmentChoice(ec))
-	return &EquipmentChoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *EquipmentChoiceClient) UpdateOneID(id int) *EquipmentChoiceUpdateOne {
-	mutation := newEquipmentChoiceMutation(c.config, OpUpdateOne, withEquipmentChoiceID(id))
-	return &EquipmentChoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for EquipmentChoice.
-func (c *EquipmentChoiceClient) Delete() *EquipmentChoiceDelete {
-	mutation := newEquipmentChoiceMutation(c.config, OpDelete)
-	return &EquipmentChoiceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *EquipmentChoiceClient) DeleteOne(ec *EquipmentChoice) *EquipmentChoiceDeleteOne {
-	return c.DeleteOneID(ec.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *EquipmentChoiceClient) DeleteOneID(id int) *EquipmentChoiceDeleteOne {
-	builder := c.Delete().Where(equipmentchoice.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &EquipmentChoiceDeleteOne{builder}
-}
-
-// Query returns a query builder for EquipmentChoice.
-func (c *EquipmentChoiceClient) Query() *EquipmentChoiceQuery {
-	return &EquipmentChoiceQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeEquipmentChoice},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a EquipmentChoice entity by its id.
-func (c *EquipmentChoiceClient) Get(ctx context.Context, id int) (*EquipmentChoice, error) {
-	return c.Query().Where(equipmentchoice.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *EquipmentChoiceClient) GetX(ctx context.Context, id int) *EquipmentChoice {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryClass queries the class edge of a EquipmentChoice.
-func (c *EquipmentChoiceClient) QueryClass(ec *EquipmentChoice) *ClassQuery {
+// QueryClass queries the class edge of a EquipmentEntry.
+func (c *EquipmentEntryClient) QueryClass(ee *EquipmentEntry) *ClassQuery {
 	query := (&ClassClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ec.ID
+		id := ee.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(equipmentchoice.Table, equipmentchoice.FieldID, id),
+			sqlgraph.From(equipmententry.Table, equipmententry.FieldID, id),
 			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, equipmentchoice.ClassTable, equipmentchoice.ClassPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, equipmententry.ClassTable, equipmententry.ClassPrimaryKey...),
 		)
-		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(ee.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
-// QueryEquipment queries the equipment edge of a EquipmentChoice.
-func (c *EquipmentChoiceClient) QueryEquipment(ec *EquipmentChoice) *EquipmentQuery {
+// QueryEquipment queries the equipment edge of a EquipmentEntry.
+func (c *EquipmentEntryClient) QueryEquipment(ee *EquipmentEntry) *EquipmentQuery {
 	query := (&EquipmentClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ec.ID
+		id := ee.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(equipmentchoice.Table, equipmentchoice.FieldID, id),
+			sqlgraph.From(equipmententry.Table, equipmententry.FieldID, id),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, equipmentchoice.EquipmentTable, equipmentchoice.EquipmentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipmententry.EquipmentTable, equipmententry.EquipmentColumn),
 		)
-		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(ee.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *EquipmentChoiceClient) Hooks() []Hook {
-	return c.hooks.EquipmentChoice
+func (c *EquipmentEntryClient) Hooks() []Hook {
+	return c.hooks.EquipmentEntry
 }
 
 // Interceptors returns the client interceptors.
-func (c *EquipmentChoiceClient) Interceptors() []Interceptor {
-	return c.inters.EquipmentChoice
+func (c *EquipmentEntryClient) Interceptors() []Interceptor {
+	return c.inters.EquipmentEntry
 }
 
-func (c *EquipmentChoiceClient) mutate(ctx context.Context, m *EquipmentChoiceMutation) (Value, error) {
+func (c *EquipmentEntryClient) mutate(ctx context.Context, m *EquipmentEntryMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&EquipmentChoiceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EquipmentEntryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&EquipmentChoiceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EquipmentEntryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&EquipmentChoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EquipmentEntryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&EquipmentChoiceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&EquipmentEntryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown EquipmentChoice mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown EquipmentEntry mutation op: %q", m.Op())
 	}
 }
 
-// EquipmentCostClient is a client for the EquipmentCost schema.
-type EquipmentCostClient struct {
+// FeatClient is a client for the Feat schema.
+type FeatClient struct {
 	config
 }
 
-// NewEquipmentCostClient returns a client for the EquipmentCost from the given config.
-func NewEquipmentCostClient(c config) *EquipmentCostClient {
-	return &EquipmentCostClient{config: c}
+// NewFeatClient returns a client for the Feat from the given config.
+func NewFeatClient(c config) *FeatClient {
+	return &FeatClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `equipmentcost.Hooks(f(g(h())))`.
-func (c *EquipmentCostClient) Use(hooks ...Hook) {
-	c.hooks.EquipmentCost = append(c.hooks.EquipmentCost, hooks...)
+// A call to `Use(f, g, h)` equals to `feat.Hooks(f(g(h())))`.
+func (c *FeatClient) Use(hooks ...Hook) {
+	c.hooks.Feat = append(c.hooks.Feat, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `equipmentcost.Intercept(f(g(h())))`.
-func (c *EquipmentCostClient) Intercept(interceptors ...Interceptor) {
-	c.inters.EquipmentCost = append(c.inters.EquipmentCost, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `feat.Intercept(f(g(h())))`.
+func (c *FeatClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Feat = append(c.inters.Feat, interceptors...)
 }
 
-// Create returns a builder for creating a EquipmentCost entity.
-func (c *EquipmentCostClient) Create() *EquipmentCostCreate {
-	mutation := newEquipmentCostMutation(c.config, OpCreate)
-	return &EquipmentCostCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Feat entity.
+func (c *FeatClient) Create() *FeatCreate {
+	mutation := newFeatMutation(c.config, OpCreate)
+	return &FeatCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of EquipmentCost entities.
-func (c *EquipmentCostClient) CreateBulk(builders ...*EquipmentCostCreate) *EquipmentCostCreateBulk {
-	return &EquipmentCostCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Feat entities.
+func (c *FeatClient) CreateBulk(builders ...*FeatCreate) *FeatCreateBulk {
+	return &FeatCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for EquipmentCost.
-func (c *EquipmentCostClient) Update() *EquipmentCostUpdate {
-	mutation := newEquipmentCostMutation(c.config, OpUpdate)
-	return &EquipmentCostUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *FeatClient) MapCreateBulk(slice any, setFunc func(*FeatCreate, int)) *FeatCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &FeatCreateBulk{err: fmt.Errorf("calling to FeatClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*FeatCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &FeatCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Feat.
+func (c *FeatClient) Update() *FeatUpdate {
+	mutation := newFeatMutation(c.config, OpUpdate)
+	return &FeatUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *EquipmentCostClient) UpdateOne(ec *EquipmentCost) *EquipmentCostUpdateOne {
-	mutation := newEquipmentCostMutation(c.config, OpUpdateOne, withEquipmentCost(ec))
-	return &EquipmentCostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *FeatClient) UpdateOne(f *Feat) *FeatUpdateOne {
+	mutation := newFeatMutation(c.config, OpUpdateOne, withFeat(f))
+	return &FeatUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *EquipmentCostClient) UpdateOneID(id int) *EquipmentCostUpdateOne {
-	mutation := newEquipmentCostMutation(c.config, OpUpdateOne, withEquipmentCostID(id))
-	return &EquipmentCostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *FeatClient) UpdateOneID(id int) *FeatUpdateOne {
+	mutation := newFeatMutation(c.config, OpUpdateOne, withFeatID(id))
+	return &FeatUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for EquipmentCost.
-func (c *EquipmentCostClient) Delete() *EquipmentCostDelete {
-	mutation := newEquipmentCostMutation(c.config, OpDelete)
-	return &EquipmentCostDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Feat.
+func (c *FeatClient) Delete() *FeatDelete {
+	mutation := newFeatMutation(c.config, OpDelete)
+	return &FeatDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *EquipmentCostClient) DeleteOne(ec *EquipmentCost) *EquipmentCostDeleteOne {
-	return c.DeleteOneID(ec.ID)
+func (c *FeatClient) DeleteOne(f *Feat) *FeatDeleteOne {
+	return c.DeleteOneID(f.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *EquipmentCostClient) DeleteOneID(id int) *EquipmentCostDeleteOne {
-	builder := c.Delete().Where(equipmentcost.ID(id))
+func (c *FeatClient) DeleteOneID(id int) *FeatDeleteOne {
+	builder := c.Delete().Where(feat.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &EquipmentCostDeleteOne{builder}
+	return &FeatDeleteOne{builder}
 }
 
-// Query returns a query builder for EquipmentCost.
-func (c *EquipmentCostClient) Query() *EquipmentCostQuery {
-	return &EquipmentCostQuery{
+// Query returns a query builder for Feat.
+func (c *FeatClient) Query() *FeatQuery {
+	return &FeatQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeEquipmentCost},
+		ctx:    &QueryContext{Type: TypeFeat},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a EquipmentCost entity by its id.
-func (c *EquipmentCostClient) Get(ctx context.Context, id int) (*EquipmentCost, error) {
-	return c.Query().Where(equipmentcost.ID(id)).Only(ctx)
+// Get returns a Feat entity by its id.
+func (c *FeatClient) Get(ctx context.Context, id int) (*Feat, error) {
+	return c.Query().Where(feat.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *EquipmentCostClient) GetX(ctx context.Context, id int) *EquipmentCost {
+func (c *FeatClient) GetX(ctx context.Context, id int) *Feat {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -2246,60 +3202,177 @@ func (c *EquipmentCostClient) GetX(ctx context.Context, id int) *EquipmentCost {
 	return obj
 }
 
-// QueryEquipment queries the equipment edge of a EquipmentCost.
-func (c *EquipmentCostClient) QueryEquipment(ec *EquipmentCost) *EquipmentQuery {
-	query := (&EquipmentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ec.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(equipmentcost.Table, equipmentcost.FieldID, id),
-			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, equipmentcost.EquipmentTable, equipmentcost.EquipmentColumn),
-		)
-		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
+// Hooks returns the client hooks.
+func (c *FeatClient) Hooks() []Hook {
+	return c.hooks.Feat
 }
 
-// QueryCoin queries the coin edge of a EquipmentCost.
-func (c *EquipmentCostClient) QueryCoin(ec *EquipmentCost) *CoinQuery {
-	query := (&CoinClient{config: c.config}).Query()
+// Interceptors returns the client interceptors.
+func (c *FeatClient) Interceptors() []Interceptor {
+	return c.inters.Feat
+}
+
+func (c *FeatClient) mutate(ctx context.Context, m *FeatMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&FeatCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&FeatUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&FeatUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&FeatDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Feat mutation op: %q", m.Op())
+	}
+}
+
+// FeatureClient is a client for the Feature schema.
+type FeatureClient struct {
+	config
+}
+
+// NewFeatureClient returns a client for the Feature from the given config.
+func NewFeatureClient(c config) *FeatureClient {
+	return &FeatureClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `feature.Hooks(f(g(h())))`.
+func (c *FeatureClient) Use(hooks ...Hook) {
+	c.hooks.Feature = append(c.hooks.Feature, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `feature.Intercept(f(g(h())))`.
+func (c *FeatureClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Feature = append(c.inters.Feature, interceptors...)
+}
+
+// Create returns a builder for creating a Feature entity.
+func (c *FeatureClient) Create() *FeatureCreate {
+	mutation := newFeatureMutation(c.config, OpCreate)
+	return &FeatureCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Feature entities.
+func (c *FeatureClient) CreateBulk(builders ...*FeatureCreate) *FeatureCreateBulk {
+	return &FeatureCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *FeatureClient) MapCreateBulk(slice any, setFunc func(*FeatureCreate, int)) *FeatureCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &FeatureCreateBulk{err: fmt.Errorf("calling to FeatureClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*FeatureCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &FeatureCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Feature.
+func (c *FeatureClient) Update() *FeatureUpdate {
+	mutation := newFeatureMutation(c.config, OpUpdate)
+	return &FeatureUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FeatureClient) UpdateOne(f *Feature) *FeatureUpdateOne {
+	mutation := newFeatureMutation(c.config, OpUpdateOne, withFeature(f))
+	return &FeatureUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FeatureClient) UpdateOneID(id int) *FeatureUpdateOne {
+	mutation := newFeatureMutation(c.config, OpUpdateOne, withFeatureID(id))
+	return &FeatureUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Feature.
+func (c *FeatureClient) Delete() *FeatureDelete {
+	mutation := newFeatureMutation(c.config, OpDelete)
+	return &FeatureDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FeatureClient) DeleteOne(f *Feature) *FeatureDeleteOne {
+	return c.DeleteOneID(f.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *FeatureClient) DeleteOneID(id int) *FeatureDeleteOne {
+	builder := c.Delete().Where(feature.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FeatureDeleteOne{builder}
+}
+
+// Query returns a query builder for Feature.
+func (c *FeatureClient) Query() *FeatureQuery {
+	return &FeatureQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeFeature},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Feature entity by its id.
+func (c *FeatureClient) Get(ctx context.Context, id int) (*Feature, error) {
+	return c.Query().Where(feature.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FeatureClient) GetX(ctx context.Context, id int) *Feature {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryPrerequisites queries the prerequisites edge of a Feature.
+func (c *FeatureClient) QueryPrerequisites(f *Feature) *PrerequisiteQuery {
+	query := (&PrerequisiteClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ec.ID
+		id := f.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(equipmentcost.Table, equipmentcost.FieldID, id),
-			sqlgraph.To(coin.Table, coin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipmentcost.CoinTable, equipmentcost.CoinColumn),
+			sqlgraph.From(feature.Table, feature.FieldID, id),
+			sqlgraph.To(prerequisite.Table, prerequisite.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, feature.PrerequisitesTable, feature.PrerequisitesColumn),
 		)
-		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *EquipmentCostClient) Hooks() []Hook {
-	return c.hooks.EquipmentCost
+func (c *FeatureClient) Hooks() []Hook {
+	return c.hooks.Feature
 }
 
 // Interceptors returns the client interceptors.
-func (c *EquipmentCostClient) Interceptors() []Interceptor {
-	return c.inters.EquipmentCost
+func (c *FeatureClient) Interceptors() []Interceptor {
+	return c.inters.Feature
 }
 
-func (c *EquipmentCostClient) mutate(ctx context.Context, m *EquipmentCostMutation) (Value, error) {
+func (c *FeatureClient) mutate(ctx context.Context, m *FeatureMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&EquipmentCostCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&FeatureCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&EquipmentCostUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&FeatureUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&EquipmentCostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&FeatureUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&EquipmentCostDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&FeatureDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown EquipmentCost mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Feature mutation op: %q", m.Op())
 	}
 }
 
@@ -2333,6 +3406,21 @@ func (c *GearClient) Create() *GearCreate {
 
 // CreateBulk returns a builder for creating a bulk of Gear entities.
 func (c *GearClient) CreateBulk(builders ...*GearCreate) *GearCreateBulk {
+	return &GearCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *GearClient) MapCreateBulk(slice any, setFunc func(*GearCreate, int)) *GearCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &GearCreateBulk{err: fmt.Errorf("calling to GearClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*GearCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &GearCreateBulk{config: c.config, builders: builders}
 }
 
@@ -2470,6 +3558,21 @@ func (c *LanguageClient) CreateBulk(builders ...*LanguageCreate) *LanguageCreate
 	return &LanguageCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *LanguageClient) MapCreateBulk(slice any, setFunc func(*LanguageCreate, int)) *LanguageCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &LanguageCreateBulk{err: fmt.Errorf("calling to LanguageClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*LanguageCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &LanguageCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for Language.
 func (c *LanguageClient) Update() *LanguageUpdate {
 	mutation := newLanguageMutation(c.config, OpUpdate)
@@ -2530,15 +3633,31 @@ func (c *LanguageClient) GetX(ctx context.Context, id int) *Language {
 	return obj
 }
 
-// QueryRaceSpeakers queries the race_speakers edge of a Language.
-func (c *LanguageClient) QueryRaceSpeakers(l *Language) *RaceQuery {
+// QueryRace queries the race edge of a Language.
+func (c *LanguageClient) QueryRace(l *Language) *RaceQuery {
 	query := (&RaceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := l.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(language.Table, language.FieldID, id),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, language.RaceSpeakersTable, language.RaceSpeakersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, language.RaceTable, language.RacePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOptions queries the options edge of a Language.
+func (c *LanguageClient) QueryOptions(l *Language) *LanguageChoiceQuery {
+	query := (&LanguageChoiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := l.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(language.Table, language.FieldID, id),
+			sqlgraph.To(languagechoice.Table, languagechoice.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, language.OptionsTable, language.OptionsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
 		return fromV, nil
@@ -2568,6 +3687,171 @@ func (c *LanguageClient) mutate(ctx context.Context, m *LanguageMutation) (Value
 		return (&LanguageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Language mutation op: %q", m.Op())
+	}
+}
+
+// LanguageChoiceClient is a client for the LanguageChoice schema.
+type LanguageChoiceClient struct {
+	config
+}
+
+// NewLanguageChoiceClient returns a client for the LanguageChoice from the given config.
+func NewLanguageChoiceClient(c config) *LanguageChoiceClient {
+	return &LanguageChoiceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `languagechoice.Hooks(f(g(h())))`.
+func (c *LanguageChoiceClient) Use(hooks ...Hook) {
+	c.hooks.LanguageChoice = append(c.hooks.LanguageChoice, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `languagechoice.Intercept(f(g(h())))`.
+func (c *LanguageChoiceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.LanguageChoice = append(c.inters.LanguageChoice, interceptors...)
+}
+
+// Create returns a builder for creating a LanguageChoice entity.
+func (c *LanguageChoiceClient) Create() *LanguageChoiceCreate {
+	mutation := newLanguageChoiceMutation(c.config, OpCreate)
+	return &LanguageChoiceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of LanguageChoice entities.
+func (c *LanguageChoiceClient) CreateBulk(builders ...*LanguageChoiceCreate) *LanguageChoiceCreateBulk {
+	return &LanguageChoiceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *LanguageChoiceClient) MapCreateBulk(slice any, setFunc func(*LanguageChoiceCreate, int)) *LanguageChoiceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &LanguageChoiceCreateBulk{err: fmt.Errorf("calling to LanguageChoiceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*LanguageChoiceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &LanguageChoiceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for LanguageChoice.
+func (c *LanguageChoiceClient) Update() *LanguageChoiceUpdate {
+	mutation := newLanguageChoiceMutation(c.config, OpUpdate)
+	return &LanguageChoiceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *LanguageChoiceClient) UpdateOne(lc *LanguageChoice) *LanguageChoiceUpdateOne {
+	mutation := newLanguageChoiceMutation(c.config, OpUpdateOne, withLanguageChoice(lc))
+	return &LanguageChoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *LanguageChoiceClient) UpdateOneID(id int) *LanguageChoiceUpdateOne {
+	mutation := newLanguageChoiceMutation(c.config, OpUpdateOne, withLanguageChoiceID(id))
+	return &LanguageChoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for LanguageChoice.
+func (c *LanguageChoiceClient) Delete() *LanguageChoiceDelete {
+	mutation := newLanguageChoiceMutation(c.config, OpDelete)
+	return &LanguageChoiceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *LanguageChoiceClient) DeleteOne(lc *LanguageChoice) *LanguageChoiceDeleteOne {
+	return c.DeleteOneID(lc.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *LanguageChoiceClient) DeleteOneID(id int) *LanguageChoiceDeleteOne {
+	builder := c.Delete().Where(languagechoice.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &LanguageChoiceDeleteOne{builder}
+}
+
+// Query returns a query builder for LanguageChoice.
+func (c *LanguageChoiceClient) Query() *LanguageChoiceQuery {
+	return &LanguageChoiceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeLanguageChoice},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a LanguageChoice entity by its id.
+func (c *LanguageChoiceClient) Get(ctx context.Context, id int) (*LanguageChoice, error) {
+	return c.Query().Where(languagechoice.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *LanguageChoiceClient) GetX(ctx context.Context, id int) *LanguageChoice {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryLanguages queries the languages edge of a LanguageChoice.
+func (c *LanguageChoiceClient) QueryLanguages(lc *LanguageChoice) *LanguageQuery {
+	query := (&LanguageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := lc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(languagechoice.Table, languagechoice.FieldID, id),
+			sqlgraph.To(language.Table, language.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, languagechoice.LanguagesTable, languagechoice.LanguagesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(lc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRace queries the race edge of a LanguageChoice.
+func (c *LanguageChoiceClient) QueryRace(lc *LanguageChoice) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := lc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(languagechoice.Table, languagechoice.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, languagechoice.RaceTable, languagechoice.RaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(lc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *LanguageChoiceClient) Hooks() []Hook {
+	return c.hooks.LanguageChoice
+}
+
+// Interceptors returns the client interceptors.
+func (c *LanguageChoiceClient) Interceptors() []Interceptor {
+	return c.inters.LanguageChoice
+}
+
+func (c *LanguageChoiceClient) mutate(ctx context.Context, m *LanguageChoiceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&LanguageChoiceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&LanguageChoiceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&LanguageChoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&LanguageChoiceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown LanguageChoice mutation op: %q", m.Op())
 	}
 }
 
@@ -2601,6 +3885,21 @@ func (c *MagicSchoolClient) Create() *MagicSchoolCreate {
 
 // CreateBulk returns a builder for creating a bulk of MagicSchool entities.
 func (c *MagicSchoolClient) CreateBulk(builders ...*MagicSchoolCreate) *MagicSchoolCreateBulk {
+	return &MagicSchoolCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MagicSchoolClient) MapCreateBulk(slice any, setFunc func(*MagicSchoolCreate, int)) *MagicSchoolCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MagicSchoolCreateBulk{err: fmt.Errorf("calling to MagicSchoolClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MagicSchoolCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &MagicSchoolCreateBulk{config: c.config, builders: builders}
 }
 
@@ -2689,6 +3988,155 @@ func (c *MagicSchoolClient) mutate(ctx context.Context, m *MagicSchoolMutation) 
 	}
 }
 
+// PrerequisiteClient is a client for the Prerequisite schema.
+type PrerequisiteClient struct {
+	config
+}
+
+// NewPrerequisiteClient returns a client for the Prerequisite from the given config.
+func NewPrerequisiteClient(c config) *PrerequisiteClient {
+	return &PrerequisiteClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `prerequisite.Hooks(f(g(h())))`.
+func (c *PrerequisiteClient) Use(hooks ...Hook) {
+	c.hooks.Prerequisite = append(c.hooks.Prerequisite, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `prerequisite.Intercept(f(g(h())))`.
+func (c *PrerequisiteClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Prerequisite = append(c.inters.Prerequisite, interceptors...)
+}
+
+// Create returns a builder for creating a Prerequisite entity.
+func (c *PrerequisiteClient) Create() *PrerequisiteCreate {
+	mutation := newPrerequisiteMutation(c.config, OpCreate)
+	return &PrerequisiteCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Prerequisite entities.
+func (c *PrerequisiteClient) CreateBulk(builders ...*PrerequisiteCreate) *PrerequisiteCreateBulk {
+	return &PrerequisiteCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PrerequisiteClient) MapCreateBulk(slice any, setFunc func(*PrerequisiteCreate, int)) *PrerequisiteCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PrerequisiteCreateBulk{err: fmt.Errorf("calling to PrerequisiteClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PrerequisiteCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PrerequisiteCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Prerequisite.
+func (c *PrerequisiteClient) Update() *PrerequisiteUpdate {
+	mutation := newPrerequisiteMutation(c.config, OpUpdate)
+	return &PrerequisiteUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PrerequisiteClient) UpdateOne(pr *Prerequisite) *PrerequisiteUpdateOne {
+	mutation := newPrerequisiteMutation(c.config, OpUpdateOne, withPrerequisite(pr))
+	return &PrerequisiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PrerequisiteClient) UpdateOneID(id int) *PrerequisiteUpdateOne {
+	mutation := newPrerequisiteMutation(c.config, OpUpdateOne, withPrerequisiteID(id))
+	return &PrerequisiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Prerequisite.
+func (c *PrerequisiteClient) Delete() *PrerequisiteDelete {
+	mutation := newPrerequisiteMutation(c.config, OpDelete)
+	return &PrerequisiteDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PrerequisiteClient) DeleteOne(pr *Prerequisite) *PrerequisiteDeleteOne {
+	return c.DeleteOneID(pr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PrerequisiteClient) DeleteOneID(id int) *PrerequisiteDeleteOne {
+	builder := c.Delete().Where(prerequisite.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PrerequisiteDeleteOne{builder}
+}
+
+// Query returns a query builder for Prerequisite.
+func (c *PrerequisiteClient) Query() *PrerequisiteQuery {
+	return &PrerequisiteQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePrerequisite},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Prerequisite entity by its id.
+func (c *PrerequisiteClient) Get(ctx context.Context, id int) (*Prerequisite, error) {
+	return c.Query().Where(prerequisite.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PrerequisiteClient) GetX(ctx context.Context, id int) *Prerequisite {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryFeature queries the feature edge of a Prerequisite.
+func (c *PrerequisiteClient) QueryFeature(pr *Prerequisite) *FeatureQuery {
+	query := (&FeatureClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(prerequisite.Table, prerequisite.FieldID, id),
+			sqlgraph.To(feature.Table, feature.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, prerequisite.FeatureTable, prerequisite.FeatureColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PrerequisiteClient) Hooks() []Hook {
+	return c.hooks.Prerequisite
+}
+
+// Interceptors returns the client interceptors.
+func (c *PrerequisiteClient) Interceptors() []Interceptor {
+	return c.inters.Prerequisite
+}
+
+func (c *PrerequisiteClient) mutate(ctx context.Context, m *PrerequisiteMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PrerequisiteCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PrerequisiteUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PrerequisiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PrerequisiteDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Prerequisite mutation op: %q", m.Op())
+	}
+}
+
 // ProficiencyClient is a client for the Proficiency schema.
 type ProficiencyClient struct {
 	config
@@ -2719,6 +4167,21 @@ func (c *ProficiencyClient) Create() *ProficiencyCreate {
 
 // CreateBulk returns a builder for creating a bulk of Proficiency entities.
 func (c *ProficiencyClient) CreateBulk(builders ...*ProficiencyCreate) *ProficiencyCreateBulk {
+	return &ProficiencyCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProficiencyClient) MapCreateBulk(slice any, setFunc func(*ProficiencyCreate, int)) *ProficiencyCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProficiencyCreateBulk{err: fmt.Errorf("calling to ProficiencyClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProficiencyCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &ProficiencyCreateBulk{config: c.config, builders: builders}
 }
 
@@ -2782,31 +4245,15 @@ func (c *ProficiencyClient) GetX(ctx context.Context, id int) *Proficiency {
 	return obj
 }
 
-// QueryClasses queries the classes edge of a Proficiency.
-func (c *ProficiencyClient) QueryClasses(pr *Proficiency) *ClassQuery {
-	query := (&ClassClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.ClassesTable, proficiency.ClassesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryRaces queries the races edge of a Proficiency.
-func (c *ProficiencyClient) QueryRaces(pr *Proficiency) *RaceQuery {
+// QueryRace queries the race edge of a Proficiency.
+func (c *ProficiencyClient) QueryRace(pr *Proficiency) *RaceQuery {
 	query := (&RaceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pr.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.RacesTable, proficiency.RacesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.RaceTable, proficiency.RacePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -2814,31 +4261,15 @@ func (c *ProficiencyClient) QueryRaces(pr *Proficiency) *RaceQuery {
 	return query
 }
 
-// QuerySubraces queries the subraces edge of a Proficiency.
-func (c *ProficiencyClient) QuerySubraces(pr *Proficiency) *SubraceQuery {
-	query := (&SubraceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.SubracesTable, proficiency.SubracesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryChoice queries the choice edge of a Proficiency.
-func (c *ProficiencyClient) QueryChoice(pr *Proficiency) *ProficiencyChoiceQuery {
+// QueryOptions queries the options edge of a Proficiency.
+func (c *ProficiencyClient) QueryOptions(pr *Proficiency) *ProficiencyChoiceQuery {
 	query := (&ProficiencyChoiceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pr.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
 			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, proficiency.ChoiceTable, proficiency.ChoicePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.OptionsTable, proficiency.OptionsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -2846,15 +4277,15 @@ func (c *ProficiencyClient) QueryChoice(pr *Proficiency) *ProficiencyChoiceQuery
 	return query
 }
 
-// QuerySkill queries the skill edge of a Proficiency.
-func (c *ProficiencyClient) QuerySkill(pr *Proficiency) *SkillQuery {
-	query := (&SkillClient{config: c.config}).Query()
+// QueryClass queries the class edge of a Proficiency.
+func (c *ProficiencyClient) QueryClass(pr *Proficiency) *ClassQuery {
+	query := (&ClassClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pr.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
-			sqlgraph.To(skill.Table, skill.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, proficiency.SkillTable, proficiency.SkillColumn),
+			sqlgraph.To(class.Table, class.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.ClassTable, proficiency.ClassPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -2862,47 +4293,15 @@ func (c *ProficiencyClient) QuerySkill(pr *Proficiency) *SkillQuery {
 	return query
 }
 
-// QueryEquipment queries the equipment edge of a Proficiency.
-func (c *ProficiencyClient) QueryEquipment(pr *Proficiency) *EquipmentQuery {
-	query := (&EquipmentClient{config: c.config}).Query()
+// QueryCharacterProficiencies queries the character_proficiencies edge of a Proficiency.
+func (c *ProficiencyClient) QueryCharacterProficiencies(pr *Proficiency) *CharacterProficiencyQuery {
+	query := (&CharacterProficiencyClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pr.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
-			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, proficiency.EquipmentTable, proficiency.EquipmentColumn),
-		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryEquipmentCategory queries the equipment_category edge of a Proficiency.
-func (c *ProficiencyClient) QueryEquipmentCategory(pr *Proficiency) *EquipmentCategoryQuery {
-	query := (&EquipmentCategoryClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
-			sqlgraph.To(equipmentcategory.Table, equipmentcategory.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, proficiency.EquipmentCategoryTable, proficiency.EquipmentCategoryColumn),
-		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySavingThrow queries the saving_throw edge of a Proficiency.
-func (c *ProficiencyClient) QuerySavingThrow(pr *Proficiency) *AbilityScoreQuery {
-	query := (&AbilityScoreClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
-			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, proficiency.SavingThrowTable, proficiency.SavingThrowColumn),
+			sqlgraph.To(characterproficiency.Table, characterproficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, proficiency.CharacterProficienciesTable, proficiency.CharacterProficienciesColumn),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -2968,6 +4367,21 @@ func (c *ProficiencyChoiceClient) CreateBulk(builders ...*ProficiencyChoiceCreat
 	return &ProficiencyChoiceCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProficiencyChoiceClient) MapCreateBulk(slice any, setFunc func(*ProficiencyChoiceCreate, int)) *ProficiencyChoiceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProficiencyChoiceCreateBulk{err: fmt.Errorf("calling to ProficiencyChoiceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProficiencyChoiceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProficiencyChoiceCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for ProficiencyChoice.
 func (c *ProficiencyChoiceClient) Update() *ProficiencyChoiceUpdate {
 	mutation := newProficiencyChoiceMutation(c.config, OpUpdate)
@@ -3028,63 +4442,15 @@ func (c *ProficiencyChoiceClient) GetX(ctx context.Context, id int) *Proficiency
 	return obj
 }
 
-// QueryProficiency queries the proficiency edge of a ProficiencyChoice.
-func (c *ProficiencyChoiceClient) QueryProficiency(pc *ProficiencyChoice) *ProficiencyQuery {
+// QueryProficiencies queries the proficiencies edge of a ProficiencyChoice.
+func (c *ProficiencyChoiceClient) QueryProficiencies(pc *ProficiencyChoice) *ProficiencyQuery {
 	query := (&ProficiencyClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := pc.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiencychoice.Table, proficiencychoice.FieldID, id),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, proficiencychoice.ProficiencyTable, proficiencychoice.ProficiencyPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(pc.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryParentChoice queries the parent_choice edge of a ProficiencyChoice.
-func (c *ProficiencyChoiceClient) QueryParentChoice(pc *ProficiencyChoice) *ProficiencyChoiceQuery {
-	query := (&ProficiencyChoiceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pc.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiencychoice.Table, proficiencychoice.FieldID, id),
-			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, proficiencychoice.ParentChoiceTable, proficiencychoice.ParentChoiceColumn),
-		)
-		fromV = sqlgraph.Neighbors(pc.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySubChoice queries the sub_choice edge of a ProficiencyChoice.
-func (c *ProficiencyChoiceClient) QuerySubChoice(pc *ProficiencyChoice) *ProficiencyChoiceQuery {
-	query := (&ProficiencyChoiceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pc.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiencychoice.Table, proficiencychoice.FieldID, id),
-			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, proficiencychoice.SubChoiceTable, proficiencychoice.SubChoiceColumn),
-		)
-		fromV = sqlgraph.Neighbors(pc.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryClass queries the class edge of a ProficiencyChoice.
-func (c *ProficiencyChoiceClient) QueryClass(pc *ProficiencyChoice) *ClassQuery {
-	query := (&ClassClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pc.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiencychoice.Table, proficiencychoice.FieldID, id),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, proficiencychoice.ClassTable, proficiencychoice.ClassPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, proficiencychoice.ProficienciesTable, proficiencychoice.ProficienciesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(pc.driver.Dialect(), step)
 		return fromV, nil
@@ -3100,7 +4466,23 @@ func (c *ProficiencyChoiceClient) QueryRace(pc *ProficiencyChoice) *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiencychoice.Table, proficiencychoice.FieldID, id),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, proficiencychoice.RaceTable, proficiencychoice.RacePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, proficiencychoice.RaceTable, proficiencychoice.RaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(pc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryClass queries the class edge of a ProficiencyChoice.
+func (c *ProficiencyChoiceClient) QueryClass(pc *ProficiencyChoice) *ClassQuery {
+	query := (&ClassClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiencychoice.Table, proficiencychoice.FieldID, id),
+			sqlgraph.To(class.Table, class.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, proficiencychoice.ClassTable, proficiencychoice.ClassColumn),
 		)
 		fromV = sqlgraph.Neighbors(pc.driver.Dialect(), step)
 		return fromV, nil
@@ -3130,6 +4512,155 @@ func (c *ProficiencyChoiceClient) mutate(ctx context.Context, m *ProficiencyChoi
 		return (&ProficiencyChoiceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ProficiencyChoice mutation op: %q", m.Op())
+	}
+}
+
+// PropertyClient is a client for the Property schema.
+type PropertyClient struct {
+	config
+}
+
+// NewPropertyClient returns a client for the Property from the given config.
+func NewPropertyClient(c config) *PropertyClient {
+	return &PropertyClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `property.Hooks(f(g(h())))`.
+func (c *PropertyClient) Use(hooks ...Hook) {
+	c.hooks.Property = append(c.hooks.Property, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `property.Intercept(f(g(h())))`.
+func (c *PropertyClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Property = append(c.inters.Property, interceptors...)
+}
+
+// Create returns a builder for creating a Property entity.
+func (c *PropertyClient) Create() *PropertyCreate {
+	mutation := newPropertyMutation(c.config, OpCreate)
+	return &PropertyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Property entities.
+func (c *PropertyClient) CreateBulk(builders ...*PropertyCreate) *PropertyCreateBulk {
+	return &PropertyCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PropertyClient) MapCreateBulk(slice any, setFunc func(*PropertyCreate, int)) *PropertyCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PropertyCreateBulk{err: fmt.Errorf("calling to PropertyClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PropertyCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PropertyCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Property.
+func (c *PropertyClient) Update() *PropertyUpdate {
+	mutation := newPropertyMutation(c.config, OpUpdate)
+	return &PropertyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PropertyClient) UpdateOne(pr *Property) *PropertyUpdateOne {
+	mutation := newPropertyMutation(c.config, OpUpdateOne, withProperty(pr))
+	return &PropertyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PropertyClient) UpdateOneID(id int) *PropertyUpdateOne {
+	mutation := newPropertyMutation(c.config, OpUpdateOne, withPropertyID(id))
+	return &PropertyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Property.
+func (c *PropertyClient) Delete() *PropertyDelete {
+	mutation := newPropertyMutation(c.config, OpDelete)
+	return &PropertyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PropertyClient) DeleteOne(pr *Property) *PropertyDeleteOne {
+	return c.DeleteOneID(pr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PropertyClient) DeleteOneID(id int) *PropertyDeleteOne {
+	builder := c.Delete().Where(property.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PropertyDeleteOne{builder}
+}
+
+// Query returns a query builder for Property.
+func (c *PropertyClient) Query() *PropertyQuery {
+	return &PropertyQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProperty},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Property entity by its id.
+func (c *PropertyClient) Get(ctx context.Context, id int) (*Property, error) {
+	return c.Query().Where(property.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PropertyClient) GetX(ctx context.Context, id int) *Property {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryWeapons queries the weapons edge of a Property.
+func (c *PropertyClient) QueryWeapons(pr *Property) *WeaponQuery {
+	query := (&WeaponClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(property.Table, property.FieldID, id),
+			sqlgraph.To(weapon.Table, weapon.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, property.WeaponsTable, property.WeaponsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PropertyClient) Hooks() []Hook {
+	return c.hooks.Property
+}
+
+// Interceptors returns the client interceptors.
+func (c *PropertyClient) Interceptors() []Interceptor {
+	return c.inters.Property
+}
+
+func (c *PropertyClient) mutate(ctx context.Context, m *PropertyMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PropertyCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PropertyUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PropertyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PropertyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Property mutation op: %q", m.Op())
 	}
 }
 
@@ -3163,6 +4694,21 @@ func (c *RaceClient) Create() *RaceCreate {
 
 // CreateBulk returns a builder for creating a bulk of Race entities.
 func (c *RaceClient) CreateBulk(builders ...*RaceCreate) *RaceCreateBulk {
+	return &RaceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RaceClient) MapCreateBulk(slice any, setFunc func(*RaceCreate, int)) *RaceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RaceCreateBulk{err: fmt.Errorf("calling to RaceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RaceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &RaceCreateBulk{config: c.config, builders: builders}
 }
 
@@ -3226,15 +4772,15 @@ func (c *RaceClient) GetX(ctx context.Context, id int) *Race {
 	return obj
 }
 
-// QueryProficiencies queries the proficiencies edge of a Race.
-func (c *RaceClient) QueryProficiencies(r *Race) *ProficiencyQuery {
-	query := (&ProficiencyClient{config: c.config}).Query()
+// QueryTraits queries the traits edge of a Race.
+func (c *RaceClient) QueryTraits(r *Race) *TraitQuery {
+	query := (&TraitClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, id),
-			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, race.ProficienciesTable, race.ProficienciesPrimaryKey...),
+			sqlgraph.To(trait.Table, trait.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.TraitsTable, race.TraitsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -3242,15 +4788,47 @@ func (c *RaceClient) QueryProficiencies(r *Race) *ProficiencyQuery {
 	return query
 }
 
-// QueryProficiencyChoice queries the proficiency_choice edge of a Race.
-func (c *RaceClient) QueryProficiencyChoice(r *Race) *ProficiencyChoiceQuery {
+// QueryStartingProficiencies queries the starting_proficiencies edge of a Race.
+func (c *RaceClient) QueryStartingProficiencies(r *Race) *ProficiencyQuery {
+	query := (&ProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.StartingProficienciesTable, race.StartingProficienciesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryStartingProficiencyOptions queries the starting_proficiency_options edge of a Race.
+func (c *RaceClient) QueryStartingProficiencyOptions(r *Race) *ProficiencyChoiceQuery {
 	query := (&ProficiencyChoiceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, race.ProficiencyChoiceTable, race.ProficiencyChoicePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, race.StartingProficiencyOptionsTable, race.StartingProficiencyOptionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAbilityBonuses queries the ability_bonuses edge of a Race.
+func (c *RaceClient) QueryAbilityBonuses(r *Race) *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.AbilityBonusesTable, race.AbilityBonusesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -3274,15 +4852,15 @@ func (c *RaceClient) QueryLanguages(r *Race) *LanguageQuery {
 	return query
 }
 
-// QuerySubrace queries the subrace edge of a Race.
-func (c *RaceClient) QuerySubrace(r *Race) *SubraceQuery {
-	query := (&SubraceClient{config: c.config}).Query()
+// QueryLanguageOptions queries the language_options edge of a Race.
+func (c *RaceClient) QueryLanguageOptions(r *Race) *LanguageChoiceQuery {
+	query := (&LanguageChoiceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, id),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, race.SubraceTable, race.SubraceColumn),
+			sqlgraph.To(languagechoice.Table, languagechoice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, race.LanguageOptionsTable, race.LanguageOptionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -3290,15 +4868,15 @@ func (c *RaceClient) QuerySubrace(r *Race) *SubraceQuery {
 	return query
 }
 
-// QueryTraits queries the traits edge of a Race.
-func (c *RaceClient) QueryTraits(r *Race) *TraitQuery {
-	query := (&TraitClient{config: c.config}).Query()
+// QueryCharacters queries the characters edge of a Race.
+func (c *RaceClient) QueryCharacters(r *Race) *CharacterQuery {
+	query := (&CharacterClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, id),
-			sqlgraph.To(trait.Table, trait.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, race.TraitsTable, race.TraitsPrimaryKey...),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, race.CharactersTable, race.CharactersColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -3306,15 +4884,15 @@ func (c *RaceClient) QueryTraits(r *Race) *TraitQuery {
 	return query
 }
 
-// QueryAbilityBonuses queries the ability_bonuses edge of a Race.
-func (c *RaceClient) QueryAbilityBonuses(r *Race) *AbilityBonusQuery {
+// QueryRaceAbilityBonuses queries the race_ability_bonuses edge of a Race.
+func (c *RaceClient) QueryRaceAbilityBonuses(r *Race) *AbilityBonusQuery {
 	query := (&AbilityBonusClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, id),
-			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, race.AbilityBonusesTable, race.AbilityBonusesColumn),
+			sqlgraph.To(abilitybonus.Table, abilitybonus.RaceColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, race.RaceAbilityBonusesTable, race.RaceAbilityBonusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -3380,6 +4958,21 @@ func (c *RuleClient) CreateBulk(builders ...*RuleCreate) *RuleCreateBulk {
 	return &RuleCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RuleClient) MapCreateBulk(slice any, setFunc func(*RuleCreate, int)) *RuleCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RuleCreateBulk{err: fmt.Errorf("calling to RuleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RuleCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RuleCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for Rule.
 func (c *RuleClient) Update() *RuleUpdate {
 	mutation := newRuleMutation(c.config, OpUpdate)
@@ -3440,15 +5033,15 @@ func (c *RuleClient) GetX(ctx context.Context, id int) *Rule {
 	return obj
 }
 
-// QueryRuleSections queries the rule_sections edge of a Rule.
-func (c *RuleClient) QueryRuleSections(r *Rule) *RuleSectionQuery {
+// QuerySections queries the sections edge of a Rule.
+func (c *RuleClient) QuerySections(r *Rule) *RuleSectionQuery {
 	query := (&RuleSectionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(rule.Table, rule.FieldID, id),
 			sqlgraph.To(rulesection.Table, rulesection.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, rule.RuleSectionsTable, rule.RuleSectionsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, rule.SectionsTable, rule.SectionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -3514,6 +5107,21 @@ func (c *RuleSectionClient) CreateBulk(builders ...*RuleSectionCreate) *RuleSect
 	return &RuleSectionCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RuleSectionClient) MapCreateBulk(slice any, setFunc func(*RuleSectionCreate, int)) *RuleSectionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RuleSectionCreateBulk{err: fmt.Errorf("calling to RuleSectionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RuleSectionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RuleSectionCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for RuleSection.
 func (c *RuleSectionClient) Update() *RuleSectionUpdate {
 	mutation := newRuleSectionMutation(c.config, OpUpdate)
@@ -3574,15 +5182,15 @@ func (c *RuleSectionClient) GetX(ctx context.Context, id int) *RuleSection {
 	return obj
 }
 
-// QueryRules queries the rules edge of a RuleSection.
-func (c *RuleSectionClient) QueryRules(rs *RuleSection) *RuleQuery {
+// QueryRule queries the rule edge of a RuleSection.
+func (c *RuleSectionClient) QueryRule(rs *RuleSection) *RuleQuery {
 	query := (&RuleClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := rs.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(rulesection.Table, rulesection.FieldID, id),
 			sqlgraph.To(rule.Table, rule.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, rulesection.RulesTable, rulesection.RulesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, rulesection.RuleTable, rulesection.RuleColumn),
 		)
 		fromV = sqlgraph.Neighbors(rs.driver.Dialect(), step)
 		return fromV, nil
@@ -3645,6 +5253,21 @@ func (c *SkillClient) Create() *SkillCreate {
 
 // CreateBulk returns a builder for creating a bulk of Skill entities.
 func (c *SkillClient) CreateBulk(builders ...*SkillCreate) *SkillCreateBulk {
+	return &SkillCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SkillClient) MapCreateBulk(slice any, setFunc func(*SkillCreate, int)) *SkillCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SkillCreateBulk{err: fmt.Errorf("calling to SkillClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SkillCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &SkillCreateBulk{config: c.config, builders: builders}
 }
 
@@ -3716,7 +5339,23 @@ func (c *SkillClient) QueryAbilityScore(s *Skill) *AbilityScoreQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(skill.Table, skill.FieldID, id),
 			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, skill.AbilityScoreTable, skill.AbilityScoreColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, skill.AbilityScoreTable, skill.AbilityScoreColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterSkill queries the character_skill edge of a Skill.
+func (c *SkillClient) QueryCharacterSkill(s *Skill) *CharacterSkillQuery {
+	query := (&CharacterSkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(skill.Table, skill.FieldID, id),
+			sqlgraph.To(characterskill.Table, characterskill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, skill.CharacterSkillTable, skill.CharacterSkillColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -3746,188 +5385,6 @@ func (c *SkillClient) mutate(ctx context.Context, m *SkillMutation) (Value, erro
 		return (&SkillDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Skill mutation op: %q", m.Op())
-	}
-}
-
-// SubraceClient is a client for the Subrace schema.
-type SubraceClient struct {
-	config
-}
-
-// NewSubraceClient returns a client for the Subrace from the given config.
-func NewSubraceClient(c config) *SubraceClient {
-	return &SubraceClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `subrace.Hooks(f(g(h())))`.
-func (c *SubraceClient) Use(hooks ...Hook) {
-	c.hooks.Subrace = append(c.hooks.Subrace, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `subrace.Intercept(f(g(h())))`.
-func (c *SubraceClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Subrace = append(c.inters.Subrace, interceptors...)
-}
-
-// Create returns a builder for creating a Subrace entity.
-func (c *SubraceClient) Create() *SubraceCreate {
-	mutation := newSubraceMutation(c.config, OpCreate)
-	return &SubraceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Subrace entities.
-func (c *SubraceClient) CreateBulk(builders ...*SubraceCreate) *SubraceCreateBulk {
-	return &SubraceCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Subrace.
-func (c *SubraceClient) Update() *SubraceUpdate {
-	mutation := newSubraceMutation(c.config, OpUpdate)
-	return &SubraceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *SubraceClient) UpdateOne(s *Subrace) *SubraceUpdateOne {
-	mutation := newSubraceMutation(c.config, OpUpdateOne, withSubrace(s))
-	return &SubraceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *SubraceClient) UpdateOneID(id int) *SubraceUpdateOne {
-	mutation := newSubraceMutation(c.config, OpUpdateOne, withSubraceID(id))
-	return &SubraceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Subrace.
-func (c *SubraceClient) Delete() *SubraceDelete {
-	mutation := newSubraceMutation(c.config, OpDelete)
-	return &SubraceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *SubraceClient) DeleteOne(s *Subrace) *SubraceDeleteOne {
-	return c.DeleteOneID(s.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *SubraceClient) DeleteOneID(id int) *SubraceDeleteOne {
-	builder := c.Delete().Where(subrace.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &SubraceDeleteOne{builder}
-}
-
-// Query returns a query builder for Subrace.
-func (c *SubraceClient) Query() *SubraceQuery {
-	return &SubraceQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeSubrace},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a Subrace entity by its id.
-func (c *SubraceClient) Get(ctx context.Context, id int) (*Subrace, error) {
-	return c.Query().Where(subrace.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *SubraceClient) GetX(ctx context.Context, id int) *Subrace {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryRace queries the race edge of a Subrace.
-func (c *SubraceClient) QueryRace(s *Subrace) *RaceQuery {
-	query := (&RaceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(subrace.Table, subrace.FieldID, id),
-			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, subrace.RaceTable, subrace.RaceColumn),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryProficiencies queries the proficiencies edge of a Subrace.
-func (c *SubraceClient) QueryProficiencies(s *Subrace) *ProficiencyQuery {
-	query := (&ProficiencyClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(subrace.Table, subrace.FieldID, id),
-			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, subrace.ProficienciesTable, subrace.ProficienciesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryTraits queries the traits edge of a Subrace.
-func (c *SubraceClient) QueryTraits(s *Subrace) *TraitQuery {
-	query := (&TraitClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(subrace.Table, subrace.FieldID, id),
-			sqlgraph.To(trait.Table, trait.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, subrace.TraitsTable, subrace.TraitsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryAbilityBonuses queries the ability_bonuses edge of a Subrace.
-func (c *SubraceClient) QueryAbilityBonuses(s *Subrace) *AbilityBonusQuery {
-	query := (&AbilityBonusClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(subrace.Table, subrace.FieldID, id),
-			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, subrace.AbilityBonusesTable, subrace.AbilityBonusesColumn),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *SubraceClient) Hooks() []Hook {
-	return c.hooks.Subrace
-}
-
-// Interceptors returns the client interceptors.
-func (c *SubraceClient) Interceptors() []Interceptor {
-	return c.inters.Subrace
-}
-
-func (c *SubraceClient) mutate(ctx context.Context, m *SubraceMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&SubraceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&SubraceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&SubraceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&SubraceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown Subrace mutation op: %q", m.Op())
 	}
 }
 
@@ -3961,6 +5418,21 @@ func (c *ToolClient) Create() *ToolCreate {
 
 // CreateBulk returns a builder for creating a bulk of Tool entities.
 func (c *ToolClient) CreateBulk(builders ...*ToolCreate) *ToolCreateBulk {
+	return &ToolCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ToolClient) MapCreateBulk(slice any, setFunc func(*ToolCreate, int)) *ToolCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ToolCreateBulk{err: fmt.Errorf("calling to ToolClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ToolCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &ToolCreateBulk{config: c.config, builders: builders}
 }
 
@@ -4098,6 +5570,21 @@ func (c *TraitClient) CreateBulk(builders ...*TraitCreate) *TraitCreateBulk {
 	return &TraitCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TraitClient) MapCreateBulk(slice any, setFunc func(*TraitCreate, int)) *TraitCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TraitCreateBulk{err: fmt.Errorf("calling to TraitClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TraitCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TraitCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for Trait.
 func (c *TraitClient) Update() *TraitUpdate {
 	mutation := newTraitMutation(c.config, OpUpdate)
@@ -4158,31 +5645,15 @@ func (c *TraitClient) GetX(ctx context.Context, id int) *Trait {
 	return obj
 }
 
-// QueryRaces queries the races edge of a Trait.
-func (c *TraitClient) QueryRaces(t *Trait) *RaceQuery {
+// QueryRace queries the race edge of a Trait.
+func (c *TraitClient) QueryRace(t *Trait) *RaceQuery {
 	query := (&RaceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(trait.Table, trait.FieldID, id),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, trait.RacesTable, trait.RacesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySubraces queries the subraces edge of a Trait.
-func (c *TraitClient) QuerySubraces(t *Trait) *SubraceQuery {
-	query := (&SubraceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := t.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(trait.Table, trait.FieldID, id),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, trait.SubracesTable, trait.SubracesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, trait.RaceTable, trait.RacePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -4245,6 +5716,21 @@ func (c *VehicleClient) Create() *VehicleCreate {
 
 // CreateBulk returns a builder for creating a bulk of Vehicle entities.
 func (c *VehicleClient) CreateBulk(builders ...*VehicleCreate) *VehicleCreateBulk {
+	return &VehicleCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *VehicleClient) MapCreateBulk(slice any, setFunc func(*VehicleCreate, int)) *VehicleCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &VehicleCreateBulk{err: fmt.Errorf("calling to VehicleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*VehicleCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &VehicleCreateBulk{config: c.config, builders: builders}
 }
 
@@ -4382,6 +5868,21 @@ func (c *WeaponClient) CreateBulk(builders ...*WeaponCreate) *WeaponCreateBulk {
 	return &WeaponCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *WeaponClient) MapCreateBulk(slice any, setFunc func(*WeaponCreate, int)) *WeaponCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &WeaponCreateBulk{err: fmt.Errorf("calling to WeaponClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*WeaponCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &WeaponCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for Weapon.
 func (c *WeaponClient) Update() *WeaponUpdate {
 	mutation := newWeaponMutation(c.config, OpUpdate)
@@ -4442,6 +5943,38 @@ func (c *WeaponClient) GetX(ctx context.Context, id int) *Weapon {
 	return obj
 }
 
+// QueryProperties queries the properties edge of a Weapon.
+func (c *WeaponClient) QueryProperties(w *Weapon) *PropertyQuery {
+	query := (&PropertyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := w.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapon.Table, weapon.FieldID, id),
+			sqlgraph.To(property.Table, property.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, weapon.PropertiesTable, weapon.PropertiesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDamageType queries the damage_type edge of a Weapon.
+func (c *WeaponClient) QueryDamageType(w *Weapon) *DamageTypeQuery {
+	query := (&DamageTypeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := w.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapon.Table, weapon.FieldID, id),
+			sqlgraph.To(damagetype.Table, damagetype.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, weapon.DamageTypeTable, weapon.DamageTypeColumn),
+		)
+		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryEquipment queries the equipment edge of a Weapon.
 func (c *WeaponClient) QueryEquipment(w *Weapon) *EquipmentQuery {
 	query := (&EquipmentClient{config: c.config}).Query()
@@ -4451,38 +5984,6 @@ func (c *WeaponClient) QueryEquipment(w *Weapon) *EquipmentQuery {
 			sqlgraph.From(weapon.Table, weapon.FieldID, id),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, true, weapon.EquipmentTable, weapon.EquipmentColumn),
-		)
-		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryWeaponDamage queries the weapon_damage edge of a Weapon.
-func (c *WeaponClient) QueryWeaponDamage(w *Weapon) *WeaponDamageQuery {
-	query := (&WeaponDamageClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := w.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(weapon.Table, weapon.FieldID, id),
-			sqlgraph.To(weapondamage.Table, weapondamage.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, weapon.WeaponDamageTable, weapon.WeaponDamageColumn),
-		)
-		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryWeaponProperties queries the weapon_properties edge of a Weapon.
-func (c *WeaponClient) QueryWeaponProperties(w *Weapon) *WeaponPropertyQuery {
-	query := (&WeaponPropertyClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := w.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(weapon.Table, weapon.FieldID, id),
-			sqlgraph.To(weaponproperty.Table, weaponproperty.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, weapon.WeaponPropertiesTable, weapon.WeaponPropertiesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
 		return fromV, nil
@@ -4515,304 +6016,20 @@ func (c *WeaponClient) mutate(ctx context.Context, m *WeaponMutation) (Value, er
 	}
 }
 
-// WeaponDamageClient is a client for the WeaponDamage schema.
-type WeaponDamageClient struct {
-	config
-}
-
-// NewWeaponDamageClient returns a client for the WeaponDamage from the given config.
-func NewWeaponDamageClient(c config) *WeaponDamageClient {
-	return &WeaponDamageClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `weapondamage.Hooks(f(g(h())))`.
-func (c *WeaponDamageClient) Use(hooks ...Hook) {
-	c.hooks.WeaponDamage = append(c.hooks.WeaponDamage, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `weapondamage.Intercept(f(g(h())))`.
-func (c *WeaponDamageClient) Intercept(interceptors ...Interceptor) {
-	c.inters.WeaponDamage = append(c.inters.WeaponDamage, interceptors...)
-}
-
-// Create returns a builder for creating a WeaponDamage entity.
-func (c *WeaponDamageClient) Create() *WeaponDamageCreate {
-	mutation := newWeaponDamageMutation(c.config, OpCreate)
-	return &WeaponDamageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of WeaponDamage entities.
-func (c *WeaponDamageClient) CreateBulk(builders ...*WeaponDamageCreate) *WeaponDamageCreateBulk {
-	return &WeaponDamageCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for WeaponDamage.
-func (c *WeaponDamageClient) Update() *WeaponDamageUpdate {
-	mutation := newWeaponDamageMutation(c.config, OpUpdate)
-	return &WeaponDamageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *WeaponDamageClient) UpdateOne(wd *WeaponDamage) *WeaponDamageUpdateOne {
-	mutation := newWeaponDamageMutation(c.config, OpUpdateOne, withWeaponDamage(wd))
-	return &WeaponDamageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *WeaponDamageClient) UpdateOneID(id int) *WeaponDamageUpdateOne {
-	mutation := newWeaponDamageMutation(c.config, OpUpdateOne, withWeaponDamageID(id))
-	return &WeaponDamageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for WeaponDamage.
-func (c *WeaponDamageClient) Delete() *WeaponDamageDelete {
-	mutation := newWeaponDamageMutation(c.config, OpDelete)
-	return &WeaponDamageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *WeaponDamageClient) DeleteOne(wd *WeaponDamage) *WeaponDamageDeleteOne {
-	return c.DeleteOneID(wd.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *WeaponDamageClient) DeleteOneID(id int) *WeaponDamageDeleteOne {
-	builder := c.Delete().Where(weapondamage.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &WeaponDamageDeleteOne{builder}
-}
-
-// Query returns a query builder for WeaponDamage.
-func (c *WeaponDamageClient) Query() *WeaponDamageQuery {
-	return &WeaponDamageQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeWeaponDamage},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a WeaponDamage entity by its id.
-func (c *WeaponDamageClient) Get(ctx context.Context, id int) (*WeaponDamage, error) {
-	return c.Query().Where(weapondamage.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *WeaponDamageClient) GetX(ctx context.Context, id int) *WeaponDamage {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryWeapon queries the weapon edge of a WeaponDamage.
-func (c *WeaponDamageClient) QueryWeapon(wd *WeaponDamage) *WeaponQuery {
-	query := (&WeaponClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := wd.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(weapondamage.Table, weapondamage.FieldID, id),
-			sqlgraph.To(weapon.Table, weapon.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, weapondamage.WeaponTable, weapondamage.WeaponColumn),
-		)
-		fromV = sqlgraph.Neighbors(wd.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryDamageType queries the damage_type edge of a WeaponDamage.
-func (c *WeaponDamageClient) QueryDamageType(wd *WeaponDamage) *DamageTypeQuery {
-	query := (&DamageTypeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := wd.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(weapondamage.Table, weapondamage.FieldID, id),
-			sqlgraph.To(damagetype.Table, damagetype.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, weapondamage.DamageTypeTable, weapondamage.DamageTypeColumn),
-		)
-		fromV = sqlgraph.Neighbors(wd.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *WeaponDamageClient) Hooks() []Hook {
-	return c.hooks.WeaponDamage
-}
-
-// Interceptors returns the client interceptors.
-func (c *WeaponDamageClient) Interceptors() []Interceptor {
-	return c.inters.WeaponDamage
-}
-
-func (c *WeaponDamageClient) mutate(ctx context.Context, m *WeaponDamageMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&WeaponDamageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&WeaponDamageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&WeaponDamageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&WeaponDamageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown WeaponDamage mutation op: %q", m.Op())
-	}
-}
-
-// WeaponPropertyClient is a client for the WeaponProperty schema.
-type WeaponPropertyClient struct {
-	config
-}
-
-// NewWeaponPropertyClient returns a client for the WeaponProperty from the given config.
-func NewWeaponPropertyClient(c config) *WeaponPropertyClient {
-	return &WeaponPropertyClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `weaponproperty.Hooks(f(g(h())))`.
-func (c *WeaponPropertyClient) Use(hooks ...Hook) {
-	c.hooks.WeaponProperty = append(c.hooks.WeaponProperty, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `weaponproperty.Intercept(f(g(h())))`.
-func (c *WeaponPropertyClient) Intercept(interceptors ...Interceptor) {
-	c.inters.WeaponProperty = append(c.inters.WeaponProperty, interceptors...)
-}
-
-// Create returns a builder for creating a WeaponProperty entity.
-func (c *WeaponPropertyClient) Create() *WeaponPropertyCreate {
-	mutation := newWeaponPropertyMutation(c.config, OpCreate)
-	return &WeaponPropertyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of WeaponProperty entities.
-func (c *WeaponPropertyClient) CreateBulk(builders ...*WeaponPropertyCreate) *WeaponPropertyCreateBulk {
-	return &WeaponPropertyCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for WeaponProperty.
-func (c *WeaponPropertyClient) Update() *WeaponPropertyUpdate {
-	mutation := newWeaponPropertyMutation(c.config, OpUpdate)
-	return &WeaponPropertyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *WeaponPropertyClient) UpdateOne(wp *WeaponProperty) *WeaponPropertyUpdateOne {
-	mutation := newWeaponPropertyMutation(c.config, OpUpdateOne, withWeaponProperty(wp))
-	return &WeaponPropertyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *WeaponPropertyClient) UpdateOneID(id int) *WeaponPropertyUpdateOne {
-	mutation := newWeaponPropertyMutation(c.config, OpUpdateOne, withWeaponPropertyID(id))
-	return &WeaponPropertyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for WeaponProperty.
-func (c *WeaponPropertyClient) Delete() *WeaponPropertyDelete {
-	mutation := newWeaponPropertyMutation(c.config, OpDelete)
-	return &WeaponPropertyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *WeaponPropertyClient) DeleteOne(wp *WeaponProperty) *WeaponPropertyDeleteOne {
-	return c.DeleteOneID(wp.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *WeaponPropertyClient) DeleteOneID(id int) *WeaponPropertyDeleteOne {
-	builder := c.Delete().Where(weaponproperty.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &WeaponPropertyDeleteOne{builder}
-}
-
-// Query returns a query builder for WeaponProperty.
-func (c *WeaponPropertyClient) Query() *WeaponPropertyQuery {
-	return &WeaponPropertyQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeWeaponProperty},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a WeaponProperty entity by its id.
-func (c *WeaponPropertyClient) Get(ctx context.Context, id int) (*WeaponProperty, error) {
-	return c.Query().Where(weaponproperty.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *WeaponPropertyClient) GetX(ctx context.Context, id int) *WeaponProperty {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryWeapons queries the weapons edge of a WeaponProperty.
-func (c *WeaponPropertyClient) QueryWeapons(wp *WeaponProperty) *WeaponQuery {
-	query := (&WeaponClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := wp.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(weaponproperty.Table, weaponproperty.FieldID, id),
-			sqlgraph.To(weapon.Table, weapon.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, weaponproperty.WeaponsTable, weaponproperty.WeaponsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(wp.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *WeaponPropertyClient) Hooks() []Hook {
-	return c.hooks.WeaponProperty
-}
-
-// Interceptors returns the client interceptors.
-func (c *WeaponPropertyClient) Interceptors() []Interceptor {
-	return c.inters.WeaponProperty
-}
-
-func (c *WeaponPropertyClient) mutate(ctx context.Context, m *WeaponPropertyMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&WeaponPropertyCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&WeaponPropertyUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&WeaponPropertyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&WeaponPropertyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown WeaponProperty mutation op: %q", m.Op())
-	}
-}
-
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityBonus, AbilityScore, Armor, ArmorClass, Class, ClassEquipment, Coin,
-		DamageType, Equipment, EquipmentCategory, EquipmentChoice, EquipmentCost, Gear,
-		Language, MagicSchool, Proficiency, ProficiencyChoice, Race, Rule, RuleSection,
-		Skill, Subrace, Tool, Trait, Vehicle, Weapon, WeaponDamage,
-		WeaponProperty []ent.Hook
+		AbilityBonus, AbilityScore, Alignment, Armor, Character, CharacterAbilityScore,
+		CharacterProficiency, CharacterSkill, Class, Coin, Condition, Cost, DamageType,
+		Equipment, EquipmentEntry, Feat, Feature, Gear, Language, LanguageChoice,
+		MagicSchool, Prerequisite, Proficiency, ProficiencyChoice, Property, Race,
+		Rule, RuleSection, Skill, Tool, Trait, Vehicle, Weapon []ent.Hook
 	}
 	inters struct {
-		AbilityBonus, AbilityScore, Armor, ArmorClass, Class, ClassEquipment, Coin,
-		DamageType, Equipment, EquipmentCategory, EquipmentChoice, EquipmentCost, Gear,
-		Language, MagicSchool, Proficiency, ProficiencyChoice, Race, Rule, RuleSection,
-		Skill, Subrace, Tool, Trait, Vehicle, Weapon, WeaponDamage,
-		WeaponProperty []ent.Interceptor
+		AbilityBonus, AbilityScore, Alignment, Armor, Character, CharacterAbilityScore,
+		CharacterProficiency, CharacterSkill, Class, Coin, Condition, Cost, DamageType,
+		Equipment, EquipmentEntry, Feat, Feature, Gear, Language, LanguageChoice,
+		MagicSchool, Prerequisite, Proficiency, ProficiencyChoice, Property, Race,
+		Rule, RuleSection, Skill, Tool, Trait, Vehicle, Weapon []ent.Interceptor
 	}
 )

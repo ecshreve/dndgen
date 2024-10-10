@@ -3,6 +3,10 @@
 package weapon
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -12,59 +16,72 @@ const (
 	Label = "weapon"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldIndx holds the string denoting the indx field in the database.
-	FieldIndx = "indx"
-	// FieldName holds the string denoting the name field in the database.
-	FieldName = "name"
-	// FieldEquipmentID holds the string denoting the equipment_id field in the database.
-	FieldEquipmentID = "equipment_id"
 	// FieldWeaponCategory holds the string denoting the weapon_category field in the database.
 	FieldWeaponCategory = "weapon_category"
-	// FieldWeaponRange holds the string denoting the weapon_range field in the database.
-	FieldWeaponRange = "weapon_range"
+	// FieldWeaponSubcategory holds the string denoting the weapon_subcategory field in the database.
+	FieldWeaponSubcategory = "weapon_subcategory"
+	// FieldRangeNormal holds the string denoting the range_normal field in the database.
+	FieldRangeNormal = "range_normal"
+	// FieldRangeLong holds the string denoting the range_long field in the database.
+	FieldRangeLong = "range_long"
+	// FieldThrowRangeNormal holds the string denoting the throw_range_normal field in the database.
+	FieldThrowRangeNormal = "throw_range_normal"
+	// FieldThrowRangeLong holds the string denoting the throw_range_long field in the database.
+	FieldThrowRangeLong = "throw_range_long"
+	// FieldDamageDice holds the string denoting the damage_dice field in the database.
+	FieldDamageDice = "damage_dice"
+	// EdgeProperties holds the string denoting the properties edge name in mutations.
+	EdgeProperties = "properties"
+	// EdgeDamageType holds the string denoting the damage_type edge name in mutations.
+	EdgeDamageType = "damage_type"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
-	// EdgeWeaponDamage holds the string denoting the weapon_damage edge name in mutations.
-	EdgeWeaponDamage = "weapon_damage"
-	// EdgeWeaponProperties holds the string denoting the weapon_properties edge name in mutations.
-	EdgeWeaponProperties = "weapon_properties"
 	// Table holds the table name of the weapon in the database.
 	Table = "weapons"
+	// PropertiesTable is the table that holds the properties relation/edge. The primary key declared below.
+	PropertiesTable = "weapon_properties"
+	// PropertiesInverseTable is the table name for the Property entity.
+	// It exists in this package in order to avoid circular dependency with the "property" package.
+	PropertiesInverseTable = "properties"
+	// DamageTypeTable is the table that holds the damage_type relation/edge.
+	DamageTypeTable = "weapons"
+	// DamageTypeInverseTable is the table name for the DamageType entity.
+	// It exists in this package in order to avoid circular dependency with the "damagetype" package.
+	DamageTypeInverseTable = "damage_types"
+	// DamageTypeColumn is the table column denoting the damage_type relation/edge.
+	DamageTypeColumn = "weapon_damage_type"
 	// EquipmentTable is the table that holds the equipment relation/edge.
 	EquipmentTable = "weapons"
 	// EquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "equipment_id"
-	// WeaponDamageTable is the table that holds the weapon_damage relation/edge.
-	WeaponDamageTable = "weapon_damages"
-	// WeaponDamageInverseTable is the table name for the WeaponDamage entity.
-	// It exists in this package in order to avoid circular dependency with the "weapondamage" package.
-	WeaponDamageInverseTable = "weapon_damages"
-	// WeaponDamageColumn is the table column denoting the weapon_damage relation/edge.
-	WeaponDamageColumn = "weapon_id"
-	// WeaponPropertiesTable is the table that holds the weapon_properties relation/edge. The primary key declared below.
-	WeaponPropertiesTable = "weapon_weapon_properties"
-	// WeaponPropertiesInverseTable is the table name for the WeaponProperty entity.
-	// It exists in this package in order to avoid circular dependency with the "weaponproperty" package.
-	WeaponPropertiesInverseTable = "weapon_properties"
+	EquipmentColumn = "equipment_weapon"
 )
 
 // Columns holds all SQL columns for weapon fields.
 var Columns = []string{
 	FieldID,
-	FieldIndx,
-	FieldName,
-	FieldEquipmentID,
 	FieldWeaponCategory,
-	FieldWeaponRange,
+	FieldWeaponSubcategory,
+	FieldRangeNormal,
+	FieldRangeLong,
+	FieldThrowRangeNormal,
+	FieldThrowRangeLong,
+	FieldDamageDice,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "weapons"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"equipment_weapon",
+	"weapon_damage_type",
 }
 
 var (
-	// WeaponPropertiesPrimaryKey and WeaponPropertiesColumn2 are the table columns denoting the
-	// primary key for the weapon_properties relation (M2M).
-	WeaponPropertiesPrimaryKey = []string{"weapon_id", "weapon_property_id"}
+	// PropertiesPrimaryKey and PropertiesColumn2 are the table columns denoting the
+	// primary key for the properties relation (M2M).
+	PropertiesPrimaryKey = []string{"weapon_id", "property_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -74,15 +91,62 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
 
-var (
-	// IndxValidator is a validator for the "indx" field. It is called by the builders before save.
-	IndxValidator func(string) error
-	// NameValidator is a validator for the "name" field. It is called by the builders before save.
-	NameValidator func(string) error
+// WeaponCategory defines the type for the "weapon_category" enum field.
+type WeaponCategory string
+
+// WeaponCategory values.
+const (
+	WeaponCategorySimple  WeaponCategory = "simple"
+	WeaponCategoryMartial WeaponCategory = "martial"
+	WeaponCategoryExotic  WeaponCategory = "exotic"
+	WeaponCategoryOther   WeaponCategory = "other"
 )
+
+func (wc WeaponCategory) String() string {
+	return string(wc)
+}
+
+// WeaponCategoryValidator is a validator for the "weapon_category" field enum values. It is called by the builders before save.
+func WeaponCategoryValidator(wc WeaponCategory) error {
+	switch wc {
+	case WeaponCategorySimple, WeaponCategoryMartial, WeaponCategoryExotic, WeaponCategoryOther:
+		return nil
+	default:
+		return fmt.Errorf("weapon: invalid enum value for weapon_category field: %q", wc)
+	}
+}
+
+// WeaponSubcategory defines the type for the "weapon_subcategory" enum field.
+type WeaponSubcategory string
+
+// WeaponSubcategory values.
+const (
+	WeaponSubcategoryMelee  WeaponSubcategory = "melee"
+	WeaponSubcategoryRanged WeaponSubcategory = "ranged"
+	WeaponSubcategoryOther  WeaponSubcategory = "other"
+)
+
+func (ws WeaponSubcategory) String() string {
+	return string(ws)
+}
+
+// WeaponSubcategoryValidator is a validator for the "weapon_subcategory" field enum values. It is called by the builders before save.
+func WeaponSubcategoryValidator(ws WeaponSubcategory) error {
+	switch ws {
+	case WeaponSubcategoryMelee, WeaponSubcategoryRanged, WeaponSubcategoryOther:
+		return nil
+	default:
+		return fmt.Errorf("weapon: invalid enum value for weapon_subcategory field: %q", ws)
+	}
+}
 
 // OrderOption defines the ordering options for the Weapon queries.
 type OrderOption func(*sql.Selector)
@@ -92,29 +156,60 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByIndx orders the results by the indx field.
-func ByIndx(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIndx, opts...).ToFunc()
-}
-
-// ByName orders the results by the name field.
-func ByName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldName, opts...).ToFunc()
-}
-
-// ByEquipmentID orders the results by the equipment_id field.
-func ByEquipmentID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEquipmentID, opts...).ToFunc()
-}
-
 // ByWeaponCategory orders the results by the weapon_category field.
 func ByWeaponCategory(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldWeaponCategory, opts...).ToFunc()
 }
 
-// ByWeaponRange orders the results by the weapon_range field.
-func ByWeaponRange(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldWeaponRange, opts...).ToFunc()
+// ByWeaponSubcategory orders the results by the weapon_subcategory field.
+func ByWeaponSubcategory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWeaponSubcategory, opts...).ToFunc()
+}
+
+// ByRangeNormal orders the results by the range_normal field.
+func ByRangeNormal(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRangeNormal, opts...).ToFunc()
+}
+
+// ByRangeLong orders the results by the range_long field.
+func ByRangeLong(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRangeLong, opts...).ToFunc()
+}
+
+// ByThrowRangeNormal orders the results by the throw_range_normal field.
+func ByThrowRangeNormal(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThrowRangeNormal, opts...).ToFunc()
+}
+
+// ByThrowRangeLong orders the results by the throw_range_long field.
+func ByThrowRangeLong(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThrowRangeLong, opts...).ToFunc()
+}
+
+// ByDamageDice orders the results by the damage_dice field.
+func ByDamageDice(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDamageDice, opts...).ToFunc()
+}
+
+// ByPropertiesCount orders the results by properties count.
+func ByPropertiesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPropertiesStep(), opts...)
+	}
+}
+
+// ByProperties orders the results by properties terms.
+func ByProperties(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPropertiesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByDamageTypeField orders the results by damage_type field.
+func ByDamageTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDamageTypeStep(), sql.OrderByField(field, opts...))
+	}
 }
 
 // ByEquipmentField orders the results by equipment field.
@@ -123,33 +218,19 @@ func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByWeaponDamageCount orders the results by weapon_damage count.
-func ByWeaponDamageCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newWeaponDamageStep(), opts...)
-	}
+func newPropertiesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PropertiesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, PropertiesTable, PropertiesPrimaryKey...),
+	)
 }
-
-// ByWeaponDamage orders the results by weapon_damage terms.
-func ByWeaponDamage(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newWeaponDamageStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByWeaponPropertiesCount orders the results by weapon_properties count.
-func ByWeaponPropertiesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newWeaponPropertiesStep(), opts...)
-	}
-}
-
-// ByWeaponProperties orders the results by weapon_properties terms.
-func ByWeaponProperties(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newWeaponPropertiesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
+func newDamageTypeStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DamageTypeInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, DamageTypeTable, DamageTypeColumn),
+	)
 }
 func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
@@ -158,17 +239,39 @@ func newEquipmentStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
 	)
 }
-func newWeaponDamageStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(WeaponDamageInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, WeaponDamageTable, WeaponDamageColumn),
-	)
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e WeaponCategory) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
 }
-func newWeaponPropertiesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(WeaponPropertiesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, WeaponPropertiesTable, WeaponPropertiesPrimaryKey...),
-	)
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *WeaponCategory) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = WeaponCategory(str)
+	if err := WeaponCategoryValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid WeaponCategory", str)
+	}
+	return nil
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e WeaponSubcategory) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *WeaponSubcategory) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = WeaponSubcategory(str)
+	if err := WeaponSubcategoryValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid WeaponSubcategory", str)
+	}
+	return nil
 }

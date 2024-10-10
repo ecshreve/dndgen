@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/rule"
@@ -34,31 +35,59 @@ func (ru *RuleUpdate) SetIndx(s string) *RuleUpdate {
 	return ru
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (ru *RuleUpdate) SetNillableIndx(s *string) *RuleUpdate {
+	if s != nil {
+		ru.SetIndx(*s)
+	}
+	return ru
+}
+
 // SetName sets the "name" field.
 func (ru *RuleUpdate) SetName(s string) *RuleUpdate {
 	ru.mutation.SetName(s)
 	return ru
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (ru *RuleUpdate) SetNillableName(s *string) *RuleUpdate {
+	if s != nil {
+		ru.SetName(*s)
+	}
+	return ru
+}
+
 // SetDesc sets the "desc" field.
-func (ru *RuleUpdate) SetDesc(s string) *RuleUpdate {
+func (ru *RuleUpdate) SetDesc(s []string) *RuleUpdate {
 	ru.mutation.SetDesc(s)
 	return ru
 }
 
-// AddRuleSectionIDs adds the "rule_sections" edge to the RuleSection entity by IDs.
-func (ru *RuleUpdate) AddRuleSectionIDs(ids ...int) *RuleUpdate {
-	ru.mutation.AddRuleSectionIDs(ids...)
+// AppendDesc appends s to the "desc" field.
+func (ru *RuleUpdate) AppendDesc(s []string) *RuleUpdate {
+	ru.mutation.AppendDesc(s)
 	return ru
 }
 
-// AddRuleSections adds the "rule_sections" edges to the RuleSection entity.
-func (ru *RuleUpdate) AddRuleSections(r ...*RuleSection) *RuleUpdate {
+// ClearDesc clears the value of the "desc" field.
+func (ru *RuleUpdate) ClearDesc() *RuleUpdate {
+	ru.mutation.ClearDesc()
+	return ru
+}
+
+// AddSectionIDs adds the "sections" edge to the RuleSection entity by IDs.
+func (ru *RuleUpdate) AddSectionIDs(ids ...int) *RuleUpdate {
+	ru.mutation.AddSectionIDs(ids...)
+	return ru
+}
+
+// AddSections adds the "sections" edges to the RuleSection entity.
+func (ru *RuleUpdate) AddSections(r ...*RuleSection) *RuleUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return ru.AddRuleSectionIDs(ids...)
+	return ru.AddSectionIDs(ids...)
 }
 
 // Mutation returns the RuleMutation object of the builder.
@@ -66,25 +95,25 @@ func (ru *RuleUpdate) Mutation() *RuleMutation {
 	return ru.mutation
 }
 
-// ClearRuleSections clears all "rule_sections" edges to the RuleSection entity.
-func (ru *RuleUpdate) ClearRuleSections() *RuleUpdate {
-	ru.mutation.ClearRuleSections()
+// ClearSections clears all "sections" edges to the RuleSection entity.
+func (ru *RuleUpdate) ClearSections() *RuleUpdate {
+	ru.mutation.ClearSections()
 	return ru
 }
 
-// RemoveRuleSectionIDs removes the "rule_sections" edge to RuleSection entities by IDs.
-func (ru *RuleUpdate) RemoveRuleSectionIDs(ids ...int) *RuleUpdate {
-	ru.mutation.RemoveRuleSectionIDs(ids...)
+// RemoveSectionIDs removes the "sections" edge to RuleSection entities by IDs.
+func (ru *RuleUpdate) RemoveSectionIDs(ids ...int) *RuleUpdate {
+	ru.mutation.RemoveSectionIDs(ids...)
 	return ru
 }
 
-// RemoveRuleSections removes "rule_sections" edges to RuleSection entities.
-func (ru *RuleUpdate) RemoveRuleSections(r ...*RuleSection) *RuleUpdate {
+// RemoveSections removes "sections" edges to RuleSection entities.
+func (ru *RuleUpdate) RemoveSections(r ...*RuleSection) *RuleUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return ru.RemoveRuleSectionIDs(ids...)
+	return ru.RemoveSectionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -148,14 +177,22 @@ func (ru *RuleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(rule.FieldName, field.TypeString, value)
 	}
 	if value, ok := ru.mutation.Desc(); ok {
-		_spec.SetField(rule.FieldDesc, field.TypeString, value)
+		_spec.SetField(rule.FieldDesc, field.TypeJSON, value)
 	}
-	if ru.mutation.RuleSectionsCleared() {
+	if value, ok := ru.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, rule.FieldDesc, value)
+		})
+	}
+	if ru.mutation.DescCleared() {
+		_spec.ClearField(rule.FieldDesc, field.TypeJSON)
+	}
+	if ru.mutation.SectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   rule.RuleSectionsTable,
-			Columns: rule.RuleSectionsPrimaryKey,
+			Table:   rule.SectionsTable,
+			Columns: []string{rule.SectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(rulesection.FieldID, field.TypeInt),
@@ -163,12 +200,12 @@ func (ru *RuleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.RemovedRuleSectionsIDs(); len(nodes) > 0 && !ru.mutation.RuleSectionsCleared() {
+	if nodes := ru.mutation.RemovedSectionsIDs(); len(nodes) > 0 && !ru.mutation.SectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   rule.RuleSectionsTable,
-			Columns: rule.RuleSectionsPrimaryKey,
+			Table:   rule.SectionsTable,
+			Columns: []string{rule.SectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(rulesection.FieldID, field.TypeInt),
@@ -179,12 +216,12 @@ func (ru *RuleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.RuleSectionsIDs(); len(nodes) > 0 {
+	if nodes := ru.mutation.SectionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   rule.RuleSectionsTable,
-			Columns: rule.RuleSectionsPrimaryKey,
+			Table:   rule.SectionsTable,
+			Columns: []string{rule.SectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(rulesection.FieldID, field.TypeInt),
@@ -221,31 +258,59 @@ func (ruo *RuleUpdateOne) SetIndx(s string) *RuleUpdateOne {
 	return ruo
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (ruo *RuleUpdateOne) SetNillableIndx(s *string) *RuleUpdateOne {
+	if s != nil {
+		ruo.SetIndx(*s)
+	}
+	return ruo
+}
+
 // SetName sets the "name" field.
 func (ruo *RuleUpdateOne) SetName(s string) *RuleUpdateOne {
 	ruo.mutation.SetName(s)
 	return ruo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (ruo *RuleUpdateOne) SetNillableName(s *string) *RuleUpdateOne {
+	if s != nil {
+		ruo.SetName(*s)
+	}
+	return ruo
+}
+
 // SetDesc sets the "desc" field.
-func (ruo *RuleUpdateOne) SetDesc(s string) *RuleUpdateOne {
+func (ruo *RuleUpdateOne) SetDesc(s []string) *RuleUpdateOne {
 	ruo.mutation.SetDesc(s)
 	return ruo
 }
 
-// AddRuleSectionIDs adds the "rule_sections" edge to the RuleSection entity by IDs.
-func (ruo *RuleUpdateOne) AddRuleSectionIDs(ids ...int) *RuleUpdateOne {
-	ruo.mutation.AddRuleSectionIDs(ids...)
+// AppendDesc appends s to the "desc" field.
+func (ruo *RuleUpdateOne) AppendDesc(s []string) *RuleUpdateOne {
+	ruo.mutation.AppendDesc(s)
 	return ruo
 }
 
-// AddRuleSections adds the "rule_sections" edges to the RuleSection entity.
-func (ruo *RuleUpdateOne) AddRuleSections(r ...*RuleSection) *RuleUpdateOne {
+// ClearDesc clears the value of the "desc" field.
+func (ruo *RuleUpdateOne) ClearDesc() *RuleUpdateOne {
+	ruo.mutation.ClearDesc()
+	return ruo
+}
+
+// AddSectionIDs adds the "sections" edge to the RuleSection entity by IDs.
+func (ruo *RuleUpdateOne) AddSectionIDs(ids ...int) *RuleUpdateOne {
+	ruo.mutation.AddSectionIDs(ids...)
+	return ruo
+}
+
+// AddSections adds the "sections" edges to the RuleSection entity.
+func (ruo *RuleUpdateOne) AddSections(r ...*RuleSection) *RuleUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return ruo.AddRuleSectionIDs(ids...)
+	return ruo.AddSectionIDs(ids...)
 }
 
 // Mutation returns the RuleMutation object of the builder.
@@ -253,25 +318,25 @@ func (ruo *RuleUpdateOne) Mutation() *RuleMutation {
 	return ruo.mutation
 }
 
-// ClearRuleSections clears all "rule_sections" edges to the RuleSection entity.
-func (ruo *RuleUpdateOne) ClearRuleSections() *RuleUpdateOne {
-	ruo.mutation.ClearRuleSections()
+// ClearSections clears all "sections" edges to the RuleSection entity.
+func (ruo *RuleUpdateOne) ClearSections() *RuleUpdateOne {
+	ruo.mutation.ClearSections()
 	return ruo
 }
 
-// RemoveRuleSectionIDs removes the "rule_sections" edge to RuleSection entities by IDs.
-func (ruo *RuleUpdateOne) RemoveRuleSectionIDs(ids ...int) *RuleUpdateOne {
-	ruo.mutation.RemoveRuleSectionIDs(ids...)
+// RemoveSectionIDs removes the "sections" edge to RuleSection entities by IDs.
+func (ruo *RuleUpdateOne) RemoveSectionIDs(ids ...int) *RuleUpdateOne {
+	ruo.mutation.RemoveSectionIDs(ids...)
 	return ruo
 }
 
-// RemoveRuleSections removes "rule_sections" edges to RuleSection entities.
-func (ruo *RuleUpdateOne) RemoveRuleSections(r ...*RuleSection) *RuleUpdateOne {
+// RemoveSections removes "sections" edges to RuleSection entities.
+func (ruo *RuleUpdateOne) RemoveSections(r ...*RuleSection) *RuleUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return ruo.RemoveRuleSectionIDs(ids...)
+	return ruo.RemoveSectionIDs(ids...)
 }
 
 // Where appends a list predicates to the RuleUpdate builder.
@@ -365,14 +430,22 @@ func (ruo *RuleUpdateOne) sqlSave(ctx context.Context) (_node *Rule, err error) 
 		_spec.SetField(rule.FieldName, field.TypeString, value)
 	}
 	if value, ok := ruo.mutation.Desc(); ok {
-		_spec.SetField(rule.FieldDesc, field.TypeString, value)
+		_spec.SetField(rule.FieldDesc, field.TypeJSON, value)
 	}
-	if ruo.mutation.RuleSectionsCleared() {
+	if value, ok := ruo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, rule.FieldDesc, value)
+		})
+	}
+	if ruo.mutation.DescCleared() {
+		_spec.ClearField(rule.FieldDesc, field.TypeJSON)
+	}
+	if ruo.mutation.SectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   rule.RuleSectionsTable,
-			Columns: rule.RuleSectionsPrimaryKey,
+			Table:   rule.SectionsTable,
+			Columns: []string{rule.SectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(rulesection.FieldID, field.TypeInt),
@@ -380,12 +453,12 @@ func (ruo *RuleUpdateOne) sqlSave(ctx context.Context) (_node *Rule, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.RemovedRuleSectionsIDs(); len(nodes) > 0 && !ruo.mutation.RuleSectionsCleared() {
+	if nodes := ruo.mutation.RemovedSectionsIDs(); len(nodes) > 0 && !ruo.mutation.SectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   rule.RuleSectionsTable,
-			Columns: rule.RuleSectionsPrimaryKey,
+			Table:   rule.SectionsTable,
+			Columns: []string{rule.SectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(rulesection.FieldID, field.TypeInt),
@@ -396,12 +469,12 @@ func (ruo *RuleUpdateOne) sqlSave(ctx context.Context) (_node *Rule, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.RuleSectionsIDs(); len(nodes) > 0 {
+	if nodes := ruo.mutation.SectionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   rule.RuleSectionsTable,
-			Columns: rule.RuleSectionsPrimaryKey,
+			Table:   rule.SectionsTable,
+			Columns: []string{rule.SectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(rulesection.FieldID, field.TypeInt),

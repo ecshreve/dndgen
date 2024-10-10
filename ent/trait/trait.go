@@ -18,22 +18,15 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
-	// EdgeRaces holds the string denoting the races edge name in mutations.
-	EdgeRaces = "races"
-	// EdgeSubraces holds the string denoting the subraces edge name in mutations.
-	EdgeSubraces = "subraces"
+	// EdgeRace holds the string denoting the race edge name in mutations.
+	EdgeRace = "race"
 	// Table holds the table name of the trait in the database.
 	Table = "traits"
-	// RacesTable is the table that holds the races relation/edge. The primary key declared below.
-	RacesTable = "race_traits"
-	// RacesInverseTable is the table name for the Race entity.
+	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
+	RaceTable = "race_traits"
+	// RaceInverseTable is the table name for the Race entity.
 	// It exists in this package in order to avoid circular dependency with the "race" package.
-	RacesInverseTable = "races"
-	// SubracesTable is the table that holds the subraces relation/edge. The primary key declared below.
-	SubracesTable = "subrace_traits"
-	// SubracesInverseTable is the table name for the Subrace entity.
-	// It exists in this package in order to avoid circular dependency with the "subrace" package.
-	SubracesInverseTable = "subraces"
+	RaceInverseTable = "races"
 )
 
 // Columns holds all SQL columns for trait fields.
@@ -45,12 +38,9 @@ var Columns = []string{
 }
 
 var (
-	// RacesPrimaryKey and RacesColumn2 are the table columns denoting the
-	// primary key for the races relation (M2M).
-	RacesPrimaryKey = []string{"race_id", "trait_id"}
-	// SubracesPrimaryKey and SubracesColumn2 are the table columns denoting the
-	// primary key for the subraces relation (M2M).
-	SubracesPrimaryKey = []string{"subrace_id", "trait_id"}
+	// RacePrimaryKey and RaceColumn2 are the table columns denoting the
+	// primary key for the race relation (M2M).
+	RacePrimaryKey = []string{"race_id", "trait_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -88,44 +78,23 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByRacesCount orders the results by races count.
-func ByRacesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByRaceCount orders the results by race count.
+func ByRaceCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRacesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newRaceStep(), opts...)
 	}
 }
 
-// ByRaces orders the results by races terms.
-func ByRaces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByRace orders the results by race terms.
+func ByRace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRacesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// BySubracesCount orders the results by subraces count.
-func BySubracesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubracesStep(), opts...)
-	}
-}
-
-// BySubraces orders the results by subraces terms.
-func BySubraces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubracesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newRacesStep() *sqlgraph.Step {
+func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RacesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, RacesTable, RacesPrimaryKey...),
-	)
-}
-func newSubracesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubracesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, SubracesTable, SubracesPrimaryKey...),
+		sqlgraph.To(RaceInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
 	)
 }

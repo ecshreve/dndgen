@@ -2,64 +2,67 @@ package popper
 
 import (
 	"context"
-	"strings"
+	"fmt"
 
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/internal/utils"
-	"github.com/samsarahq/go/oops"
 )
 
-type ProficiencyWrapper struct {
-	Indx      string `json:"index"`
-	Name      string `json:"name"`
-	Reference struct {
-		Indx string `json:"index"`
-		Url  string `json:"url"`
-	} `json:"reference"`
-	Classes []*ent.Class `json:"classes"`
-	Races   []*ent.Race  `json:"races"`
+type RefWrapper struct {
+	Indx string `json:"index"`
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }
 
-// ToEnt converts the ProficiencyWrapper to an ent.Proficiency.
-func (p *ProficiencyWrapper) ToEnt() *ent.Proficiency {
-	return &ent.Proficiency{
-		Indx:                p.Indx,
-		Name:                p.Name,
-		ProficiencyCategory: strings.Replace(strings.Split(p.Reference.Url, "/")[2], "-", "_", -1),
-	}
+type ProficiencyJSON struct {
+	Indx      string        `json:"index"`
+	ProfType  string        `json:"type"`
+	Name      string        `json:"name"`
+	Classes   []IndxWrapper `json:"classes"`
+	Races     []IndxWrapper `json:"races"`
+	Reference RefWrapper    `json:"reference"`
 }
 
-// PopulateProficiency populates the Proficiency entities from the JSON data files.
-func (p *Popper) PopulateProficiency(ctx context.Context) ([]*ent.Proficiency, error) {
-	fpath := "data/Proficiency.json"
-	var v []ProficiencyWrapper
+type ProficiencyPopulator struct {
+	client   *ent.Client
+	dataFile string
+	data     []ProficiencyJSON
+	indxToId map[string]int
+}
 
-	if err := utils.LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+func NewProficiencyPopulator(pp *Popper, dataFile string) *ProficiencyPopulator {
+	ep := &ProficiencyPopulator{
+		client:   pp.Client,
+		dataFile: dataFile,
+		indxToId: pp.IndxToId,
 	}
 
-	creates := make([]*ent.ProficiencyCreate, len(v))
-	for i, vv := range v {
-		creates[i] = p.Client.Proficiency.Create().SetProficiency(&ent.Proficiency{
-			Indx:                vv.Indx,
-			Name:                vv.Name,
-			ProficiencyCategory: strings.Replace(strings.Split(vv.Reference.Url, "/")[2], "-", "_", -1),
-		})
+	if err := utils.LoadJSONFile(ep.dataFile, &ep.data); err != nil {
+		log.Fatal("Error loading equipment data", "error", err)
 	}
 
-	created, err := p.Client.Proficiency.CreateBulk(creates...).Save(ctx)
-	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save Proficiency entities")
-	}
-	log.Infof("created %d entities for type Proficiency", len(created))
+	return ep
+}
 
-	p.PopulateProficiencyEdges(ctx, created, v)
-
-	for _, c := range created {
-		p.IdToIndx[c.ID] = c.Indx
-		p.IndxToId[c.Indx] = c.ID
+func (cp *ProficiencyPopulator) Populate(ctx context.Context) error {
+	if len(cp.data) == 0 {
+		return fmt.Errorf("no Proficiency data to populate")
 	}
 
-	return created, nil
+	for _, prof := range cp.data {
+		profCreate := cp.client.Proficiency.Create().
+			SetIndx(prof.Indx).
+			SetName(prof.Name).
+			SetReference(prof.Reference.URL)
+
+		profEntity, err := profCreate.Save(ctx)
+		if err != nil {
+			log.Warn("error creating proficiency", "error", err)
+		}
+		cp.indxToId[prof.Indx] = profEntity.ID
+		log.Info("Populated proficiency", "indx", profEntity.Indx, "id", profEntity.ID)
+	}
+
+	return nil
 }

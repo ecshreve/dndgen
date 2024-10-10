@@ -8,28 +8,26 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
 )
 
 // TraitQuery is the builder for querying Trait entities.
 type TraitQuery struct {
 	config
-	ctx               *QueryContext
-	order             []trait.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.Trait
-	withRaces         *RaceQuery
-	withSubraces      *SubraceQuery
-	modifiers         []func(*sql.Selector)
-	loadTotal         []func(context.Context, []*Trait) error
-	withNamedRaces    map[string]*RaceQuery
-	withNamedSubraces map[string]*SubraceQuery
+	ctx           *QueryContext
+	order         []trait.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.Trait
+	withRace      *RaceQuery
+	modifiers     []func(*sql.Selector)
+	loadTotal     []func(context.Context, []*Trait) error
+	withNamedRace map[string]*RaceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -66,8 +64,8 @@ func (tq *TraitQuery) Order(o ...trait.OrderOption) *TraitQuery {
 	return tq
 }
 
-// QueryRaces chains the current query on the "races" edge.
-func (tq *TraitQuery) QueryRaces() *RaceQuery {
+// QueryRace chains the current query on the "race" edge.
+func (tq *TraitQuery) QueryRace() *RaceQuery {
 	query := (&RaceClient{config: tq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := tq.prepareQuery(ctx); err != nil {
@@ -80,29 +78,7 @@ func (tq *TraitQuery) QueryRaces() *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(trait.Table, trait.FieldID, selector),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, trait.RacesTable, trait.RacesPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySubraces chains the current query on the "subraces" edge.
-func (tq *TraitQuery) QuerySubraces() *SubraceQuery {
-	query := (&SubraceClient{config: tq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := tq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := tq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(trait.Table, trait.FieldID, selector),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, trait.SubracesTable, trait.SubracesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, trait.RaceTable, trait.RacePrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -113,7 +89,7 @@ func (tq *TraitQuery) QuerySubraces() *SubraceQuery {
 // First returns the first Trait entity from the query.
 // Returns a *NotFoundError when no Trait was found.
 func (tq *TraitQuery) First(ctx context.Context) (*Trait, error) {
-	nodes, err := tq.Limit(1).All(setContextOp(ctx, tq.ctx, "First"))
+	nodes, err := tq.Limit(1).All(setContextOp(ctx, tq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +112,7 @@ func (tq *TraitQuery) FirstX(ctx context.Context) *Trait {
 // Returns a *NotFoundError when no Trait ID was found.
 func (tq *TraitQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = tq.Limit(1).IDs(setContextOp(ctx, tq.ctx, "FirstID")); err != nil {
+	if ids, err = tq.Limit(1).IDs(setContextOp(ctx, tq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -159,7 +135,7 @@ func (tq *TraitQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one Trait entity is found.
 // Returns a *NotFoundError when no Trait entities are found.
 func (tq *TraitQuery) Only(ctx context.Context) (*Trait, error) {
-	nodes, err := tq.Limit(2).All(setContextOp(ctx, tq.ctx, "Only"))
+	nodes, err := tq.Limit(2).All(setContextOp(ctx, tq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +163,7 @@ func (tq *TraitQuery) OnlyX(ctx context.Context) *Trait {
 // Returns a *NotFoundError when no entities are found.
 func (tq *TraitQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = tq.Limit(2).IDs(setContextOp(ctx, tq.ctx, "OnlyID")); err != nil {
+	if ids, err = tq.Limit(2).IDs(setContextOp(ctx, tq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -212,7 +188,7 @@ func (tq *TraitQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Traits.
 func (tq *TraitQuery) All(ctx context.Context) ([]*Trait, error) {
-	ctx = setContextOp(ctx, tq.ctx, "All")
+	ctx = setContextOp(ctx, tq.ctx, ent.OpQueryAll)
 	if err := tq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -234,7 +210,7 @@ func (tq *TraitQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if tq.ctx.Unique == nil && tq.path != nil {
 		tq.Unique(true)
 	}
-	ctx = setContextOp(ctx, tq.ctx, "IDs")
+	ctx = setContextOp(ctx, tq.ctx, ent.OpQueryIDs)
 	if err = tq.Select(trait.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -252,7 +228,7 @@ func (tq *TraitQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (tq *TraitQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, tq.ctx, "Count")
+	ctx = setContextOp(ctx, tq.ctx, ent.OpQueryCount)
 	if err := tq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -270,7 +246,7 @@ func (tq *TraitQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (tq *TraitQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, tq.ctx, "Exist")
+	ctx = setContextOp(ctx, tq.ctx, ent.OpQueryExist)
 	switch _, err := tq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -297,38 +273,26 @@ func (tq *TraitQuery) Clone() *TraitQuery {
 		return nil
 	}
 	return &TraitQuery{
-		config:       tq.config,
-		ctx:          tq.ctx.Clone(),
-		order:        append([]trait.OrderOption{}, tq.order...),
-		inters:       append([]Interceptor{}, tq.inters...),
-		predicates:   append([]predicate.Trait{}, tq.predicates...),
-		withRaces:    tq.withRaces.Clone(),
-		withSubraces: tq.withSubraces.Clone(),
+		config:     tq.config,
+		ctx:        tq.ctx.Clone(),
+		order:      append([]trait.OrderOption{}, tq.order...),
+		inters:     append([]Interceptor{}, tq.inters...),
+		predicates: append([]predicate.Trait{}, tq.predicates...),
+		withRace:   tq.withRace.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
 	}
 }
 
-// WithRaces tells the query-builder to eager-load the nodes that are connected to
-// the "races" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *TraitQuery) WithRaces(opts ...func(*RaceQuery)) *TraitQuery {
+// WithRace tells the query-builder to eager-load the nodes that are connected to
+// the "race" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TraitQuery) WithRace(opts ...func(*RaceQuery)) *TraitQuery {
 	query := (&RaceClient{config: tq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	tq.withRaces = query
-	return tq
-}
-
-// WithSubraces tells the query-builder to eager-load the nodes that are connected to
-// the "subraces" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *TraitQuery) WithSubraces(opts ...func(*SubraceQuery)) *TraitQuery {
-	query := (&SubraceClient{config: tq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	tq.withSubraces = query
+	tq.withRace = query
 	return tq
 }
 
@@ -410,9 +374,8 @@ func (tq *TraitQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Trait,
 	var (
 		nodes       = []*Trait{}
 		_spec       = tq.querySpec()
-		loadedTypes = [2]bool{
-			tq.withRaces != nil,
-			tq.withSubraces != nil,
+		loadedTypes = [1]bool{
+			tq.withRace != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -436,31 +399,17 @@ func (tq *TraitQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Trait,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := tq.withRaces; query != nil {
-		if err := tq.loadRaces(ctx, query, nodes,
-			func(n *Trait) { n.Edges.Races = []*Race{} },
-			func(n *Trait, e *Race) { n.Edges.Races = append(n.Edges.Races, e) }); err != nil {
+	if query := tq.withRace; query != nil {
+		if err := tq.loadRace(ctx, query, nodes,
+			func(n *Trait) { n.Edges.Race = []*Race{} },
+			func(n *Trait, e *Race) { n.Edges.Race = append(n.Edges.Race, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := tq.withSubraces; query != nil {
-		if err := tq.loadSubraces(ctx, query, nodes,
-			func(n *Trait) { n.Edges.Subraces = []*Subrace{} },
-			func(n *Trait, e *Subrace) { n.Edges.Subraces = append(n.Edges.Subraces, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range tq.withNamedRaces {
-		if err := tq.loadRaces(ctx, query, nodes,
-			func(n *Trait) { n.appendNamedRaces(name) },
-			func(n *Trait, e *Race) { n.appendNamedRaces(name, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range tq.withNamedSubraces {
-		if err := tq.loadSubraces(ctx, query, nodes,
-			func(n *Trait) { n.appendNamedSubraces(name) },
-			func(n *Trait, e *Subrace) { n.appendNamedSubraces(name, e) }); err != nil {
+	for name, query := range tq.withNamedRace {
+		if err := tq.loadRace(ctx, query, nodes,
+			func(n *Trait) { n.appendNamedRace(name) },
+			func(n *Trait, e *Race) { n.appendNamedRace(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -472,7 +421,7 @@ func (tq *TraitQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Trait,
 	return nodes, nil
 }
 
-func (tq *TraitQuery) loadRaces(ctx context.Context, query *RaceQuery, nodes []*Trait, init func(*Trait), assign func(*Trait, *Race)) error {
+func (tq *TraitQuery) loadRace(ctx context.Context, query *RaceQuery, nodes []*Trait, init func(*Trait), assign func(*Trait, *Race)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*Trait)
 	nids := make(map[int]map[*Trait]struct{})
@@ -484,11 +433,11 @@ func (tq *TraitQuery) loadRaces(ctx context.Context, query *RaceQuery, nodes []*
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(trait.RacesTable)
-		s.Join(joinT).On(s.C(race.FieldID), joinT.C(trait.RacesPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(trait.RacesPrimaryKey[1]), edgeIDs...))
+		joinT := sql.Table(trait.RaceTable)
+		s.Join(joinT).On(s.C(race.FieldID), joinT.C(trait.RacePrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(trait.RacePrimaryKey[1]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(trait.RacesPrimaryKey[1]))
+		s.Select(joinT.C(trait.RacePrimaryKey[1]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -525,68 +474,7 @@ func (tq *TraitQuery) loadRaces(ctx context.Context, query *RaceQuery, nodes []*
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "races" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
-func (tq *TraitQuery) loadSubraces(ctx context.Context, query *SubraceQuery, nodes []*Trait, init func(*Trait), assign func(*Trait, *Subrace)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Trait)
-	nids := make(map[int]map[*Trait]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(trait.SubracesTable)
-		s.Join(joinT).On(s.C(subrace.FieldID), joinT.C(trait.SubracesPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(trait.SubracesPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(trait.SubracesPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Trait]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Subrace](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "subraces" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "race" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -679,31 +567,17 @@ func (tq *TraitQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// WithNamedRaces tells the query-builder to eager-load the nodes that are connected to the "races"
+// WithNamedRace tells the query-builder to eager-load the nodes that are connected to the "race"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (tq *TraitQuery) WithNamedRaces(name string, opts ...func(*RaceQuery)) *TraitQuery {
+func (tq *TraitQuery) WithNamedRace(name string, opts ...func(*RaceQuery)) *TraitQuery {
 	query := (&RaceClient{config: tq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	if tq.withNamedRaces == nil {
-		tq.withNamedRaces = make(map[string]*RaceQuery)
+	if tq.withNamedRace == nil {
+		tq.withNamedRace = make(map[string]*RaceQuery)
 	}
-	tq.withNamedRaces[name] = query
-	return tq
-}
-
-// WithNamedSubraces tells the query-builder to eager-load the nodes that are connected to the "subraces"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (tq *TraitQuery) WithNamedSubraces(name string, opts ...func(*SubraceQuery)) *TraitQuery {
-	query := (&SubraceClient{config: tq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if tq.withNamedSubraces == nil {
-		tq.withNamedSubraces = make(map[string]*SubraceQuery)
-	}
-	tq.withNamedSubraces[name] = query
+	tq.withNamedRace[name] = query
 	return tq
 }
 
@@ -721,7 +595,7 @@ func (tgb *TraitGroupBy) Aggregate(fns ...AggregateFunc) *TraitGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (tgb *TraitGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, tgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, tgb.build.ctx, ent.OpQueryGroupBy)
 	if err := tgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -769,7 +643,7 @@ func (ts *TraitSelect) Aggregate(fns ...AggregateFunc) *TraitSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ts *TraitSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ts.ctx, "Select")
+	ctx = setContextOp(ctx, ts.ctx, ent.OpQuerySelect)
 	if err := ts.prepareQuery(ctx); err != nil {
 		return err
 	}

@@ -53,19 +53,9 @@ func IDLTE(id int) predicate.Armor {
 	return predicate.Armor(sql.FieldLTE(FieldID, id))
 }
 
-// Indx applies equality check predicate on the "indx" field. It's identical to IndxEQ.
-func Indx(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldIndx, v))
-}
-
-// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
-func Name(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldName, v))
-}
-
-// ArmorCategory applies equality check predicate on the "armor_category" field. It's identical to ArmorCategoryEQ.
-func ArmorCategory(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldArmorCategory, v))
+// StrMinimum applies equality check predicate on the "str_minimum" field. It's identical to StrMinimumEQ.
+func StrMinimum(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldStrMinimum, v))
 }
 
 // StealthDisadvantage applies equality check predicate on the "stealth_disadvantage" field. It's identical to StealthDisadvantageEQ.
@@ -73,209 +63,79 @@ func StealthDisadvantage(v bool) predicate.Armor {
 	return predicate.Armor(sql.FieldEQ(FieldStealthDisadvantage, v))
 }
 
-// MinStrength applies equality check predicate on the "min_strength" field. It's identical to MinStrengthEQ.
-func MinStrength(v int) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldMinStrength, v))
+// AcBase applies equality check predicate on the "ac_base" field. It's identical to AcBaseEQ.
+func AcBase(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldAcBase, v))
 }
 
-// EquipmentID applies equality check predicate on the "equipment_id" field. It's identical to EquipmentIDEQ.
-func EquipmentID(v int) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldEquipmentID, v))
+// AcDexBonus applies equality check predicate on the "ac_dex_bonus" field. It's identical to AcDexBonusEQ.
+func AcDexBonus(v bool) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldAcDexBonus, v))
 }
 
-// IndxEQ applies the EQ predicate on the "indx" field.
-func IndxEQ(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldIndx, v))
-}
-
-// IndxNEQ applies the NEQ predicate on the "indx" field.
-func IndxNEQ(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldNEQ(FieldIndx, v))
-}
-
-// IndxIn applies the In predicate on the "indx" field.
-func IndxIn(vs ...string) predicate.Armor {
-	return predicate.Armor(sql.FieldIn(FieldIndx, vs...))
-}
-
-// IndxNotIn applies the NotIn predicate on the "indx" field.
-func IndxNotIn(vs ...string) predicate.Armor {
-	return predicate.Armor(sql.FieldNotIn(FieldIndx, vs...))
-}
-
-// IndxGT applies the GT predicate on the "indx" field.
-func IndxGT(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldGT(FieldIndx, v))
-}
-
-// IndxGTE applies the GTE predicate on the "indx" field.
-func IndxGTE(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldGTE(FieldIndx, v))
-}
-
-// IndxLT applies the LT predicate on the "indx" field.
-func IndxLT(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldLT(FieldIndx, v))
-}
-
-// IndxLTE applies the LTE predicate on the "indx" field.
-func IndxLTE(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldLTE(FieldIndx, v))
-}
-
-// IndxContains applies the Contains predicate on the "indx" field.
-func IndxContains(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldContains(FieldIndx, v))
-}
-
-// IndxHasPrefix applies the HasPrefix predicate on the "indx" field.
-func IndxHasPrefix(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldHasPrefix(FieldIndx, v))
-}
-
-// IndxHasSuffix applies the HasSuffix predicate on the "indx" field.
-func IndxHasSuffix(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldHasSuffix(FieldIndx, v))
-}
-
-// IndxEqualFold applies the EqualFold predicate on the "indx" field.
-func IndxEqualFold(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldEqualFold(FieldIndx, v))
-}
-
-// IndxContainsFold applies the ContainsFold predicate on the "indx" field.
-func IndxContainsFold(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldContainsFold(FieldIndx, v))
-}
-
-// NameEQ applies the EQ predicate on the "name" field.
-func NameEQ(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldName, v))
-}
-
-// NameNEQ applies the NEQ predicate on the "name" field.
-func NameNEQ(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldNEQ(FieldName, v))
-}
-
-// NameIn applies the In predicate on the "name" field.
-func NameIn(vs ...string) predicate.Armor {
-	return predicate.Armor(sql.FieldIn(FieldName, vs...))
-}
-
-// NameNotIn applies the NotIn predicate on the "name" field.
-func NameNotIn(vs ...string) predicate.Armor {
-	return predicate.Armor(sql.FieldNotIn(FieldName, vs...))
-}
-
-// NameGT applies the GT predicate on the "name" field.
-func NameGT(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldGT(FieldName, v))
-}
-
-// NameGTE applies the GTE predicate on the "name" field.
-func NameGTE(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldGTE(FieldName, v))
-}
-
-// NameLT applies the LT predicate on the "name" field.
-func NameLT(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldLT(FieldName, v))
-}
-
-// NameLTE applies the LTE predicate on the "name" field.
-func NameLTE(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldLTE(FieldName, v))
-}
-
-// NameContains applies the Contains predicate on the "name" field.
-func NameContains(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldContains(FieldName, v))
-}
-
-// NameHasPrefix applies the HasPrefix predicate on the "name" field.
-func NameHasPrefix(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldHasPrefix(FieldName, v))
-}
-
-// NameHasSuffix applies the HasSuffix predicate on the "name" field.
-func NameHasSuffix(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldHasSuffix(FieldName, v))
-}
-
-// NameEqualFold applies the EqualFold predicate on the "name" field.
-func NameEqualFold(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldEqualFold(FieldName, v))
-}
-
-// NameContainsFold applies the ContainsFold predicate on the "name" field.
-func NameContainsFold(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldContainsFold(FieldName, v))
+// AcMaxBonus applies equality check predicate on the "ac_max_bonus" field. It's identical to AcMaxBonusEQ.
+func AcMaxBonus(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldAcMaxBonus, v))
 }
 
 // ArmorCategoryEQ applies the EQ predicate on the "armor_category" field.
-func ArmorCategoryEQ(v string) predicate.Armor {
+func ArmorCategoryEQ(v ArmorCategory) predicate.Armor {
 	return predicate.Armor(sql.FieldEQ(FieldArmorCategory, v))
 }
 
 // ArmorCategoryNEQ applies the NEQ predicate on the "armor_category" field.
-func ArmorCategoryNEQ(v string) predicate.Armor {
+func ArmorCategoryNEQ(v ArmorCategory) predicate.Armor {
 	return predicate.Armor(sql.FieldNEQ(FieldArmorCategory, v))
 }
 
 // ArmorCategoryIn applies the In predicate on the "armor_category" field.
-func ArmorCategoryIn(vs ...string) predicate.Armor {
+func ArmorCategoryIn(vs ...ArmorCategory) predicate.Armor {
 	return predicate.Armor(sql.FieldIn(FieldArmorCategory, vs...))
 }
 
 // ArmorCategoryNotIn applies the NotIn predicate on the "armor_category" field.
-func ArmorCategoryNotIn(vs ...string) predicate.Armor {
+func ArmorCategoryNotIn(vs ...ArmorCategory) predicate.Armor {
 	return predicate.Armor(sql.FieldNotIn(FieldArmorCategory, vs...))
 }
 
-// ArmorCategoryGT applies the GT predicate on the "armor_category" field.
-func ArmorCategoryGT(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldGT(FieldArmorCategory, v))
+// StrMinimumEQ applies the EQ predicate on the "str_minimum" field.
+func StrMinimumEQ(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldStrMinimum, v))
 }
 
-// ArmorCategoryGTE applies the GTE predicate on the "armor_category" field.
-func ArmorCategoryGTE(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldGTE(FieldArmorCategory, v))
+// StrMinimumNEQ applies the NEQ predicate on the "str_minimum" field.
+func StrMinimumNEQ(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldNEQ(FieldStrMinimum, v))
 }
 
-// ArmorCategoryLT applies the LT predicate on the "armor_category" field.
-func ArmorCategoryLT(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldLT(FieldArmorCategory, v))
+// StrMinimumIn applies the In predicate on the "str_minimum" field.
+func StrMinimumIn(vs ...int) predicate.Armor {
+	return predicate.Armor(sql.FieldIn(FieldStrMinimum, vs...))
 }
 
-// ArmorCategoryLTE applies the LTE predicate on the "armor_category" field.
-func ArmorCategoryLTE(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldLTE(FieldArmorCategory, v))
+// StrMinimumNotIn applies the NotIn predicate on the "str_minimum" field.
+func StrMinimumNotIn(vs ...int) predicate.Armor {
+	return predicate.Armor(sql.FieldNotIn(FieldStrMinimum, vs...))
 }
 
-// ArmorCategoryContains applies the Contains predicate on the "armor_category" field.
-func ArmorCategoryContains(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldContains(FieldArmorCategory, v))
+// StrMinimumGT applies the GT predicate on the "str_minimum" field.
+func StrMinimumGT(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldGT(FieldStrMinimum, v))
 }
 
-// ArmorCategoryHasPrefix applies the HasPrefix predicate on the "armor_category" field.
-func ArmorCategoryHasPrefix(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldHasPrefix(FieldArmorCategory, v))
+// StrMinimumGTE applies the GTE predicate on the "str_minimum" field.
+func StrMinimumGTE(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldGTE(FieldStrMinimum, v))
 }
 
-// ArmorCategoryHasSuffix applies the HasSuffix predicate on the "armor_category" field.
-func ArmorCategoryHasSuffix(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldHasSuffix(FieldArmorCategory, v))
+// StrMinimumLT applies the LT predicate on the "str_minimum" field.
+func StrMinimumLT(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldLT(FieldStrMinimum, v))
 }
 
-// ArmorCategoryEqualFold applies the EqualFold predicate on the "armor_category" field.
-func ArmorCategoryEqualFold(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldEqualFold(FieldArmorCategory, v))
-}
-
-// ArmorCategoryContainsFold applies the ContainsFold predicate on the "armor_category" field.
-func ArmorCategoryContainsFold(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldContainsFold(FieldArmorCategory, v))
+// StrMinimumLTE applies the LTE predicate on the "str_minimum" field.
+func StrMinimumLTE(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldLTE(FieldStrMinimum, v))
 }
 
 // StealthDisadvantageEQ applies the EQ predicate on the "stealth_disadvantage" field.
@@ -288,64 +148,94 @@ func StealthDisadvantageNEQ(v bool) predicate.Armor {
 	return predicate.Armor(sql.FieldNEQ(FieldStealthDisadvantage, v))
 }
 
-// MinStrengthEQ applies the EQ predicate on the "min_strength" field.
-func MinStrengthEQ(v int) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldMinStrength, v))
+// AcBaseEQ applies the EQ predicate on the "ac_base" field.
+func AcBaseEQ(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldAcBase, v))
 }
 
-// MinStrengthNEQ applies the NEQ predicate on the "min_strength" field.
-func MinStrengthNEQ(v int) predicate.Armor {
-	return predicate.Armor(sql.FieldNEQ(FieldMinStrength, v))
+// AcBaseNEQ applies the NEQ predicate on the "ac_base" field.
+func AcBaseNEQ(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldNEQ(FieldAcBase, v))
 }
 
-// MinStrengthIn applies the In predicate on the "min_strength" field.
-func MinStrengthIn(vs ...int) predicate.Armor {
-	return predicate.Armor(sql.FieldIn(FieldMinStrength, vs...))
+// AcBaseIn applies the In predicate on the "ac_base" field.
+func AcBaseIn(vs ...int) predicate.Armor {
+	return predicate.Armor(sql.FieldIn(FieldAcBase, vs...))
 }
 
-// MinStrengthNotIn applies the NotIn predicate on the "min_strength" field.
-func MinStrengthNotIn(vs ...int) predicate.Armor {
-	return predicate.Armor(sql.FieldNotIn(FieldMinStrength, vs...))
+// AcBaseNotIn applies the NotIn predicate on the "ac_base" field.
+func AcBaseNotIn(vs ...int) predicate.Armor {
+	return predicate.Armor(sql.FieldNotIn(FieldAcBase, vs...))
 }
 
-// MinStrengthGT applies the GT predicate on the "min_strength" field.
-func MinStrengthGT(v int) predicate.Armor {
-	return predicate.Armor(sql.FieldGT(FieldMinStrength, v))
+// AcBaseGT applies the GT predicate on the "ac_base" field.
+func AcBaseGT(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldGT(FieldAcBase, v))
 }
 
-// MinStrengthGTE applies the GTE predicate on the "min_strength" field.
-func MinStrengthGTE(v int) predicate.Armor {
-	return predicate.Armor(sql.FieldGTE(FieldMinStrength, v))
+// AcBaseGTE applies the GTE predicate on the "ac_base" field.
+func AcBaseGTE(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldGTE(FieldAcBase, v))
 }
 
-// MinStrengthLT applies the LT predicate on the "min_strength" field.
-func MinStrengthLT(v int) predicate.Armor {
-	return predicate.Armor(sql.FieldLT(FieldMinStrength, v))
+// AcBaseLT applies the LT predicate on the "ac_base" field.
+func AcBaseLT(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldLT(FieldAcBase, v))
 }
 
-// MinStrengthLTE applies the LTE predicate on the "min_strength" field.
-func MinStrengthLTE(v int) predicate.Armor {
-	return predicate.Armor(sql.FieldLTE(FieldMinStrength, v))
+// AcBaseLTE applies the LTE predicate on the "ac_base" field.
+func AcBaseLTE(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldLTE(FieldAcBase, v))
 }
 
-// EquipmentIDEQ applies the EQ predicate on the "equipment_id" field.
-func EquipmentIDEQ(v int) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldEquipmentID, v))
+// AcDexBonusEQ applies the EQ predicate on the "ac_dex_bonus" field.
+func AcDexBonusEQ(v bool) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldAcDexBonus, v))
 }
 
-// EquipmentIDNEQ applies the NEQ predicate on the "equipment_id" field.
-func EquipmentIDNEQ(v int) predicate.Armor {
-	return predicate.Armor(sql.FieldNEQ(FieldEquipmentID, v))
+// AcDexBonusNEQ applies the NEQ predicate on the "ac_dex_bonus" field.
+func AcDexBonusNEQ(v bool) predicate.Armor {
+	return predicate.Armor(sql.FieldNEQ(FieldAcDexBonus, v))
 }
 
-// EquipmentIDIn applies the In predicate on the "equipment_id" field.
-func EquipmentIDIn(vs ...int) predicate.Armor {
-	return predicate.Armor(sql.FieldIn(FieldEquipmentID, vs...))
+// AcMaxBonusEQ applies the EQ predicate on the "ac_max_bonus" field.
+func AcMaxBonusEQ(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldAcMaxBonus, v))
 }
 
-// EquipmentIDNotIn applies the NotIn predicate on the "equipment_id" field.
-func EquipmentIDNotIn(vs ...int) predicate.Armor {
-	return predicate.Armor(sql.FieldNotIn(FieldEquipmentID, vs...))
+// AcMaxBonusNEQ applies the NEQ predicate on the "ac_max_bonus" field.
+func AcMaxBonusNEQ(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldNEQ(FieldAcMaxBonus, v))
+}
+
+// AcMaxBonusIn applies the In predicate on the "ac_max_bonus" field.
+func AcMaxBonusIn(vs ...int) predicate.Armor {
+	return predicate.Armor(sql.FieldIn(FieldAcMaxBonus, vs...))
+}
+
+// AcMaxBonusNotIn applies the NotIn predicate on the "ac_max_bonus" field.
+func AcMaxBonusNotIn(vs ...int) predicate.Armor {
+	return predicate.Armor(sql.FieldNotIn(FieldAcMaxBonus, vs...))
+}
+
+// AcMaxBonusGT applies the GT predicate on the "ac_max_bonus" field.
+func AcMaxBonusGT(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldGT(FieldAcMaxBonus, v))
+}
+
+// AcMaxBonusGTE applies the GTE predicate on the "ac_max_bonus" field.
+func AcMaxBonusGTE(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldGTE(FieldAcMaxBonus, v))
+}
+
+// AcMaxBonusLT applies the LT predicate on the "ac_max_bonus" field.
+func AcMaxBonusLT(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldLT(FieldAcMaxBonus, v))
+}
+
+// AcMaxBonusLTE applies the LTE predicate on the "ac_max_bonus" field.
+func AcMaxBonusLTE(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldLTE(FieldAcMaxBonus, v))
 }
 
 // HasEquipment applies the HasEdge predicate on the "equipment" edge.
@@ -371,57 +261,17 @@ func HasEquipmentWith(preds ...predicate.Equipment) predicate.Armor {
 	})
 }
 
-// HasArmorClass applies the HasEdge predicate on the "armor_class" edge.
-func HasArmorClass() predicate.Armor {
-	return predicate.Armor(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ArmorClassTable, ArmorClassColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasArmorClassWith applies the HasEdge predicate on the "armor_class" edge with a given conditions (other predicates).
-func HasArmorClassWith(preds ...predicate.ArmorClass) predicate.Armor {
-	return predicate.Armor(func(s *sql.Selector) {
-		step := newArmorClassStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Armor) predicate.Armor {
-	return predicate.Armor(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Armor(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Armor) predicate.Armor {
-	return predicate.Armor(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Armor(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Armor) predicate.Armor {
-	return predicate.Armor(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Armor(sql.NotPredicates(p))
 }

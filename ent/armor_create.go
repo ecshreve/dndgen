@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/armor"
-	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/equipment"
 )
 
@@ -21,21 +20,15 @@ type ArmorCreate struct {
 	hooks    []Hook
 }
 
-// SetIndx sets the "indx" field.
-func (ac *ArmorCreate) SetIndx(s string) *ArmorCreate {
-	ac.mutation.SetIndx(s)
-	return ac
-}
-
-// SetName sets the "name" field.
-func (ac *ArmorCreate) SetName(s string) *ArmorCreate {
-	ac.mutation.SetName(s)
-	return ac
-}
-
 // SetArmorCategory sets the "armor_category" field.
-func (ac *ArmorCreate) SetArmorCategory(s string) *ArmorCreate {
-	ac.mutation.SetArmorCategory(s)
+func (ac *ArmorCreate) SetArmorCategory(value armor.ArmorCategory) *ArmorCreate {
+	ac.mutation.SetArmorCategory(value)
+	return ac
+}
+
+// SetStrMinimum sets the "str_minimum" field.
+func (ac *ArmorCreate) SetStrMinimum(i int) *ArmorCreate {
+	ac.mutation.SetStrMinimum(i)
 	return ac
 }
 
@@ -45,36 +38,49 @@ func (ac *ArmorCreate) SetStealthDisadvantage(b bool) *ArmorCreate {
 	return ac
 }
 
-// SetMinStrength sets the "min_strength" field.
-func (ac *ArmorCreate) SetMinStrength(i int) *ArmorCreate {
-	ac.mutation.SetMinStrength(i)
+// SetAcBase sets the "ac_base" field.
+func (ac *ArmorCreate) SetAcBase(i int) *ArmorCreate {
+	ac.mutation.SetAcBase(i)
 	return ac
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (ac *ArmorCreate) SetEquipmentID(i int) *ArmorCreate {
-	ac.mutation.SetEquipmentID(i)
+// SetAcDexBonus sets the "ac_dex_bonus" field.
+func (ac *ArmorCreate) SetAcDexBonus(b bool) *ArmorCreate {
+	ac.mutation.SetAcDexBonus(b)
+	return ac
+}
+
+// SetNillableAcDexBonus sets the "ac_dex_bonus" field if the given value is not nil.
+func (ac *ArmorCreate) SetNillableAcDexBonus(b *bool) *ArmorCreate {
+	if b != nil {
+		ac.SetAcDexBonus(*b)
+	}
+	return ac
+}
+
+// SetAcMaxBonus sets the "ac_max_bonus" field.
+func (ac *ArmorCreate) SetAcMaxBonus(i int) *ArmorCreate {
+	ac.mutation.SetAcMaxBonus(i)
+	return ac
+}
+
+// SetNillableAcMaxBonus sets the "ac_max_bonus" field if the given value is not nil.
+func (ac *ArmorCreate) SetNillableAcMaxBonus(i *int) *ArmorCreate {
+	if i != nil {
+		ac.SetAcMaxBonus(*i)
+	}
+	return ac
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (ac *ArmorCreate) SetEquipmentID(id int) *ArmorCreate {
+	ac.mutation.SetEquipmentID(id)
 	return ac
 }
 
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (ac *ArmorCreate) SetEquipment(e *Equipment) *ArmorCreate {
 	return ac.SetEquipmentID(e.ID)
-}
-
-// AddArmorClasIDs adds the "armor_class" edge to the ArmorClass entity by IDs.
-func (ac *ArmorCreate) AddArmorClasIDs(ids ...int) *ArmorCreate {
-	ac.mutation.AddArmorClasIDs(ids...)
-	return ac
-}
-
-// AddArmorClass adds the "armor_class" edges to the ArmorClass entity.
-func (ac *ArmorCreate) AddArmorClass(a ...*ArmorClass) *ArmorCreate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return ac.AddArmorClasIDs(ids...)
 }
 
 // Mutation returns the ArmorMutation object of the builder.
@@ -84,6 +90,7 @@ func (ac *ArmorCreate) Mutation() *ArmorMutation {
 
 // Save creates the Armor in the database.
 func (ac *ArmorCreate) Save(ctx context.Context) (*Armor, error) {
+	ac.defaults()
 	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
@@ -109,37 +116,49 @@ func (ac *ArmorCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ac *ArmorCreate) defaults() {
+	if _, ok := ac.mutation.AcDexBonus(); !ok {
+		v := armor.DefaultAcDexBonus
+		ac.mutation.SetAcDexBonus(v)
+	}
+	if _, ok := ac.mutation.AcMaxBonus(); !ok {
+		v := armor.DefaultAcMaxBonus
+		ac.mutation.SetAcMaxBonus(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (ac *ArmorCreate) check() error {
-	if _, ok := ac.mutation.Indx(); !ok {
-		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Armor.indx"`)}
-	}
-	if v, ok := ac.mutation.Indx(); ok {
-		if err := armor.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Armor.indx": %w`, err)}
-		}
-	}
-	if _, ok := ac.mutation.Name(); !ok {
-		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Armor.name"`)}
-	}
-	if v, ok := ac.mutation.Name(); ok {
-		if err := armor.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Armor.name": %w`, err)}
-		}
-	}
 	if _, ok := ac.mutation.ArmorCategory(); !ok {
 		return &ValidationError{Name: "armor_category", err: errors.New(`ent: missing required field "Armor.armor_category"`)}
+	}
+	if v, ok := ac.mutation.ArmorCategory(); ok {
+		if err := armor.ArmorCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "armor_category", err: fmt.Errorf(`ent: validator failed for field "Armor.armor_category": %w`, err)}
+		}
+	}
+	if _, ok := ac.mutation.StrMinimum(); !ok {
+		return &ValidationError{Name: "str_minimum", err: errors.New(`ent: missing required field "Armor.str_minimum"`)}
 	}
 	if _, ok := ac.mutation.StealthDisadvantage(); !ok {
 		return &ValidationError{Name: "stealth_disadvantage", err: errors.New(`ent: missing required field "Armor.stealth_disadvantage"`)}
 	}
-	if _, ok := ac.mutation.MinStrength(); !ok {
-		return &ValidationError{Name: "min_strength", err: errors.New(`ent: missing required field "Armor.min_strength"`)}
+	if _, ok := ac.mutation.AcBase(); !ok {
+		return &ValidationError{Name: "ac_base", err: errors.New(`ent: missing required field "Armor.ac_base"`)}
 	}
-	if _, ok := ac.mutation.EquipmentID(); !ok {
-		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "Armor.equipment_id"`)}
+	if v, ok := ac.mutation.AcBase(); ok {
+		if err := armor.AcBaseValidator(v); err != nil {
+			return &ValidationError{Name: "ac_base", err: fmt.Errorf(`ent: validator failed for field "Armor.ac_base": %w`, err)}
+		}
 	}
-	if _, ok := ac.mutation.EquipmentID(); !ok {
+	if _, ok := ac.mutation.AcDexBonus(); !ok {
+		return &ValidationError{Name: "ac_dex_bonus", err: errors.New(`ent: missing required field "Armor.ac_dex_bonus"`)}
+	}
+	if _, ok := ac.mutation.AcMaxBonus(); !ok {
+		return &ValidationError{Name: "ac_max_bonus", err: errors.New(`ent: missing required field "Armor.ac_max_bonus"`)}
+	}
+	if len(ac.mutation.EquipmentIDs()) == 0 {
 		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Armor.equipment"`)}
 	}
 	return nil
@@ -168,25 +187,29 @@ func (ac *ArmorCreate) createSpec() (*Armor, *sqlgraph.CreateSpec) {
 		_node = &Armor{config: ac.config}
 		_spec = sqlgraph.NewCreateSpec(armor.Table, sqlgraph.NewFieldSpec(armor.FieldID, field.TypeInt))
 	)
-	if value, ok := ac.mutation.Indx(); ok {
-		_spec.SetField(armor.FieldIndx, field.TypeString, value)
-		_node.Indx = value
-	}
-	if value, ok := ac.mutation.Name(); ok {
-		_spec.SetField(armor.FieldName, field.TypeString, value)
-		_node.Name = value
-	}
 	if value, ok := ac.mutation.ArmorCategory(); ok {
-		_spec.SetField(armor.FieldArmorCategory, field.TypeString, value)
+		_spec.SetField(armor.FieldArmorCategory, field.TypeEnum, value)
 		_node.ArmorCategory = value
+	}
+	if value, ok := ac.mutation.StrMinimum(); ok {
+		_spec.SetField(armor.FieldStrMinimum, field.TypeInt, value)
+		_node.StrMinimum = value
 	}
 	if value, ok := ac.mutation.StealthDisadvantage(); ok {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)
 		_node.StealthDisadvantage = value
 	}
-	if value, ok := ac.mutation.MinStrength(); ok {
-		_spec.SetField(armor.FieldMinStrength, field.TypeInt, value)
-		_node.MinStrength = value
+	if value, ok := ac.mutation.AcBase(); ok {
+		_spec.SetField(armor.FieldAcBase, field.TypeInt, value)
+		_node.AcBase = value
+	}
+	if value, ok := ac.mutation.AcDexBonus(); ok {
+		_spec.SetField(armor.FieldAcDexBonus, field.TypeBool, value)
+		_node.AcDexBonus = value
+	}
+	if value, ok := ac.mutation.AcMaxBonus(); ok {
+		_spec.SetField(armor.FieldAcMaxBonus, field.TypeInt, value)
+		_node.AcMaxBonus = value
 	}
 	if nodes := ac.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -202,23 +225,7 @@ func (ac *ArmorCreate) createSpec() (*Armor, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.EquipmentID = nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ac.mutation.ArmorClassIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   armor.ArmorClassTable,
-			Columns: []string{armor.ArmorClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
+		_node.equipment_armor = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -227,17 +234,22 @@ func (ac *ArmorCreate) createSpec() (*Armor, *sqlgraph.CreateSpec) {
 // ArmorCreateBulk is the builder for creating many Armor entities in bulk.
 type ArmorCreateBulk struct {
 	config
+	err      error
 	builders []*ArmorCreate
 }
 
 // Save creates the Armor entities in the database.
 func (acb *ArmorCreateBulk) Save(ctx context.Context) ([]*Armor, error) {
+	if acb.err != nil {
+		return nil, acb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(acb.builders))
 	nodes := make([]*Armor, len(acb.builders))
 	mutators := make([]Mutator, len(acb.builders))
 	for i := range acb.builders {
 		func(i int, root context.Context) {
 			builder := acb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ArmorMutation)
 				if !ok {

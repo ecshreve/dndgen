@@ -18,20 +18,21 @@ type Vehicle struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Indx holds the value of the "indx" field.
-	Indx string `json:"index"`
-	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
 	// VehicleCategory holds the value of the "vehicle_category" field.
-	VehicleCategory string `json:"vehicle_category,omitempty"`
+	VehicleCategory vehicle.VehicleCategory `json:"vehicle_category,omitempty"`
 	// Capacity holds the value of the "capacity" field.
 	Capacity string `json:"capacity,omitempty"`
-	// EquipmentID holds the value of the "equipment_id" field.
-	EquipmentID int `json:"equipment_id,omitempty"`
+	// Desc holds the value of the "desc" field.
+	Desc []string `json:"desc,omitempty"`
+	// SpeedQuantity holds the value of the "speed_quantity" field.
+	SpeedQuantity float64 `json:"speed_quantity,omitempty"`
+	// SpeedUnits holds the value of the "speed_units" field.
+	SpeedUnits vehicle.SpeedUnits `json:"speed_units,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the VehicleQuery when eager-loading is set.
-	Edges        VehicleEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges             VehicleEdges `json:"-"`
+	equipment_vehicle *int
+	selectValues      sql.SelectValues
 }
 
 // VehicleEdges holds the relations/edges for other nodes in the graph.
@@ -48,12 +49,10 @@ type VehicleEdges struct {
 // EquipmentOrErr returns the Equipment value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e VehicleEdges) EquipmentOrErr() (*Equipment, error) {
-	if e.loadedTypes[0] {
-		if e.Equipment == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: equipment.Label}
-		}
+	if e.Equipment != nil {
 		return e.Equipment, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: equipment.Label}
 	}
 	return nil, &NotLoadedError{edge: "equipment"}
 }
@@ -63,10 +62,16 @@ func (*Vehicle) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case vehicle.FieldID, vehicle.FieldEquipmentID:
+		case vehicle.FieldDesc:
+			values[i] = new([]byte)
+		case vehicle.FieldSpeedQuantity:
+			values[i] = new(sql.NullFloat64)
+		case vehicle.FieldID:
 			values[i] = new(sql.NullInt64)
-		case vehicle.FieldIndx, vehicle.FieldName, vehicle.FieldVehicleCategory, vehicle.FieldCapacity:
+		case vehicle.FieldVehicleCategory, vehicle.FieldCapacity, vehicle.FieldSpeedUnits:
 			values[i] = new(sql.NullString)
+		case vehicle.ForeignKeys[0]: // equipment_vehicle
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -88,23 +93,11 @@ func (v *Vehicle) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			v.ID = int(value.Int64)
-		case vehicle.FieldIndx:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field indx", values[i])
-			} else if value.Valid {
-				v.Indx = value.String
-			}
-		case vehicle.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field name", values[i])
-			} else if value.Valid {
-				v.Name = value.String
-			}
 		case vehicle.FieldVehicleCategory:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field vehicle_category", values[i])
 			} else if value.Valid {
-				v.VehicleCategory = value.String
+				v.VehicleCategory = vehicle.VehicleCategory(value.String)
 			}
 		case vehicle.FieldCapacity:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -112,11 +105,32 @@ func (v *Vehicle) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				v.Capacity = value.String
 			}
-		case vehicle.FieldEquipmentID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field equipment_id", values[i])
+		case vehicle.FieldDesc:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field desc", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &v.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
+			}
+		case vehicle.FieldSpeedQuantity:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field speed_quantity", values[i])
 			} else if value.Valid {
-				v.EquipmentID = int(value.Int64)
+				v.SpeedQuantity = value.Float64
+			}
+		case vehicle.FieldSpeedUnits:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field speed_units", values[i])
+			} else if value.Valid {
+				v.SpeedUnits = vehicle.SpeedUnits(value.String)
+			}
+		case vehicle.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field equipment_vehicle", value)
+			} else if value.Valid {
+				v.equipment_vehicle = new(int)
+				*v.equipment_vehicle = int(value.Int64)
 			}
 		default:
 			v.selectValues.Set(columns[i], values[i])
@@ -159,20 +173,20 @@ func (v *Vehicle) String() string {
 	var builder strings.Builder
 	builder.WriteString("Vehicle(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", v.ID))
-	builder.WriteString("indx=")
-	builder.WriteString(v.Indx)
-	builder.WriteString(", ")
-	builder.WriteString("name=")
-	builder.WriteString(v.Name)
-	builder.WriteString(", ")
 	builder.WriteString("vehicle_category=")
-	builder.WriteString(v.VehicleCategory)
+	builder.WriteString(fmt.Sprintf("%v", v.VehicleCategory))
 	builder.WriteString(", ")
 	builder.WriteString("capacity=")
 	builder.WriteString(v.Capacity)
 	builder.WriteString(", ")
-	builder.WriteString("equipment_id=")
-	builder.WriteString(fmt.Sprintf("%v", v.EquipmentID))
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", v.Desc))
+	builder.WriteString(", ")
+	builder.WriteString("speed_quantity=")
+	builder.WriteString(fmt.Sprintf("%v", v.SpeedQuantity))
+	builder.WriteString(", ")
+	builder.WriteString("speed_units=")
+	builder.WriteString(fmt.Sprintf("%v", v.SpeedUnits))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -208,11 +222,11 @@ func (v *Vehicle) UnmarshalJSON(data []byte) error {
 }
 
 func (vc *VehicleCreate) SetVehicle(input *Vehicle) *VehicleCreate {
-	vc.SetIndx(input.Indx)
-	vc.SetName(input.Name)
 	vc.SetVehicleCategory(input.VehicleCategory)
 	vc.SetCapacity(input.Capacity)
-	vc.SetEquipmentID(input.EquipmentID)
+	vc.SetDesc(input.Desc)
+	vc.SetSpeedQuantity(input.SpeedQuantity)
+	vc.SetSpeedUnits(input.SpeedUnits)
 	return vc
 }
 

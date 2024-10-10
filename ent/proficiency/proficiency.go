@@ -16,74 +16,40 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldProficiencyCategory holds the string denoting the proficiency_category field in the database.
-	FieldProficiencyCategory = "proficiency_category"
-	// EdgeClasses holds the string denoting the classes edge name in mutations.
-	EdgeClasses = "classes"
-	// EdgeRaces holds the string denoting the races edge name in mutations.
-	EdgeRaces = "races"
-	// EdgeSubraces holds the string denoting the subraces edge name in mutations.
-	EdgeSubraces = "subraces"
-	// EdgeChoice holds the string denoting the choice edge name in mutations.
-	EdgeChoice = "choice"
-	// EdgeSkill holds the string denoting the skill edge name in mutations.
-	EdgeSkill = "skill"
-	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
-	EdgeEquipment = "equipment"
-	// EdgeEquipmentCategory holds the string denoting the equipment_category edge name in mutations.
-	EdgeEquipmentCategory = "equipment_category"
-	// EdgeSavingThrow holds the string denoting the saving_throw edge name in mutations.
-	EdgeSavingThrow = "saving_throw"
+	// FieldReference holds the string denoting the reference field in the database.
+	FieldReference = "reference"
+	// EdgeRace holds the string denoting the race edge name in mutations.
+	EdgeRace = "race"
+	// EdgeOptions holds the string denoting the options edge name in mutations.
+	EdgeOptions = "options"
+	// EdgeClass holds the string denoting the class edge name in mutations.
+	EdgeClass = "class"
+	// EdgeCharacterProficiencies holds the string denoting the character_proficiencies edge name in mutations.
+	EdgeCharacterProficiencies = "character_proficiencies"
 	// Table holds the table name of the proficiency in the database.
 	Table = "proficiencies"
-	// ClassesTable is the table that holds the classes relation/edge. The primary key declared below.
-	ClassesTable = "class_proficiencies"
-	// ClassesInverseTable is the table name for the Class entity.
-	// It exists in this package in order to avoid circular dependency with the "class" package.
-	ClassesInverseTable = "classes"
-	// RacesTable is the table that holds the races relation/edge. The primary key declared below.
-	RacesTable = "race_proficiencies"
-	// RacesInverseTable is the table name for the Race entity.
+	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
+	RaceTable = "race_starting_proficiencies"
+	// RaceInverseTable is the table name for the Race entity.
 	// It exists in this package in order to avoid circular dependency with the "race" package.
-	RacesInverseTable = "races"
-	// SubracesTable is the table that holds the subraces relation/edge. The primary key declared below.
-	SubracesTable = "subrace_proficiencies"
-	// SubracesInverseTable is the table name for the Subrace entity.
-	// It exists in this package in order to avoid circular dependency with the "subrace" package.
-	SubracesInverseTable = "subraces"
-	// ChoiceTable is the table that holds the choice relation/edge. The primary key declared below.
-	ChoiceTable = "proficiency_choice"
-	// ChoiceInverseTable is the table name for the ProficiencyChoice entity.
+	RaceInverseTable = "races"
+	// OptionsTable is the table that holds the options relation/edge. The primary key declared below.
+	OptionsTable = "proficiency_choice_proficiencies"
+	// OptionsInverseTable is the table name for the ProficiencyChoice entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
-	ChoiceInverseTable = "proficiency_choices"
-	// SkillTable is the table that holds the skill relation/edge.
-	SkillTable = "skills"
-	// SkillInverseTable is the table name for the Skill entity.
-	// It exists in this package in order to avoid circular dependency with the "skill" package.
-	SkillInverseTable = "skills"
-	// SkillColumn is the table column denoting the skill relation/edge.
-	SkillColumn = "proficiency_skill"
-	// EquipmentTable is the table that holds the equipment relation/edge.
-	EquipmentTable = "equipment"
-	// EquipmentInverseTable is the table name for the Equipment entity.
-	// It exists in this package in order to avoid circular dependency with the "equipment" package.
-	EquipmentInverseTable = "equipment"
-	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "proficiency_equipment"
-	// EquipmentCategoryTable is the table that holds the equipment_category relation/edge.
-	EquipmentCategoryTable = "equipment_categories"
-	// EquipmentCategoryInverseTable is the table name for the EquipmentCategory entity.
-	// It exists in this package in order to avoid circular dependency with the "equipmentcategory" package.
-	EquipmentCategoryInverseTable = "equipment_categories"
-	// EquipmentCategoryColumn is the table column denoting the equipment_category relation/edge.
-	EquipmentCategoryColumn = "proficiency_equipment_category"
-	// SavingThrowTable is the table that holds the saving_throw relation/edge.
-	SavingThrowTable = "ability_scores"
-	// SavingThrowInverseTable is the table name for the AbilityScore entity.
-	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
-	SavingThrowInverseTable = "ability_scores"
-	// SavingThrowColumn is the table column denoting the saving_throw relation/edge.
-	SavingThrowColumn = "proficiency_saving_throw"
+	OptionsInverseTable = "proficiency_choices"
+	// ClassTable is the table that holds the class relation/edge. The primary key declared below.
+	ClassTable = "class_proficiencies"
+	// ClassInverseTable is the table name for the Class entity.
+	// It exists in this package in order to avoid circular dependency with the "class" package.
+	ClassInverseTable = "classes"
+	// CharacterProficienciesTable is the table that holds the character_proficiencies relation/edge.
+	CharacterProficienciesTable = "character_proficiencies"
+	// CharacterProficienciesInverseTable is the table name for the CharacterProficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "characterproficiency" package.
+	CharacterProficienciesInverseTable = "character_proficiencies"
+	// CharacterProficienciesColumn is the table column denoting the character_proficiencies relation/edge.
+	CharacterProficienciesColumn = "character_proficiency_proficiency"
 )
 
 // Columns holds all SQL columns for proficiency fields.
@@ -91,22 +57,19 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
-	FieldProficiencyCategory,
+	FieldReference,
 }
 
 var (
-	// ClassesPrimaryKey and ClassesColumn2 are the table columns denoting the
-	// primary key for the classes relation (M2M).
-	ClassesPrimaryKey = []string{"class_id", "proficiency_id"}
-	// RacesPrimaryKey and RacesColumn2 are the table columns denoting the
-	// primary key for the races relation (M2M).
-	RacesPrimaryKey = []string{"race_id", "proficiency_id"}
-	// SubracesPrimaryKey and SubracesColumn2 are the table columns denoting the
-	// primary key for the subraces relation (M2M).
-	SubracesPrimaryKey = []string{"subrace_id", "proficiency_id"}
-	// ChoicePrimaryKey and ChoiceColumn2 are the table columns denoting the
-	// primary key for the choice relation (M2M).
-	ChoicePrimaryKey = []string{"proficiency_id", "proficiency_choice_id"}
+	// RacePrimaryKey and RaceColumn2 are the table columns denoting the
+	// primary key for the race relation (M2M).
+	RacePrimaryKey = []string{"race_id", "proficiency_id"}
+	// OptionsPrimaryKey and OptionsColumn2 are the table columns denoting the
+	// primary key for the options relation (M2M).
+	OptionsPrimaryKey = []string{"proficiency_choice_id", "proficiency_id"}
+	// ClassPrimaryKey and ClassColumn2 are the table columns denoting the
+	// primary key for the class relation (M2M).
+	ClassPrimaryKey = []string{"class_id", "proficiency_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -124,6 +87,8 @@ var (
 	IndxValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// ReferenceValidator is a validator for the "reference" field. It is called by the builders before save.
+	ReferenceValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Proficiency queries.
@@ -144,175 +109,91 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByProficiencyCategory orders the results by the proficiency_category field.
-func ByProficiencyCategory(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldProficiencyCategory, opts...).ToFunc()
+// ByReference orders the results by the reference field.
+func ByReference(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldReference, opts...).ToFunc()
 }
 
-// ByClassesCount orders the results by classes count.
-func ByClassesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByRaceCount orders the results by race count.
+func ByRaceCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newClassesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newRaceStep(), opts...)
 	}
 }
 
-// ByClasses orders the results by classes terms.
-func ByClasses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByRace orders the results by race terms.
+func ByRace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newClassesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByRacesCount orders the results by races count.
-func ByRacesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByOptionsCount orders the results by options count.
+func ByOptionsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRacesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newOptionsStep(), opts...)
 	}
 }
 
-// ByRaces orders the results by races terms.
-func ByRaces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByOptions orders the results by options terms.
+func ByOptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRacesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newOptionsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// BySubracesCount orders the results by subraces count.
-func BySubracesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByClassCount orders the results by class count.
+func ByClassCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubracesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newClassStep(), opts...)
 	}
 }
 
-// BySubraces orders the results by subraces terms.
-func BySubraces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByClass orders the results by class terms.
+func ByClass(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubracesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newClassStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByChoiceCount orders the results by choice count.
-func ByChoiceCount(opts ...sql.OrderTermOption) OrderOption {
+// ByCharacterProficienciesCount orders the results by character_proficiencies count.
+func ByCharacterProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newChoiceStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newCharacterProficienciesStep(), opts...)
 	}
 }
 
-// ByChoice orders the results by choice terms.
-func ByChoice(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByCharacterProficiencies orders the results by character_proficiencies terms.
+func ByCharacterProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newChoiceStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newCharacterProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// BySkillCount orders the results by skill count.
-func BySkillCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSkillStep(), opts...)
-	}
-}
-
-// BySkill orders the results by skill terms.
-func BySkill(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSkillStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByEquipmentCount orders the results by equipment count.
-func ByEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEquipmentStep(), opts...)
-	}
-}
-
-// ByEquipment orders the results by equipment terms.
-func ByEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByEquipmentCategoryCount orders the results by equipment_category count.
-func ByEquipmentCategoryCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEquipmentCategoryStep(), opts...)
-	}
-}
-
-// ByEquipmentCategory orders the results by equipment_category terms.
-func ByEquipmentCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// BySavingThrowCount orders the results by saving_throw count.
-func BySavingThrowCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSavingThrowStep(), opts...)
-	}
-}
-
-// BySavingThrow orders the results by saving_throw terms.
-func BySavingThrow(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSavingThrowStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newClassesStep() *sqlgraph.Step {
+func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ClassesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
+		sqlgraph.To(RaceInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
 	)
 }
-func newRacesStep() *sqlgraph.Step {
+func newOptionsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RacesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, RacesTable, RacesPrimaryKey...),
+		sqlgraph.To(OptionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, OptionsTable, OptionsPrimaryKey...),
 	)
 }
-func newSubracesStep() *sqlgraph.Step {
+func newClassStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubracesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, SubracesTable, SubracesPrimaryKey...),
+		sqlgraph.To(ClassInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
 	)
 }
-func newChoiceStep() *sqlgraph.Step {
+func newCharacterProficienciesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ChoiceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ChoiceTable, ChoicePrimaryKey...),
-	)
-}
-func newSkillStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SkillInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, SkillTable, SkillColumn),
-	)
-}
-func newEquipmentStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentTable, EquipmentColumn),
-	)
-}
-func newEquipmentCategoryStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EquipmentCategoryInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentCategoryTable, EquipmentCategoryColumn),
-	)
-}
-func newSavingThrowStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SavingThrowInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, SavingThrowTable, SavingThrowColumn),
+		sqlgraph.To(CharacterProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CharacterProficienciesTable, CharacterProficienciesColumn),
 	)
 }

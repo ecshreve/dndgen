@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/coin"
+	"github.com/ecshreve/dndgen/ent/cost"
 )
 
 // CoinCreate is the builder for creating a Coin entity.
@@ -32,7 +33,7 @@ func (cc *CoinCreate) SetName(s string) *CoinCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (cc *CoinCreate) SetDesc(s string) *CoinCreate {
+func (cc *CoinCreate) SetDesc(s []string) *CoinCreate {
 	cc.mutation.SetDesc(s)
 	return cc
 }
@@ -41,6 +42,21 @@ func (cc *CoinCreate) SetDesc(s string) *CoinCreate {
 func (cc *CoinCreate) SetGoldConversionRate(f float64) *CoinCreate {
 	cc.mutation.SetGoldConversionRate(f)
 	return cc
+}
+
+// AddCostIDs adds the "costs" edge to the Cost entity by IDs.
+func (cc *CoinCreate) AddCostIDs(ids ...int) *CoinCreate {
+	cc.mutation.AddCostIDs(ids...)
+	return cc
+}
+
+// AddCosts adds the "costs" edges to the Cost entity.
+func (cc *CoinCreate) AddCosts(c ...*Cost) *CoinCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cc.AddCostIDs(ids...)
 }
 
 // Mutation returns the CoinMutation object of the builder.
@@ -93,9 +109,6 @@ func (cc *CoinCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Coin.name": %w`, err)}
 		}
 	}
-	if _, ok := cc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Coin.desc"`)}
-	}
 	if _, ok := cc.mutation.GoldConversionRate(); !ok {
 		return &ValidationError{Name: "gold_conversion_rate", err: errors.New(`ent: missing required field "Coin.gold_conversion_rate"`)}
 	}
@@ -134,12 +147,28 @@ func (cc *CoinCreate) createSpec() (*Coin, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := cc.mutation.Desc(); ok {
-		_spec.SetField(coin.FieldDesc, field.TypeString, value)
+		_spec.SetField(coin.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
 	}
 	if value, ok := cc.mutation.GoldConversionRate(); ok {
 		_spec.SetField(coin.FieldGoldConversionRate, field.TypeFloat64, value)
 		_node.GoldConversionRate = value
+	}
+	if nodes := cc.mutation.CostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   coin.CostsTable,
+			Columns: []string{coin.CostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
@@ -147,11 +176,15 @@ func (cc *CoinCreate) createSpec() (*Coin, *sqlgraph.CreateSpec) {
 // CoinCreateBulk is the builder for creating many Coin entities in bulk.
 type CoinCreateBulk struct {
 	config
+	err      error
 	builders []*CoinCreate
 }
 
 // Save creates the Coin entities in the database.
 func (ccb *CoinCreateBulk) Save(ctx context.Context) ([]*Coin, error) {
+	if ccb.err != nil {
+		return nil, ccb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
 	nodes := make([]*Coin, len(ccb.builders))
 	mutators := make([]Mutator, len(ccb.builders))

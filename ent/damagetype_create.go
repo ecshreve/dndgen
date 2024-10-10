@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/damagetype"
-	"github.com/ecshreve/dndgen/ent/weapondamage"
+	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
 // DamageTypeCreate is the builder for creating a DamageType entity.
@@ -38,19 +38,19 @@ func (dtc *DamageTypeCreate) SetDesc(s []string) *DamageTypeCreate {
 	return dtc
 }
 
-// AddWeaponDamageIDs adds the "weapon_damage" edge to the WeaponDamage entity by IDs.
-func (dtc *DamageTypeCreate) AddWeaponDamageIDs(ids ...int) *DamageTypeCreate {
-	dtc.mutation.AddWeaponDamageIDs(ids...)
+// AddWeaponIDs adds the "weapons" edge to the Weapon entity by IDs.
+func (dtc *DamageTypeCreate) AddWeaponIDs(ids ...int) *DamageTypeCreate {
+	dtc.mutation.AddWeaponIDs(ids...)
 	return dtc
 }
 
-// AddWeaponDamage adds the "weapon_damage" edges to the WeaponDamage entity.
-func (dtc *DamageTypeCreate) AddWeaponDamage(w ...*WeaponDamage) *DamageTypeCreate {
+// AddWeapons adds the "weapons" edges to the Weapon entity.
+func (dtc *DamageTypeCreate) AddWeapons(w ...*Weapon) *DamageTypeCreate {
 	ids := make([]int, len(w))
 	for i := range w {
 		ids[i] = w[i].ID
 	}
-	return dtc.AddWeaponDamageIDs(ids...)
+	return dtc.AddWeaponIDs(ids...)
 }
 
 // Mutation returns the DamageTypeMutation object of the builder.
@@ -103,9 +103,6 @@ func (dtc *DamageTypeCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "DamageType.name": %w`, err)}
 		}
 	}
-	if _, ok := dtc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "DamageType.desc"`)}
-	}
 	return nil
 }
 
@@ -144,15 +141,15 @@ func (dtc *DamageTypeCreate) createSpec() (*DamageType, *sqlgraph.CreateSpec) {
 		_spec.SetField(damagetype.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
 	}
-	if nodes := dtc.mutation.WeaponDamageIDs(); len(nodes) > 0 {
+	if nodes := dtc.mutation.WeaponsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   damagetype.WeaponDamageTable,
-			Columns: []string{damagetype.WeaponDamageColumn},
+			Table:   damagetype.WeaponsTable,
+			Columns: []string{damagetype.WeaponsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -166,11 +163,15 @@ func (dtc *DamageTypeCreate) createSpec() (*DamageType, *sqlgraph.CreateSpec) {
 // DamageTypeCreateBulk is the builder for creating many DamageType entities in bulk.
 type DamageTypeCreateBulk struct {
 	config
+	err      error
 	builders []*DamageTypeCreate
 }
 
 // Save creates the DamageType entities in the database.
 func (dtcb *DamageTypeCreateBulk) Save(ctx context.Context) ([]*DamageType, error) {
+	if dtcb.err != nil {
+		return nil, dtcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(dtcb.builders))
 	nodes := make([]*DamageType, len(dtcb.builders))
 	mutators := make([]Mutator, len(dtcb.builders))

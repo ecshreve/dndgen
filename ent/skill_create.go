@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -55,6 +56,21 @@ func (sc *SkillCreate) SetNillableAbilityScoreID(id *int) *SkillCreate {
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
 func (sc *SkillCreate) SetAbilityScore(a *AbilityScore) *SkillCreate {
 	return sc.SetAbilityScoreID(a.ID)
+}
+
+// AddCharacterSkillIDs adds the "character_skill" edge to the CharacterSkill entity by IDs.
+func (sc *SkillCreate) AddCharacterSkillIDs(ids ...int) *SkillCreate {
+	sc.mutation.AddCharacterSkillIDs(ids...)
+	return sc
+}
+
+// AddCharacterSkill adds the "character_skill" edges to the CharacterSkill entity.
+func (sc *SkillCreate) AddCharacterSkill(c ...*CharacterSkill) *SkillCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return sc.AddCharacterSkillIDs(ids...)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -107,9 +123,6 @@ func (sc *SkillCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Skill.name": %w`, err)}
 		}
 	}
-	if _, ok := sc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Skill.desc"`)}
-	}
 	return nil
 }
 
@@ -151,7 +164,7 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 	if nodes := sc.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   skill.AbilityScoreTable,
 			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
@@ -162,7 +175,23 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.skill_ability_score = &nodes[0]
+		_node.ability_score_skills = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.CharacterSkillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   skill.CharacterSkillTable,
+			Columns: []string{skill.CharacterSkillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -171,11 +200,15 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 // SkillCreateBulk is the builder for creating many Skill entities in bulk.
 type SkillCreateBulk struct {
 	config
+	err      error
 	builders []*SkillCreate
 }
 
 // Save creates the Skill entities in the database.
 func (scb *SkillCreateBulk) Save(ctx context.Context) ([]*Skill, error) {
+	if scb.err != nil {
+		return nil, scb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(scb.builders))
 	nodes := make([]*Skill, len(scb.builders))
 	mutators := make([]Mutator, len(scb.builders))

@@ -12,78 +12,56 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // AbilityBonus is the model entity for the AbilityBonus schema.
 type AbilityBonus struct {
 	config `json:"-"`
-	// ID of the ent.
-	ID int `json:"id,omitempty"`
-	// AbilityScoreID holds the value of the "ability_score_id" field.
-	AbilityScoreID int `json:"ability_score_id,omitempty"`
 	// Bonus holds the value of the "bonus" field.
 	Bonus int `json:"bonus,omitempty"`
+	// RaceID holds the value of the "race_id" field.
+	RaceID int `json:"race_id,omitempty"`
+	// AbilityScoreID holds the value of the "ability_score_id" field.
+	AbilityScoreID int `json:"ability_score_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AbilityBonusQuery when eager-loading is set.
-	Edges                   AbilityBonusEdges `json:"-"`
-	race_ability_bonuses    *int
-	subrace_ability_bonuses *int
-	selectValues            sql.SelectValues
+	Edges        AbilityBonusEdges `json:"-"`
+	selectValues sql.SelectValues
 }
 
 // AbilityBonusEdges holds the relations/edges for other nodes in the graph.
 type AbilityBonusEdges struct {
-	// AbilityScore holds the value of the ability_score edge.
-	AbilityScore *AbilityScore `json:"ability_score,omitempty"`
 	// Race holds the value of the race edge.
 	Race *Race `json:"race,omitempty"`
-	// Subrace holds the value of the subrace edge.
-	Subrace *Subrace `json:"subrace,omitempty"`
+	// AbilityScore holds the value of the ability_score edge.
+	AbilityScore *AbilityScore `json:"ability_score,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
-}
-
-// AbilityScoreOrErr returns the AbilityScore value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e AbilityBonusEdges) AbilityScoreOrErr() (*AbilityScore, error) {
-	if e.loadedTypes[0] {
-		if e.AbilityScore == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: abilityscore.Label}
-		}
-		return e.AbilityScore, nil
-	}
-	return nil, &NotLoadedError{edge: "ability_score"}
+	totalCount [2]map[string]int
 }
 
 // RaceOrErr returns the Race value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e AbilityBonusEdges) RaceOrErr() (*Race, error) {
-	if e.loadedTypes[1] {
-		if e.Race == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: race.Label}
-		}
+	if e.Race != nil {
 		return e.Race, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: race.Label}
 	}
 	return nil, &NotLoadedError{edge: "race"}
 }
 
-// SubraceOrErr returns the Subrace value or an error if the edge
+// AbilityScoreOrErr returns the AbilityScore value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e AbilityBonusEdges) SubraceOrErr() (*Subrace, error) {
-	if e.loadedTypes[2] {
-		if e.Subrace == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: subrace.Label}
-		}
-		return e.Subrace, nil
+func (e AbilityBonusEdges) AbilityScoreOrErr() (*AbilityScore, error) {
+	if e.AbilityScore != nil {
+		return e.AbilityScore, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: abilityscore.Label}
 	}
-	return nil, &NotLoadedError{edge: "subrace"}
+	return nil, &NotLoadedError{edge: "ability_score"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -91,11 +69,7 @@ func (*AbilityBonus) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case abilitybonus.FieldID, abilitybonus.FieldAbilityScoreID, abilitybonus.FieldBonus:
-			values[i] = new(sql.NullInt64)
-		case abilitybonus.ForeignKeys[0]: // race_ability_bonuses
-			values[i] = new(sql.NullInt64)
-		case abilitybonus.ForeignKeys[1]: // subrace_ability_bonuses
+		case abilitybonus.FieldBonus, abilitybonus.FieldRaceID, abilitybonus.FieldAbilityScoreID:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -112,37 +86,23 @@ func (ab *AbilityBonus) assignValues(columns []string, values []any) error {
 	}
 	for i := range columns {
 		switch columns[i] {
-		case abilitybonus.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
-			}
-			ab.ID = int(value.Int64)
-		case abilitybonus.FieldAbilityScoreID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field ability_score_id", values[i])
-			} else if value.Valid {
-				ab.AbilityScoreID = int(value.Int64)
-			}
 		case abilitybonus.FieldBonus:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field bonus", values[i])
 			} else if value.Valid {
 				ab.Bonus = int(value.Int64)
 			}
-		case abilitybonus.ForeignKeys[0]:
+		case abilitybonus.FieldRaceID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field race_ability_bonuses", value)
+				return fmt.Errorf("unexpected type %T for field race_id", values[i])
 			} else if value.Valid {
-				ab.race_ability_bonuses = new(int)
-				*ab.race_ability_bonuses = int(value.Int64)
+				ab.RaceID = int(value.Int64)
 			}
-		case abilitybonus.ForeignKeys[1]:
+		case abilitybonus.FieldAbilityScoreID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field subrace_ability_bonuses", value)
+				return fmt.Errorf("unexpected type %T for field ability_score_id", values[i])
 			} else if value.Valid {
-				ab.subrace_ability_bonuses = new(int)
-				*ab.subrace_ability_bonuses = int(value.Int64)
+				ab.AbilityScoreID = int(value.Int64)
 			}
 		default:
 			ab.selectValues.Set(columns[i], values[i])
@@ -157,19 +117,14 @@ func (ab *AbilityBonus) Value(name string) (ent.Value, error) {
 	return ab.selectValues.Get(name)
 }
 
-// QueryAbilityScore queries the "ability_score" edge of the AbilityBonus entity.
-func (ab *AbilityBonus) QueryAbilityScore() *AbilityScoreQuery {
-	return NewAbilityBonusClient(ab.config).QueryAbilityScore(ab)
-}
-
 // QueryRace queries the "race" edge of the AbilityBonus entity.
 func (ab *AbilityBonus) QueryRace() *RaceQuery {
 	return NewAbilityBonusClient(ab.config).QueryRace(ab)
 }
 
-// QuerySubrace queries the "subrace" edge of the AbilityBonus entity.
-func (ab *AbilityBonus) QuerySubrace() *SubraceQuery {
-	return NewAbilityBonusClient(ab.config).QuerySubrace(ab)
+// QueryAbilityScore queries the "ability_score" edge of the AbilityBonus entity.
+func (ab *AbilityBonus) QueryAbilityScore() *AbilityScoreQuery {
+	return NewAbilityBonusClient(ab.config).QueryAbilityScore(ab)
 }
 
 // Update returns a builder for updating this AbilityBonus.
@@ -194,12 +149,14 @@ func (ab *AbilityBonus) Unwrap() *AbilityBonus {
 func (ab *AbilityBonus) String() string {
 	var builder strings.Builder
 	builder.WriteString("AbilityBonus(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", ab.ID))
-	builder.WriteString("ability_score_id=")
-	builder.WriteString(fmt.Sprintf("%v", ab.AbilityScoreID))
-	builder.WriteString(", ")
 	builder.WriteString("bonus=")
 	builder.WriteString(fmt.Sprintf("%v", ab.Bonus))
+	builder.WriteString(", ")
+	builder.WriteString("race_id=")
+	builder.WriteString(fmt.Sprintf("%v", ab.RaceID))
+	builder.WriteString(", ")
+	builder.WriteString("ability_score_id=")
+	builder.WriteString(fmt.Sprintf("%v", ab.AbilityScoreID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -235,8 +192,9 @@ func (ab *AbilityBonus) UnmarshalJSON(data []byte) error {
 }
 
 func (abc *AbilityBonusCreate) SetAbilityBonus(input *AbilityBonus) *AbilityBonusCreate {
-	abc.SetAbilityScoreID(input.AbilityScoreID)
 	abc.SetBonus(input.Bonus)
+	abc.SetRaceID(input.RaceID)
+	abc.SetAbilityScoreID(input.AbilityScoreID)
 	return abc
 }
 

@@ -33,25 +33,25 @@ type Class struct {
 type ClassEdges struct {
 	// Proficiencies holds the value of the proficiencies edge.
 	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
-	// ProficiencyChoices holds the value of the proficiency_choices edge.
-	ProficiencyChoices []*ProficiencyChoice `json:"proficiency_choices,omitempty"`
-	// Equipment holds the value of the equipment edge.
-	Equipment []*Equipment `json:"equipment,omitempty"`
-	// EquipmentChoices holds the value of the equipment_choices edge.
-	EquipmentChoices []*EquipmentChoice `json:"equipment_choices,omitempty"`
-	// ClassEquipment holds the value of the class_equipment edge.
-	ClassEquipment []*ClassEquipment `json:"class_equipment,omitempty"`
+	// ProficiencyOptions holds the value of the proficiency_options edge.
+	ProficiencyOptions []*ProficiencyChoice `json:"proficiency_options,omitempty"`
+	// StartingEquipment holds the value of the starting_equipment edge.
+	StartingEquipment []*EquipmentEntry `json:"starting_equipment,omitempty"`
+	// SavingThrows holds the value of the saving_throws edge.
+	SavingThrows []*AbilityScore `json:"saving_throws,omitempty"`
+	// Characters holds the value of the characters edge.
+	Characters []*Character `json:"characters,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [5]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [5]map[string]int
 
 	namedProficiencies      map[string][]*Proficiency
-	namedProficiencyChoices map[string][]*ProficiencyChoice
-	namedEquipment          map[string][]*Equipment
-	namedEquipmentChoices   map[string][]*EquipmentChoice
-	namedClassEquipment     map[string][]*ClassEquipment
+	namedProficiencyOptions map[string][]*ProficiencyChoice
+	namedStartingEquipment  map[string][]*EquipmentEntry
+	namedSavingThrows       map[string][]*AbilityScore
+	namedCharacters         map[string][]*Character
 }
 
 // ProficienciesOrErr returns the Proficiencies value or an error if the edge
@@ -63,40 +63,40 @@ func (e ClassEdges) ProficienciesOrErr() ([]*Proficiency, error) {
 	return nil, &NotLoadedError{edge: "proficiencies"}
 }
 
-// ProficiencyChoicesOrErr returns the ProficiencyChoices value or an error if the edge
+// ProficiencyOptionsOrErr returns the ProficiencyOptions value or an error if the edge
 // was not loaded in eager-loading.
-func (e ClassEdges) ProficiencyChoicesOrErr() ([]*ProficiencyChoice, error) {
+func (e ClassEdges) ProficiencyOptionsOrErr() ([]*ProficiencyChoice, error) {
 	if e.loadedTypes[1] {
-		return e.ProficiencyChoices, nil
+		return e.ProficiencyOptions, nil
 	}
-	return nil, &NotLoadedError{edge: "proficiency_choices"}
+	return nil, &NotLoadedError{edge: "proficiency_options"}
 }
 
-// EquipmentOrErr returns the Equipment value or an error if the edge
+// StartingEquipmentOrErr returns the StartingEquipment value or an error if the edge
 // was not loaded in eager-loading.
-func (e ClassEdges) EquipmentOrErr() ([]*Equipment, error) {
+func (e ClassEdges) StartingEquipmentOrErr() ([]*EquipmentEntry, error) {
 	if e.loadedTypes[2] {
-		return e.Equipment, nil
+		return e.StartingEquipment, nil
 	}
-	return nil, &NotLoadedError{edge: "equipment"}
+	return nil, &NotLoadedError{edge: "starting_equipment"}
 }
 
-// EquipmentChoicesOrErr returns the EquipmentChoices value or an error if the edge
+// SavingThrowsOrErr returns the SavingThrows value or an error if the edge
 // was not loaded in eager-loading.
-func (e ClassEdges) EquipmentChoicesOrErr() ([]*EquipmentChoice, error) {
+func (e ClassEdges) SavingThrowsOrErr() ([]*AbilityScore, error) {
 	if e.loadedTypes[3] {
-		return e.EquipmentChoices, nil
+		return e.SavingThrows, nil
 	}
-	return nil, &NotLoadedError{edge: "equipment_choices"}
+	return nil, &NotLoadedError{edge: "saving_throws"}
 }
 
-// ClassEquipmentOrErr returns the ClassEquipment value or an error if the edge
+// CharactersOrErr returns the Characters value or an error if the edge
 // was not loaded in eager-loading.
-func (e ClassEdges) ClassEquipmentOrErr() ([]*ClassEquipment, error) {
+func (e ClassEdges) CharactersOrErr() ([]*Character, error) {
 	if e.loadedTypes[4] {
-		return e.ClassEquipment, nil
+		return e.Characters, nil
 	}
-	return nil, &NotLoadedError{edge: "class_equipment"}
+	return nil, &NotLoadedError{edge: "characters"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -165,24 +165,24 @@ func (c *Class) QueryProficiencies() *ProficiencyQuery {
 	return NewClassClient(c.config).QueryProficiencies(c)
 }
 
-// QueryProficiencyChoices queries the "proficiency_choices" edge of the Class entity.
-func (c *Class) QueryProficiencyChoices() *ProficiencyChoiceQuery {
-	return NewClassClient(c.config).QueryProficiencyChoices(c)
+// QueryProficiencyOptions queries the "proficiency_options" edge of the Class entity.
+func (c *Class) QueryProficiencyOptions() *ProficiencyChoiceQuery {
+	return NewClassClient(c.config).QueryProficiencyOptions(c)
 }
 
-// QueryEquipment queries the "equipment" edge of the Class entity.
-func (c *Class) QueryEquipment() *EquipmentQuery {
-	return NewClassClient(c.config).QueryEquipment(c)
+// QueryStartingEquipment queries the "starting_equipment" edge of the Class entity.
+func (c *Class) QueryStartingEquipment() *EquipmentEntryQuery {
+	return NewClassClient(c.config).QueryStartingEquipment(c)
 }
 
-// QueryEquipmentChoices queries the "equipment_choices" edge of the Class entity.
-func (c *Class) QueryEquipmentChoices() *EquipmentChoiceQuery {
-	return NewClassClient(c.config).QueryEquipmentChoices(c)
+// QuerySavingThrows queries the "saving_throws" edge of the Class entity.
+func (c *Class) QuerySavingThrows() *AbilityScoreQuery {
+	return NewClassClient(c.config).QuerySavingThrows(c)
 }
 
-// QueryClassEquipment queries the "class_equipment" edge of the Class entity.
-func (c *Class) QueryClassEquipment() *ClassEquipmentQuery {
-	return NewClassClient(c.config).QueryClassEquipment(c)
+// QueryCharacters queries the "characters" edge of the Class entity.
+func (c *Class) QueryCharacters() *CharacterQuery {
+	return NewClassClient(c.config).QueryCharacters(c)
 }
 
 // Update returns a builder for updating this Class.
@@ -281,99 +281,99 @@ func (c *Class) appendNamedProficiencies(name string, edges ...*Proficiency) {
 	}
 }
 
-// NamedProficiencyChoices returns the ProficiencyChoices named value or an error if the edge was not
+// NamedProficiencyOptions returns the ProficiencyOptions named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (c *Class) NamedProficiencyChoices(name string) ([]*ProficiencyChoice, error) {
-	if c.Edges.namedProficiencyChoices == nil {
+func (c *Class) NamedProficiencyOptions(name string) ([]*ProficiencyChoice, error) {
+	if c.Edges.namedProficiencyOptions == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := c.Edges.namedProficiencyChoices[name]
+	nodes, ok := c.Edges.namedProficiencyOptions[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (c *Class) appendNamedProficiencyChoices(name string, edges ...*ProficiencyChoice) {
-	if c.Edges.namedProficiencyChoices == nil {
-		c.Edges.namedProficiencyChoices = make(map[string][]*ProficiencyChoice)
+func (c *Class) appendNamedProficiencyOptions(name string, edges ...*ProficiencyChoice) {
+	if c.Edges.namedProficiencyOptions == nil {
+		c.Edges.namedProficiencyOptions = make(map[string][]*ProficiencyChoice)
 	}
 	if len(edges) == 0 {
-		c.Edges.namedProficiencyChoices[name] = []*ProficiencyChoice{}
+		c.Edges.namedProficiencyOptions[name] = []*ProficiencyChoice{}
 	} else {
-		c.Edges.namedProficiencyChoices[name] = append(c.Edges.namedProficiencyChoices[name], edges...)
+		c.Edges.namedProficiencyOptions[name] = append(c.Edges.namedProficiencyOptions[name], edges...)
 	}
 }
 
-// NamedEquipment returns the Equipment named value or an error if the edge was not
+// NamedStartingEquipment returns the StartingEquipment named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (c *Class) NamedEquipment(name string) ([]*Equipment, error) {
-	if c.Edges.namedEquipment == nil {
+func (c *Class) NamedStartingEquipment(name string) ([]*EquipmentEntry, error) {
+	if c.Edges.namedStartingEquipment == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := c.Edges.namedEquipment[name]
+	nodes, ok := c.Edges.namedStartingEquipment[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (c *Class) appendNamedEquipment(name string, edges ...*Equipment) {
-	if c.Edges.namedEquipment == nil {
-		c.Edges.namedEquipment = make(map[string][]*Equipment)
+func (c *Class) appendNamedStartingEquipment(name string, edges ...*EquipmentEntry) {
+	if c.Edges.namedStartingEquipment == nil {
+		c.Edges.namedStartingEquipment = make(map[string][]*EquipmentEntry)
 	}
 	if len(edges) == 0 {
-		c.Edges.namedEquipment[name] = []*Equipment{}
+		c.Edges.namedStartingEquipment[name] = []*EquipmentEntry{}
 	} else {
-		c.Edges.namedEquipment[name] = append(c.Edges.namedEquipment[name], edges...)
+		c.Edges.namedStartingEquipment[name] = append(c.Edges.namedStartingEquipment[name], edges...)
 	}
 }
 
-// NamedEquipmentChoices returns the EquipmentChoices named value or an error if the edge was not
+// NamedSavingThrows returns the SavingThrows named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (c *Class) NamedEquipmentChoices(name string) ([]*EquipmentChoice, error) {
-	if c.Edges.namedEquipmentChoices == nil {
+func (c *Class) NamedSavingThrows(name string) ([]*AbilityScore, error) {
+	if c.Edges.namedSavingThrows == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := c.Edges.namedEquipmentChoices[name]
+	nodes, ok := c.Edges.namedSavingThrows[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (c *Class) appendNamedEquipmentChoices(name string, edges ...*EquipmentChoice) {
-	if c.Edges.namedEquipmentChoices == nil {
-		c.Edges.namedEquipmentChoices = make(map[string][]*EquipmentChoice)
+func (c *Class) appendNamedSavingThrows(name string, edges ...*AbilityScore) {
+	if c.Edges.namedSavingThrows == nil {
+		c.Edges.namedSavingThrows = make(map[string][]*AbilityScore)
 	}
 	if len(edges) == 0 {
-		c.Edges.namedEquipmentChoices[name] = []*EquipmentChoice{}
+		c.Edges.namedSavingThrows[name] = []*AbilityScore{}
 	} else {
-		c.Edges.namedEquipmentChoices[name] = append(c.Edges.namedEquipmentChoices[name], edges...)
+		c.Edges.namedSavingThrows[name] = append(c.Edges.namedSavingThrows[name], edges...)
 	}
 }
 
-// NamedClassEquipment returns the ClassEquipment named value or an error if the edge was not
+// NamedCharacters returns the Characters named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (c *Class) NamedClassEquipment(name string) ([]*ClassEquipment, error) {
-	if c.Edges.namedClassEquipment == nil {
+func (c *Class) NamedCharacters(name string) ([]*Character, error) {
+	if c.Edges.namedCharacters == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := c.Edges.namedClassEquipment[name]
+	nodes, ok := c.Edges.namedCharacters[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (c *Class) appendNamedClassEquipment(name string, edges ...*ClassEquipment) {
-	if c.Edges.namedClassEquipment == nil {
-		c.Edges.namedClassEquipment = make(map[string][]*ClassEquipment)
+func (c *Class) appendNamedCharacters(name string, edges ...*Character) {
+	if c.Edges.namedCharacters == nil {
+		c.Edges.namedCharacters = make(map[string][]*Character)
 	}
 	if len(edges) == 0 {
-		c.Edges.namedClassEquipment[name] = []*ClassEquipment{}
+		c.Edges.namedCharacters[name] = []*Character{}
 	} else {
-		c.Edges.namedClassEquipment[name] = append(c.Edges.namedClassEquipment[name], edges...)
+		c.Edges.namedCharacters[name] = append(c.Edges.namedCharacters[name], edges...)
 	}
 }
 

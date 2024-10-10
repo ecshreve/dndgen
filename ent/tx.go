@@ -16,36 +16,52 @@ type Tx struct {
 	AbilityBonus *AbilityBonusClient
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
+	// Alignment is the client for interacting with the Alignment builders.
+	Alignment *AlignmentClient
 	// Armor is the client for interacting with the Armor builders.
 	Armor *ArmorClient
-	// ArmorClass is the client for interacting with the ArmorClass builders.
-	ArmorClass *ArmorClassClient
+	// Character is the client for interacting with the Character builders.
+	Character *CharacterClient
+	// CharacterAbilityScore is the client for interacting with the CharacterAbilityScore builders.
+	CharacterAbilityScore *CharacterAbilityScoreClient
+	// CharacterProficiency is the client for interacting with the CharacterProficiency builders.
+	CharacterProficiency *CharacterProficiencyClient
+	// CharacterSkill is the client for interacting with the CharacterSkill builders.
+	CharacterSkill *CharacterSkillClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
-	// ClassEquipment is the client for interacting with the ClassEquipment builders.
-	ClassEquipment *ClassEquipmentClient
 	// Coin is the client for interacting with the Coin builders.
 	Coin *CoinClient
+	// Condition is the client for interacting with the Condition builders.
+	Condition *ConditionClient
+	// Cost is the client for interacting with the Cost builders.
+	Cost *CostClient
 	// DamageType is the client for interacting with the DamageType builders.
 	DamageType *DamageTypeClient
 	// Equipment is the client for interacting with the Equipment builders.
 	Equipment *EquipmentClient
-	// EquipmentCategory is the client for interacting with the EquipmentCategory builders.
-	EquipmentCategory *EquipmentCategoryClient
-	// EquipmentChoice is the client for interacting with the EquipmentChoice builders.
-	EquipmentChoice *EquipmentChoiceClient
-	// EquipmentCost is the client for interacting with the EquipmentCost builders.
-	EquipmentCost *EquipmentCostClient
+	// EquipmentEntry is the client for interacting with the EquipmentEntry builders.
+	EquipmentEntry *EquipmentEntryClient
+	// Feat is the client for interacting with the Feat builders.
+	Feat *FeatClient
+	// Feature is the client for interacting with the Feature builders.
+	Feature *FeatureClient
 	// Gear is the client for interacting with the Gear builders.
 	Gear *GearClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
+	// LanguageChoice is the client for interacting with the LanguageChoice builders.
+	LanguageChoice *LanguageChoiceClient
 	// MagicSchool is the client for interacting with the MagicSchool builders.
 	MagicSchool *MagicSchoolClient
+	// Prerequisite is the client for interacting with the Prerequisite builders.
+	Prerequisite *PrerequisiteClient
 	// Proficiency is the client for interacting with the Proficiency builders.
 	Proficiency *ProficiencyClient
 	// ProficiencyChoice is the client for interacting with the ProficiencyChoice builders.
 	ProficiencyChoice *ProficiencyChoiceClient
+	// Property is the client for interacting with the Property builders.
+	Property *PropertyClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
 	// Rule is the client for interacting with the Rule builders.
@@ -54,8 +70,6 @@ type Tx struct {
 	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
-	// Subrace is the client for interacting with the Subrace builders.
-	Subrace *SubraceClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
 	// Trait is the client for interacting with the Trait builders.
@@ -64,10 +78,6 @@ type Tx struct {
 	Vehicle *VehicleClient
 	// Weapon is the client for interacting with the Weapon builders.
 	Weapon *WeaponClient
-	// WeaponDamage is the client for interacting with the WeaponDamage builders.
-	WeaponDamage *WeaponDamageClient
-	// WeaponProperty is the client for interacting with the WeaponProperty builders.
-	WeaponProperty *WeaponPropertyClient
 
 	// lazily loaded.
 	client     *Client
@@ -201,32 +211,37 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.AbilityBonus = NewAbilityBonusClient(tx.config)
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
+	tx.Alignment = NewAlignmentClient(tx.config)
 	tx.Armor = NewArmorClient(tx.config)
-	tx.ArmorClass = NewArmorClassClient(tx.config)
+	tx.Character = NewCharacterClient(tx.config)
+	tx.CharacterAbilityScore = NewCharacterAbilityScoreClient(tx.config)
+	tx.CharacterProficiency = NewCharacterProficiencyClient(tx.config)
+	tx.CharacterSkill = NewCharacterSkillClient(tx.config)
 	tx.Class = NewClassClient(tx.config)
-	tx.ClassEquipment = NewClassEquipmentClient(tx.config)
 	tx.Coin = NewCoinClient(tx.config)
+	tx.Condition = NewConditionClient(tx.config)
+	tx.Cost = NewCostClient(tx.config)
 	tx.DamageType = NewDamageTypeClient(tx.config)
 	tx.Equipment = NewEquipmentClient(tx.config)
-	tx.EquipmentCategory = NewEquipmentCategoryClient(tx.config)
-	tx.EquipmentChoice = NewEquipmentChoiceClient(tx.config)
-	tx.EquipmentCost = NewEquipmentCostClient(tx.config)
+	tx.EquipmentEntry = NewEquipmentEntryClient(tx.config)
+	tx.Feat = NewFeatClient(tx.config)
+	tx.Feature = NewFeatureClient(tx.config)
 	tx.Gear = NewGearClient(tx.config)
 	tx.Language = NewLanguageClient(tx.config)
+	tx.LanguageChoice = NewLanguageChoiceClient(tx.config)
 	tx.MagicSchool = NewMagicSchoolClient(tx.config)
+	tx.Prerequisite = NewPrerequisiteClient(tx.config)
 	tx.Proficiency = NewProficiencyClient(tx.config)
 	tx.ProficiencyChoice = NewProficiencyChoiceClient(tx.config)
+	tx.Property = NewPropertyClient(tx.config)
 	tx.Race = NewRaceClient(tx.config)
 	tx.Rule = NewRuleClient(tx.config)
 	tx.RuleSection = NewRuleSectionClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
-	tx.Subrace = NewSubraceClient(tx.config)
 	tx.Tool = NewToolClient(tx.config)
 	tx.Trait = NewTraitClient(tx.config)
 	tx.Vehicle = NewVehicleClient(tx.config)
 	tx.Weapon = NewWeaponClient(tx.config)
-	tx.WeaponDamage = NewWeaponDamageClient(tx.config)
-	tx.WeaponProperty = NewWeaponPropertyClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

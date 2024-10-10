@@ -3,6 +3,10 @@
 package race
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -16,66 +20,84 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldAlignment holds the string denoting the alignment field in the database.
-	FieldAlignment = "alignment"
-	// FieldAge holds the string denoting the age field in the database.
-	FieldAge = "age"
-	// FieldSize holds the string denoting the size field in the database.
-	FieldSize = "size"
-	// FieldSizeDescription holds the string denoting the size_description field in the database.
-	FieldSizeDescription = "size_description"
-	// FieldLanguageDesc holds the string denoting the language_desc field in the database.
-	FieldLanguageDesc = "language_desc"
 	// FieldSpeed holds the string denoting the speed field in the database.
 	FieldSpeed = "speed"
-	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
-	EdgeProficiencies = "proficiencies"
-	// EdgeProficiencyChoice holds the string denoting the proficiency_choice edge name in mutations.
-	EdgeProficiencyChoice = "proficiency_choice"
-	// EdgeLanguages holds the string denoting the languages edge name in mutations.
-	EdgeLanguages = "languages"
-	// EdgeSubrace holds the string denoting the subrace edge name in mutations.
-	EdgeSubrace = "subrace"
+	// FieldSize holds the string denoting the size field in the database.
+	FieldSize = "size"
+	// FieldSizeDesc holds the string denoting the size_desc field in the database.
+	FieldSizeDesc = "size_desc"
+	// FieldAlignmentDesc holds the string denoting the alignment_desc field in the database.
+	FieldAlignmentDesc = "alignment_desc"
+	// FieldAgeDesc holds the string denoting the age_desc field in the database.
+	FieldAgeDesc = "age_desc"
+	// FieldLanguageDesc holds the string denoting the language_desc field in the database.
+	FieldLanguageDesc = "language_desc"
 	// EdgeTraits holds the string denoting the traits edge name in mutations.
 	EdgeTraits = "traits"
+	// EdgeStartingProficiencies holds the string denoting the starting_proficiencies edge name in mutations.
+	EdgeStartingProficiencies = "starting_proficiencies"
+	// EdgeStartingProficiencyOptions holds the string denoting the starting_proficiency_options edge name in mutations.
+	EdgeStartingProficiencyOptions = "starting_proficiency_options"
 	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
 	EdgeAbilityBonuses = "ability_bonuses"
+	// EdgeLanguages holds the string denoting the languages edge name in mutations.
+	EdgeLanguages = "languages"
+	// EdgeLanguageOptions holds the string denoting the language_options edge name in mutations.
+	EdgeLanguageOptions = "language_options"
+	// EdgeCharacters holds the string denoting the characters edge name in mutations.
+	EdgeCharacters = "characters"
+	// EdgeRaceAbilityBonuses holds the string denoting the race_ability_bonuses edge name in mutations.
+	EdgeRaceAbilityBonuses = "race_ability_bonuses"
 	// Table holds the table name of the race in the database.
 	Table = "races"
-	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
-	ProficienciesTable = "race_proficiencies"
-	// ProficienciesInverseTable is the table name for the Proficiency entity.
-	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
-	ProficienciesInverseTable = "proficiencies"
-	// ProficiencyChoiceTable is the table that holds the proficiency_choice relation/edge. The primary key declared below.
-	ProficiencyChoiceTable = "race_proficiency_choice"
-	// ProficiencyChoiceInverseTable is the table name for the ProficiencyChoice entity.
-	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
-	ProficiencyChoiceInverseTable = "proficiency_choices"
-	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
-	LanguagesTable = "race_languages"
-	// LanguagesInverseTable is the table name for the Language entity.
-	// It exists in this package in order to avoid circular dependency with the "language" package.
-	LanguagesInverseTable = "languages"
-	// SubraceTable is the table that holds the subrace relation/edge.
-	SubraceTable = "subraces"
-	// SubraceInverseTable is the table name for the Subrace entity.
-	// It exists in this package in order to avoid circular dependency with the "subrace" package.
-	SubraceInverseTable = "subraces"
-	// SubraceColumn is the table column denoting the subrace relation/edge.
-	SubraceColumn = "subrace_race"
 	// TraitsTable is the table that holds the traits relation/edge. The primary key declared below.
 	TraitsTable = "race_traits"
 	// TraitsInverseTable is the table name for the Trait entity.
 	// It exists in this package in order to avoid circular dependency with the "trait" package.
 	TraitsInverseTable = "traits"
-	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge.
+	// StartingProficienciesTable is the table that holds the starting_proficiencies relation/edge. The primary key declared below.
+	StartingProficienciesTable = "race_starting_proficiencies"
+	// StartingProficienciesInverseTable is the table name for the Proficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
+	StartingProficienciesInverseTable = "proficiencies"
+	// StartingProficiencyOptionsTable is the table that holds the starting_proficiency_options relation/edge.
+	StartingProficiencyOptionsTable = "proficiency_choices"
+	// StartingProficiencyOptionsInverseTable is the table name for the ProficiencyChoice entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
+	StartingProficiencyOptionsInverseTable = "proficiency_choices"
+	// StartingProficiencyOptionsColumn is the table column denoting the starting_proficiency_options relation/edge.
+	StartingProficiencyOptionsColumn = "race_starting_proficiency_options"
+	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge. The primary key declared below.
 	AbilityBonusesTable = "ability_bonus"
-	// AbilityBonusesInverseTable is the table name for the AbilityBonus entity.
+	// AbilityBonusesInverseTable is the table name for the AbilityScore entity.
+	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
+	AbilityBonusesInverseTable = "ability_scores"
+	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
+	LanguagesTable = "race_languages"
+	// LanguagesInverseTable is the table name for the Language entity.
+	// It exists in this package in order to avoid circular dependency with the "language" package.
+	LanguagesInverseTable = "languages"
+	// LanguageOptionsTable is the table that holds the language_options relation/edge.
+	LanguageOptionsTable = "language_choices"
+	// LanguageOptionsInverseTable is the table name for the LanguageChoice entity.
+	// It exists in this package in order to avoid circular dependency with the "languagechoice" package.
+	LanguageOptionsInverseTable = "language_choices"
+	// LanguageOptionsColumn is the table column denoting the language_options relation/edge.
+	LanguageOptionsColumn = "race_language_options"
+	// CharactersTable is the table that holds the characters relation/edge.
+	CharactersTable = "characters"
+	// CharactersInverseTable is the table name for the Character entity.
+	// It exists in this package in order to avoid circular dependency with the "character" package.
+	CharactersInverseTable = "characters"
+	// CharactersColumn is the table column denoting the characters relation/edge.
+	CharactersColumn = "character_race"
+	// RaceAbilityBonusesTable is the table that holds the race_ability_bonuses relation/edge.
+	RaceAbilityBonusesTable = "ability_bonus"
+	// RaceAbilityBonusesInverseTable is the table name for the AbilityBonus entity.
 	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
-	AbilityBonusesInverseTable = "ability_bonus"
-	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
-	AbilityBonusesColumn = "race_ability_bonuses"
+	RaceAbilityBonusesInverseTable = "ability_bonus"
+	// RaceAbilityBonusesColumn is the table column denoting the race_ability_bonuses relation/edge.
+	RaceAbilityBonusesColumn = "race_id"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -83,27 +105,27 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
-	FieldAlignment,
-	FieldAge,
-	FieldSize,
-	FieldSizeDescription,
-	FieldLanguageDesc,
 	FieldSpeed,
+	FieldSize,
+	FieldSizeDesc,
+	FieldAlignmentDesc,
+	FieldAgeDesc,
+	FieldLanguageDesc,
 }
 
 var (
-	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
-	// primary key for the proficiencies relation (M2M).
-	ProficienciesPrimaryKey = []string{"race_id", "proficiency_id"}
-	// ProficiencyChoicePrimaryKey and ProficiencyChoiceColumn2 are the table columns denoting the
-	// primary key for the proficiency_choice relation (M2M).
-	ProficiencyChoicePrimaryKey = []string{"race_id", "proficiency_choice_id"}
-	// LanguagesPrimaryKey and LanguagesColumn2 are the table columns denoting the
-	// primary key for the languages relation (M2M).
-	LanguagesPrimaryKey = []string{"race_id", "language_id"}
 	// TraitsPrimaryKey and TraitsColumn2 are the table columns denoting the
 	// primary key for the traits relation (M2M).
 	TraitsPrimaryKey = []string{"race_id", "trait_id"}
+	// StartingProficienciesPrimaryKey and StartingProficienciesColumn2 are the table columns denoting the
+	// primary key for the starting_proficiencies relation (M2M).
+	StartingProficienciesPrimaryKey = []string{"race_id", "proficiency_id"}
+	// AbilityBonusesPrimaryKey and AbilityBonusesColumn2 are the table columns denoting the
+	// primary key for the ability_bonuses relation (M2M).
+	AbilityBonusesPrimaryKey = []string{"race_id", "ability_score_id"}
+	// LanguagesPrimaryKey and LanguagesColumn2 are the table columns denoting the
+	// primary key for the languages relation (M2M).
+	LanguagesPrimaryKey = []string{"race_id", "language_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -121,7 +143,36 @@ var (
 	IndxValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// SpeedValidator is a validator for the "speed" field. It is called by the builders before save.
+	SpeedValidator func(int) error
 )
+
+// Size defines the type for the "size" enum field.
+type Size string
+
+// SizeMedium is the default value of the Size enum.
+const DefaultSize = SizeMedium
+
+// Size values.
+const (
+	SizeSmall  Size = "Small"
+	SizeMedium Size = "Medium"
+	SizeLarge  Size = "Large"
+)
+
+func (s Size) String() string {
+	return string(s)
+}
+
+// SizeValidator is a validator for the "size" field enum values. It is called by the builders before save.
+func SizeValidator(s Size) error {
+	switch s {
+	case SizeSmall, SizeMedium, SizeLarge:
+		return nil
+	default:
+		return fmt.Errorf("race: invalid enum value for size field: %q", s)
+	}
+}
 
 // OrderOption defines the ordering options for the Race queries.
 type OrderOption func(*sql.Selector)
@@ -141,14 +192,9 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByAlignment orders the results by the alignment field.
-func ByAlignment(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAlignment, opts...).ToFunc()
-}
-
-// ByAge orders the results by the age field.
-func ByAge(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAge, opts...).ToFunc()
+// BySpeed orders the results by the speed field.
+func BySpeed(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpeed, opts...).ToFunc()
 }
 
 // BySize orders the results by the size field.
@@ -156,9 +202,19 @@ func BySize(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSize, opts...).ToFunc()
 }
 
-// BySizeDescription orders the results by the size_description field.
-func BySizeDescription(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSizeDescription, opts...).ToFunc()
+// BySizeDesc orders the results by the size_desc field.
+func BySizeDesc(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSizeDesc, opts...).ToFunc()
+}
+
+// ByAlignmentDesc orders the results by the alignment_desc field.
+func ByAlignmentDesc(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAlignmentDesc, opts...).ToFunc()
+}
+
+// ByAgeDesc orders the results by the age_desc field.
+func ByAgeDesc(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAgeDesc, opts...).ToFunc()
 }
 
 // ByLanguageDesc orders the results by the language_desc field.
@@ -166,36 +222,59 @@ func ByLanguageDesc(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLanguageDesc, opts...).ToFunc()
 }
 
-// BySpeed orders the results by the speed field.
-func BySpeed(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSpeed, opts...).ToFunc()
-}
-
-// ByProficienciesCount orders the results by proficiencies count.
-func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByTraitsCount orders the results by traits count.
+func ByTraitsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newTraitsStep(), opts...)
 	}
 }
 
-// ByProficiencies orders the results by proficiencies terms.
-func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByTraits orders the results by traits terms.
+func ByTraits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newTraitsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByProficiencyChoiceCount orders the results by proficiency_choice count.
-func ByProficiencyChoiceCount(opts ...sql.OrderTermOption) OrderOption {
+// ByStartingProficienciesCount orders the results by starting_proficiencies count.
+func ByStartingProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newProficiencyChoiceStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newStartingProficienciesStep(), opts...)
 	}
 }
 
-// ByProficiencyChoice orders the results by proficiency_choice terms.
-func ByProficiencyChoice(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByStartingProficiencies orders the results by starting_proficiencies terms.
+func ByStartingProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProficiencyChoiceStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newStartingProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByStartingProficiencyOptionsCount orders the results by starting_proficiency_options count.
+func ByStartingProficiencyOptionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newStartingProficiencyOptionsStep(), opts...)
+	}
+}
+
+// ByStartingProficiencyOptions orders the results by starting_proficiency_options terms.
+func ByStartingProficiencyOptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newStartingProficiencyOptionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByAbilityBonusesCount orders the results by ability_bonuses count.
+func ByAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAbilityBonusesStep(), opts...)
+	}
+}
+
+// ByAbilityBonuses orders the results by ability_bonuses terms.
+func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -213,59 +292,66 @@ func ByLanguages(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// BySubraceCount orders the results by subrace count.
-func BySubraceCount(opts ...sql.OrderTermOption) OrderOption {
+// ByLanguageOptionsField orders the results by language_options field.
+func ByLanguageOptionsField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubraceStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newLanguageOptionsStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// BySubrace orders the results by subrace terms.
-func BySubrace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByCharactersCount orders the results by characters count.
+func ByCharactersCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubraceStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborsCount(s, newCharactersStep(), opts...)
 	}
 }
 
-// ByTraitsCount orders the results by traits count.
-func ByTraitsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByCharacters orders the results by characters terms.
+func ByCharacters(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newTraitsStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newCharactersStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByTraits orders the results by traits terms.
-func ByTraits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByRaceAbilityBonusesCount orders the results by race_ability_bonuses count.
+func ByRaceAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newTraitsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborsCount(s, newRaceAbilityBonusesStep(), opts...)
 	}
 }
 
-// ByAbilityBonusesCount orders the results by ability_bonuses count.
-func ByAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByRaceAbilityBonuses orders the results by race_ability_bonuses terms.
+func ByRaceAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAbilityBonusesStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newRaceAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByAbilityBonuses orders the results by ability_bonuses terms.
-func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newProficienciesStep() *sqlgraph.Step {
+func newTraitsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProficienciesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
+		sqlgraph.To(TraitsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, TraitsTable, TraitsPrimaryKey...),
 	)
 }
-func newProficiencyChoiceStep() *sqlgraph.Step {
+func newStartingProficienciesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProficiencyChoiceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ProficiencyChoiceTable, ProficiencyChoicePrimaryKey...),
+		sqlgraph.To(StartingProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, StartingProficienciesTable, StartingProficienciesPrimaryKey...),
+	)
+}
+func newStartingProficiencyOptionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(StartingProficiencyOptionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, StartingProficiencyOptionsTable, StartingProficiencyOptionsColumn),
+	)
+}
+func newAbilityBonusesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, AbilityBonusesTable, AbilityBonusesPrimaryKey...),
 	)
 }
 func newLanguagesStep() *sqlgraph.Step {
@@ -275,24 +361,42 @@ func newLanguagesStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, false, LanguagesTable, LanguagesPrimaryKey...),
 	)
 }
-func newSubraceStep() *sqlgraph.Step {
+func newLanguageOptionsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubraceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, SubraceTable, SubraceColumn),
+		sqlgraph.To(LanguageOptionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, LanguageOptionsTable, LanguageOptionsColumn),
 	)
 }
-func newTraitsStep() *sqlgraph.Step {
+func newCharactersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(TraitsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, TraitsTable, TraitsPrimaryKey...),
+		sqlgraph.To(CharactersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CharactersTable, CharactersColumn),
 	)
 }
-func newAbilityBonusesStep() *sqlgraph.Step {
+func newRaceAbilityBonusesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
+		sqlgraph.To(RaceAbilityBonusesInverseTable, RaceAbilityBonusesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, RaceAbilityBonusesTable, RaceAbilityBonusesColumn),
 	)
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e Size) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *Size) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = Size(str)
+	if err := SizeValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid Size", str)
+	}
+	return nil
 }

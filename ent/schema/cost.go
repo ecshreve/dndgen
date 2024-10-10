@@ -6,46 +6,26 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-type Coin struct {
+// Cost holds the schema definition for the Cost entity.
+type Cost struct {
 	ent.Schema
 }
 
-func (Coin) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		CommonMixin{},
-	}
-}
-
-func (Coin) Fields() []ent.Field {
+// Fields of the Cost.
+func (Cost) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("desc"),
-		field.Float("gold_conversion_rate"),
+		field.Int("quantity").Default(1),
 	}
 }
 
-type EquipmentCost struct {
-	ent.Schema
-}
-
-func (EquipmentCost) Fields() []ent.Field {
-	return []ent.Field{
-		field.Int("equipment_id"),
-		field.Int("coin_id"),
-		field.Int("quantity"),
-		field.Float("gp_value"),
-	}
-}
-
-func (EquipmentCost) Edges() []ent.Edge {
+// Edges of the Cost.
+func (Cost) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).
-			Ref("cost").
-			Unique().
-			Required().
-			Field("equipment_id"),
 		edge.To("coin", Coin.Type).
 			Unique().
-			Required().
-			Field("coin_id"),
+			Required(),
+		edge.From("equipment", Equipment.Type).
+			Ref("cost").
+			Unique(),
 	}
 }

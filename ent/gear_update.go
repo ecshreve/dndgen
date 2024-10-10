@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -28,54 +29,41 @@ func (gu *GearUpdate) Where(ps ...predicate.Gear) *GearUpdate {
 	return gu
 }
 
-// SetIndx sets the "indx" field.
-func (gu *GearUpdate) SetIndx(s string) *GearUpdate {
-	gu.mutation.SetIndx(s)
-	return gu
-}
-
-// SetName sets the "name" field.
-func (gu *GearUpdate) SetName(s string) *GearUpdate {
-	gu.mutation.SetName(s)
-	return gu
-}
-
 // SetGearCategory sets the "gear_category" field.
 func (gu *GearUpdate) SetGearCategory(s string) *GearUpdate {
 	gu.mutation.SetGearCategory(s)
 	return gu
 }
 
-// SetQuantity sets the "quantity" field.
-func (gu *GearUpdate) SetQuantity(i int) *GearUpdate {
-	gu.mutation.ResetQuantity()
-	gu.mutation.SetQuantity(i)
-	return gu
-}
-
-// SetNillableQuantity sets the "quantity" field if the given value is not nil.
-func (gu *GearUpdate) SetNillableQuantity(i *int) *GearUpdate {
-	if i != nil {
-		gu.SetQuantity(*i)
+// SetNillableGearCategory sets the "gear_category" field if the given value is not nil.
+func (gu *GearUpdate) SetNillableGearCategory(s *string) *GearUpdate {
+	if s != nil {
+		gu.SetGearCategory(*s)
 	}
 	return gu
 }
 
-// AddQuantity adds i to the "quantity" field.
-func (gu *GearUpdate) AddQuantity(i int) *GearUpdate {
-	gu.mutation.AddQuantity(i)
+// SetDesc sets the "desc" field.
+func (gu *GearUpdate) SetDesc(s []string) *GearUpdate {
+	gu.mutation.SetDesc(s)
 	return gu
 }
 
-// ClearQuantity clears the value of the "quantity" field.
-func (gu *GearUpdate) ClearQuantity() *GearUpdate {
-	gu.mutation.ClearQuantity()
+// AppendDesc appends s to the "desc" field.
+func (gu *GearUpdate) AppendDesc(s []string) *GearUpdate {
+	gu.mutation.AppendDesc(s)
 	return gu
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (gu *GearUpdate) SetEquipmentID(i int) *GearUpdate {
-	gu.mutation.SetEquipmentID(i)
+// ClearDesc clears the value of the "desc" field.
+func (gu *GearUpdate) ClearDesc() *GearUpdate {
+	gu.mutation.ClearDesc()
+	return gu
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (gu *GearUpdate) SetEquipmentID(id int) *GearUpdate {
+	gu.mutation.SetEquipmentID(id)
 	return gu
 }
 
@@ -124,17 +112,7 @@ func (gu *GearUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (gu *GearUpdate) check() error {
-	if v, ok := gu.mutation.Indx(); ok {
-		if err := gear.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Gear.indx": %w`, err)}
-		}
-	}
-	if v, ok := gu.mutation.Name(); ok {
-		if err := gear.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Gear.name": %w`, err)}
-		}
-	}
-	if _, ok := gu.mutation.EquipmentID(); gu.mutation.EquipmentCleared() && !ok {
+	if gu.mutation.EquipmentCleared() && len(gu.mutation.EquipmentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Gear.equipment"`)
 	}
 	return nil
@@ -152,23 +130,19 @@ func (gu *GearUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := gu.mutation.Indx(); ok {
-		_spec.SetField(gear.FieldIndx, field.TypeString, value)
-	}
-	if value, ok := gu.mutation.Name(); ok {
-		_spec.SetField(gear.FieldName, field.TypeString, value)
-	}
 	if value, ok := gu.mutation.GearCategory(); ok {
 		_spec.SetField(gear.FieldGearCategory, field.TypeString, value)
 	}
-	if value, ok := gu.mutation.Quantity(); ok {
-		_spec.SetField(gear.FieldQuantity, field.TypeInt, value)
+	if value, ok := gu.mutation.Desc(); ok {
+		_spec.SetField(gear.FieldDesc, field.TypeJSON, value)
 	}
-	if value, ok := gu.mutation.AddedQuantity(); ok {
-		_spec.AddField(gear.FieldQuantity, field.TypeInt, value)
+	if value, ok := gu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, gear.FieldDesc, value)
+		})
 	}
-	if gu.mutation.QuantityCleared() {
-		_spec.ClearField(gear.FieldQuantity, field.TypeInt)
+	if gu.mutation.DescCleared() {
+		_spec.ClearField(gear.FieldDesc, field.TypeJSON)
 	}
 	if gu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -219,54 +193,41 @@ type GearUpdateOne struct {
 	mutation *GearMutation
 }
 
-// SetIndx sets the "indx" field.
-func (guo *GearUpdateOne) SetIndx(s string) *GearUpdateOne {
-	guo.mutation.SetIndx(s)
-	return guo
-}
-
-// SetName sets the "name" field.
-func (guo *GearUpdateOne) SetName(s string) *GearUpdateOne {
-	guo.mutation.SetName(s)
-	return guo
-}
-
 // SetGearCategory sets the "gear_category" field.
 func (guo *GearUpdateOne) SetGearCategory(s string) *GearUpdateOne {
 	guo.mutation.SetGearCategory(s)
 	return guo
 }
 
-// SetQuantity sets the "quantity" field.
-func (guo *GearUpdateOne) SetQuantity(i int) *GearUpdateOne {
-	guo.mutation.ResetQuantity()
-	guo.mutation.SetQuantity(i)
-	return guo
-}
-
-// SetNillableQuantity sets the "quantity" field if the given value is not nil.
-func (guo *GearUpdateOne) SetNillableQuantity(i *int) *GearUpdateOne {
-	if i != nil {
-		guo.SetQuantity(*i)
+// SetNillableGearCategory sets the "gear_category" field if the given value is not nil.
+func (guo *GearUpdateOne) SetNillableGearCategory(s *string) *GearUpdateOne {
+	if s != nil {
+		guo.SetGearCategory(*s)
 	}
 	return guo
 }
 
-// AddQuantity adds i to the "quantity" field.
-func (guo *GearUpdateOne) AddQuantity(i int) *GearUpdateOne {
-	guo.mutation.AddQuantity(i)
+// SetDesc sets the "desc" field.
+func (guo *GearUpdateOne) SetDesc(s []string) *GearUpdateOne {
+	guo.mutation.SetDesc(s)
 	return guo
 }
 
-// ClearQuantity clears the value of the "quantity" field.
-func (guo *GearUpdateOne) ClearQuantity() *GearUpdateOne {
-	guo.mutation.ClearQuantity()
+// AppendDesc appends s to the "desc" field.
+func (guo *GearUpdateOne) AppendDesc(s []string) *GearUpdateOne {
+	guo.mutation.AppendDesc(s)
 	return guo
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (guo *GearUpdateOne) SetEquipmentID(i int) *GearUpdateOne {
-	guo.mutation.SetEquipmentID(i)
+// ClearDesc clears the value of the "desc" field.
+func (guo *GearUpdateOne) ClearDesc() *GearUpdateOne {
+	guo.mutation.ClearDesc()
+	return guo
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (guo *GearUpdateOne) SetEquipmentID(id int) *GearUpdateOne {
+	guo.mutation.SetEquipmentID(id)
 	return guo
 }
 
@@ -328,17 +289,7 @@ func (guo *GearUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (guo *GearUpdateOne) check() error {
-	if v, ok := guo.mutation.Indx(); ok {
-		if err := gear.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Gear.indx": %w`, err)}
-		}
-	}
-	if v, ok := guo.mutation.Name(); ok {
-		if err := gear.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Gear.name": %w`, err)}
-		}
-	}
-	if _, ok := guo.mutation.EquipmentID(); guo.mutation.EquipmentCleared() && !ok {
+	if guo.mutation.EquipmentCleared() && len(guo.mutation.EquipmentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Gear.equipment"`)
 	}
 	return nil
@@ -373,23 +324,19 @@ func (guo *GearUpdateOne) sqlSave(ctx context.Context) (_node *Gear, err error) 
 			}
 		}
 	}
-	if value, ok := guo.mutation.Indx(); ok {
-		_spec.SetField(gear.FieldIndx, field.TypeString, value)
-	}
-	if value, ok := guo.mutation.Name(); ok {
-		_spec.SetField(gear.FieldName, field.TypeString, value)
-	}
 	if value, ok := guo.mutation.GearCategory(); ok {
 		_spec.SetField(gear.FieldGearCategory, field.TypeString, value)
 	}
-	if value, ok := guo.mutation.Quantity(); ok {
-		_spec.SetField(gear.FieldQuantity, field.TypeInt, value)
+	if value, ok := guo.mutation.Desc(); ok {
+		_spec.SetField(gear.FieldDesc, field.TypeJSON, value)
 	}
-	if value, ok := guo.mutation.AddedQuantity(); ok {
-		_spec.AddField(gear.FieldQuantity, field.TypeInt, value)
+	if value, ok := guo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, gear.FieldDesc, value)
+		})
 	}
-	if guo.mutation.QuantityCleared() {
-		_spec.ClearField(gear.FieldQuantity, field.TypeInt)
+	if guo.mutation.DescCleared() {
+		_spec.ClearField(gear.FieldDesc, field.TypeJSON)
 	}
 	if guo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{

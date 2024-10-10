@@ -9,8 +9,10 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/race"
 )
@@ -34,15 +36,43 @@ func (lu *LanguageUpdate) SetIndx(s string) *LanguageUpdate {
 	return lu
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (lu *LanguageUpdate) SetNillableIndx(s *string) *LanguageUpdate {
+	if s != nil {
+		lu.SetIndx(*s)
+	}
+	return lu
+}
+
 // SetName sets the "name" field.
 func (lu *LanguageUpdate) SetName(s string) *LanguageUpdate {
 	lu.mutation.SetName(s)
 	return lu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (lu *LanguageUpdate) SetNillableName(s *string) *LanguageUpdate {
+	if s != nil {
+		lu.SetName(*s)
+	}
+	return lu
+}
+
 // SetDesc sets the "desc" field.
-func (lu *LanguageUpdate) SetDesc(s string) *LanguageUpdate {
+func (lu *LanguageUpdate) SetDesc(s []string) *LanguageUpdate {
 	lu.mutation.SetDesc(s)
+	return lu
+}
+
+// AppendDesc appends s to the "desc" field.
+func (lu *LanguageUpdate) AppendDesc(s []string) *LanguageUpdate {
+	lu.mutation.AppendDesc(s)
+	return lu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (lu *LanguageUpdate) ClearDesc() *LanguageUpdate {
+	lu.mutation.ClearDesc()
 	return lu
 }
 
@@ -74,25 +104,34 @@ func (lu *LanguageUpdate) SetNillableScript(l *language.Script) *LanguageUpdate 
 	return lu
 }
 
-// ClearScript clears the value of the "script" field.
-func (lu *LanguageUpdate) ClearScript() *LanguageUpdate {
-	lu.mutation.ClearScript()
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
+func (lu *LanguageUpdate) AddRaceIDs(ids ...int) *LanguageUpdate {
+	lu.mutation.AddRaceIDs(ids...)
 	return lu
 }
 
-// AddRaceSpeakerIDs adds the "race_speakers" edge to the Race entity by IDs.
-func (lu *LanguageUpdate) AddRaceSpeakerIDs(ids ...int) *LanguageUpdate {
-	lu.mutation.AddRaceSpeakerIDs(ids...)
-	return lu
-}
-
-// AddRaceSpeakers adds the "race_speakers" edges to the Race entity.
-func (lu *LanguageUpdate) AddRaceSpeakers(r ...*Race) *LanguageUpdate {
+// AddRace adds the "race" edges to the Race entity.
+func (lu *LanguageUpdate) AddRace(r ...*Race) *LanguageUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return lu.AddRaceSpeakerIDs(ids...)
+	return lu.AddRaceIDs(ids...)
+}
+
+// AddOptionIDs adds the "options" edge to the LanguageChoice entity by IDs.
+func (lu *LanguageUpdate) AddOptionIDs(ids ...int) *LanguageUpdate {
+	lu.mutation.AddOptionIDs(ids...)
+	return lu
+}
+
+// AddOptions adds the "options" edges to the LanguageChoice entity.
+func (lu *LanguageUpdate) AddOptions(l ...*LanguageChoice) *LanguageUpdate {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return lu.AddOptionIDs(ids...)
 }
 
 // Mutation returns the LanguageMutation object of the builder.
@@ -100,25 +139,46 @@ func (lu *LanguageUpdate) Mutation() *LanguageMutation {
 	return lu.mutation
 }
 
-// ClearRaceSpeakers clears all "race_speakers" edges to the Race entity.
-func (lu *LanguageUpdate) ClearRaceSpeakers() *LanguageUpdate {
-	lu.mutation.ClearRaceSpeakers()
+// ClearRace clears all "race" edges to the Race entity.
+func (lu *LanguageUpdate) ClearRace() *LanguageUpdate {
+	lu.mutation.ClearRace()
 	return lu
 }
 
-// RemoveRaceSpeakerIDs removes the "race_speakers" edge to Race entities by IDs.
-func (lu *LanguageUpdate) RemoveRaceSpeakerIDs(ids ...int) *LanguageUpdate {
-	lu.mutation.RemoveRaceSpeakerIDs(ids...)
+// RemoveRaceIDs removes the "race" edge to Race entities by IDs.
+func (lu *LanguageUpdate) RemoveRaceIDs(ids ...int) *LanguageUpdate {
+	lu.mutation.RemoveRaceIDs(ids...)
 	return lu
 }
 
-// RemoveRaceSpeakers removes "race_speakers" edges to Race entities.
-func (lu *LanguageUpdate) RemoveRaceSpeakers(r ...*Race) *LanguageUpdate {
+// RemoveRace removes "race" edges to Race entities.
+func (lu *LanguageUpdate) RemoveRace(r ...*Race) *LanguageUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return lu.RemoveRaceSpeakerIDs(ids...)
+	return lu.RemoveRaceIDs(ids...)
+}
+
+// ClearOptions clears all "options" edges to the LanguageChoice entity.
+func (lu *LanguageUpdate) ClearOptions() *LanguageUpdate {
+	lu.mutation.ClearOptions()
+	return lu
+}
+
+// RemoveOptionIDs removes the "options" edge to LanguageChoice entities by IDs.
+func (lu *LanguageUpdate) RemoveOptionIDs(ids ...int) *LanguageUpdate {
+	lu.mutation.RemoveOptionIDs(ids...)
+	return lu
+}
+
+// RemoveOptions removes "options" edges to LanguageChoice entities.
+func (lu *LanguageUpdate) RemoveOptions(l ...*LanguageChoice) *LanguageUpdate {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return lu.RemoveOptionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -192,7 +252,15 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(language.FieldName, field.TypeString, value)
 	}
 	if value, ok := lu.mutation.Desc(); ok {
-		_spec.SetField(language.FieldDesc, field.TypeString, value)
+		_spec.SetField(language.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := lu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, language.FieldDesc, value)
+		})
+	}
+	if lu.mutation.DescCleared() {
+		_spec.ClearField(language.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := lu.mutation.LanguageType(); ok {
 		_spec.SetField(language.FieldLanguageType, field.TypeEnum, value)
@@ -200,15 +268,12 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := lu.mutation.Script(); ok {
 		_spec.SetField(language.FieldScript, field.TypeEnum, value)
 	}
-	if lu.mutation.ScriptCleared() {
-		_spec.ClearField(language.FieldScript, field.TypeEnum)
-	}
-	if lu.mutation.RaceSpeakersCleared() {
+	if lu.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   language.RaceSpeakersTable,
-			Columns: language.RaceSpeakersPrimaryKey,
+			Table:   language.RaceTable,
+			Columns: language.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -216,12 +281,12 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.RemovedRaceSpeakersIDs(); len(nodes) > 0 && !lu.mutation.RaceSpeakersCleared() {
+	if nodes := lu.mutation.RemovedRaceIDs(); len(nodes) > 0 && !lu.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   language.RaceSpeakersTable,
-			Columns: language.RaceSpeakersPrimaryKey,
+			Table:   language.RaceTable,
+			Columns: language.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -232,15 +297,60 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.RaceSpeakersIDs(); len(nodes) > 0 {
+	if nodes := lu.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   language.RaceSpeakersTable,
-			Columns: language.RaceSpeakersPrimaryKey,
+			Table:   language.RaceTable,
+			Columns: language.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if lu.mutation.OptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := lu.mutation.RemovedOptionsIDs(); len(nodes) > 0 && !lu.mutation.OptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := lu.mutation.OptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -274,15 +384,43 @@ func (luo *LanguageUpdateOne) SetIndx(s string) *LanguageUpdateOne {
 	return luo
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (luo *LanguageUpdateOne) SetNillableIndx(s *string) *LanguageUpdateOne {
+	if s != nil {
+		luo.SetIndx(*s)
+	}
+	return luo
+}
+
 // SetName sets the "name" field.
 func (luo *LanguageUpdateOne) SetName(s string) *LanguageUpdateOne {
 	luo.mutation.SetName(s)
 	return luo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (luo *LanguageUpdateOne) SetNillableName(s *string) *LanguageUpdateOne {
+	if s != nil {
+		luo.SetName(*s)
+	}
+	return luo
+}
+
 // SetDesc sets the "desc" field.
-func (luo *LanguageUpdateOne) SetDesc(s string) *LanguageUpdateOne {
+func (luo *LanguageUpdateOne) SetDesc(s []string) *LanguageUpdateOne {
 	luo.mutation.SetDesc(s)
+	return luo
+}
+
+// AppendDesc appends s to the "desc" field.
+func (luo *LanguageUpdateOne) AppendDesc(s []string) *LanguageUpdateOne {
+	luo.mutation.AppendDesc(s)
+	return luo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (luo *LanguageUpdateOne) ClearDesc() *LanguageUpdateOne {
+	luo.mutation.ClearDesc()
 	return luo
 }
 
@@ -314,25 +452,34 @@ func (luo *LanguageUpdateOne) SetNillableScript(l *language.Script) *LanguageUpd
 	return luo
 }
 
-// ClearScript clears the value of the "script" field.
-func (luo *LanguageUpdateOne) ClearScript() *LanguageUpdateOne {
-	luo.mutation.ClearScript()
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
+func (luo *LanguageUpdateOne) AddRaceIDs(ids ...int) *LanguageUpdateOne {
+	luo.mutation.AddRaceIDs(ids...)
 	return luo
 }
 
-// AddRaceSpeakerIDs adds the "race_speakers" edge to the Race entity by IDs.
-func (luo *LanguageUpdateOne) AddRaceSpeakerIDs(ids ...int) *LanguageUpdateOne {
-	luo.mutation.AddRaceSpeakerIDs(ids...)
-	return luo
-}
-
-// AddRaceSpeakers adds the "race_speakers" edges to the Race entity.
-func (luo *LanguageUpdateOne) AddRaceSpeakers(r ...*Race) *LanguageUpdateOne {
+// AddRace adds the "race" edges to the Race entity.
+func (luo *LanguageUpdateOne) AddRace(r ...*Race) *LanguageUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return luo.AddRaceSpeakerIDs(ids...)
+	return luo.AddRaceIDs(ids...)
+}
+
+// AddOptionIDs adds the "options" edge to the LanguageChoice entity by IDs.
+func (luo *LanguageUpdateOne) AddOptionIDs(ids ...int) *LanguageUpdateOne {
+	luo.mutation.AddOptionIDs(ids...)
+	return luo
+}
+
+// AddOptions adds the "options" edges to the LanguageChoice entity.
+func (luo *LanguageUpdateOne) AddOptions(l ...*LanguageChoice) *LanguageUpdateOne {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return luo.AddOptionIDs(ids...)
 }
 
 // Mutation returns the LanguageMutation object of the builder.
@@ -340,25 +487,46 @@ func (luo *LanguageUpdateOne) Mutation() *LanguageMutation {
 	return luo.mutation
 }
 
-// ClearRaceSpeakers clears all "race_speakers" edges to the Race entity.
-func (luo *LanguageUpdateOne) ClearRaceSpeakers() *LanguageUpdateOne {
-	luo.mutation.ClearRaceSpeakers()
+// ClearRace clears all "race" edges to the Race entity.
+func (luo *LanguageUpdateOne) ClearRace() *LanguageUpdateOne {
+	luo.mutation.ClearRace()
 	return luo
 }
 
-// RemoveRaceSpeakerIDs removes the "race_speakers" edge to Race entities by IDs.
-func (luo *LanguageUpdateOne) RemoveRaceSpeakerIDs(ids ...int) *LanguageUpdateOne {
-	luo.mutation.RemoveRaceSpeakerIDs(ids...)
+// RemoveRaceIDs removes the "race" edge to Race entities by IDs.
+func (luo *LanguageUpdateOne) RemoveRaceIDs(ids ...int) *LanguageUpdateOne {
+	luo.mutation.RemoveRaceIDs(ids...)
 	return luo
 }
 
-// RemoveRaceSpeakers removes "race_speakers" edges to Race entities.
-func (luo *LanguageUpdateOne) RemoveRaceSpeakers(r ...*Race) *LanguageUpdateOne {
+// RemoveRace removes "race" edges to Race entities.
+func (luo *LanguageUpdateOne) RemoveRace(r ...*Race) *LanguageUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return luo.RemoveRaceSpeakerIDs(ids...)
+	return luo.RemoveRaceIDs(ids...)
+}
+
+// ClearOptions clears all "options" edges to the LanguageChoice entity.
+func (luo *LanguageUpdateOne) ClearOptions() *LanguageUpdateOne {
+	luo.mutation.ClearOptions()
+	return luo
+}
+
+// RemoveOptionIDs removes the "options" edge to LanguageChoice entities by IDs.
+func (luo *LanguageUpdateOne) RemoveOptionIDs(ids ...int) *LanguageUpdateOne {
+	luo.mutation.RemoveOptionIDs(ids...)
+	return luo
+}
+
+// RemoveOptions removes "options" edges to LanguageChoice entities.
+func (luo *LanguageUpdateOne) RemoveOptions(l ...*LanguageChoice) *LanguageUpdateOne {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return luo.RemoveOptionIDs(ids...)
 }
 
 // Where appends a list predicates to the LanguageUpdate builder.
@@ -462,7 +630,15 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 		_spec.SetField(language.FieldName, field.TypeString, value)
 	}
 	if value, ok := luo.mutation.Desc(); ok {
-		_spec.SetField(language.FieldDesc, field.TypeString, value)
+		_spec.SetField(language.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := luo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, language.FieldDesc, value)
+		})
+	}
+	if luo.mutation.DescCleared() {
+		_spec.ClearField(language.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := luo.mutation.LanguageType(); ok {
 		_spec.SetField(language.FieldLanguageType, field.TypeEnum, value)
@@ -470,15 +646,12 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 	if value, ok := luo.mutation.Script(); ok {
 		_spec.SetField(language.FieldScript, field.TypeEnum, value)
 	}
-	if luo.mutation.ScriptCleared() {
-		_spec.ClearField(language.FieldScript, field.TypeEnum)
-	}
-	if luo.mutation.RaceSpeakersCleared() {
+	if luo.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   language.RaceSpeakersTable,
-			Columns: language.RaceSpeakersPrimaryKey,
+			Table:   language.RaceTable,
+			Columns: language.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -486,12 +659,12 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.RemovedRaceSpeakersIDs(); len(nodes) > 0 && !luo.mutation.RaceSpeakersCleared() {
+	if nodes := luo.mutation.RemovedRaceIDs(); len(nodes) > 0 && !luo.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   language.RaceSpeakersTable,
-			Columns: language.RaceSpeakersPrimaryKey,
+			Table:   language.RaceTable,
+			Columns: language.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -502,15 +675,60 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.RaceSpeakersIDs(); len(nodes) > 0 {
+	if nodes := luo.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   language.RaceSpeakersTable,
-			Columns: language.RaceSpeakersPrimaryKey,
+			Table:   language.RaceTable,
+			Columns: language.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if luo.mutation.OptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := luo.mutation.RemovedOptionsIDs(); len(nodes) > 0 && !luo.mutation.OptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := luo.mutation.OptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/race"
 )
 
@@ -33,7 +34,7 @@ func (lc *LanguageCreate) SetName(s string) *LanguageCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (lc *LanguageCreate) SetDesc(s string) *LanguageCreate {
+func (lc *LanguageCreate) SetDesc(s []string) *LanguageCreate {
 	lc.mutation.SetDesc(s)
 	return lc
 }
@@ -66,19 +67,34 @@ func (lc *LanguageCreate) SetNillableScript(l *language.Script) *LanguageCreate 
 	return lc
 }
 
-// AddRaceSpeakerIDs adds the "race_speakers" edge to the Race entity by IDs.
-func (lc *LanguageCreate) AddRaceSpeakerIDs(ids ...int) *LanguageCreate {
-	lc.mutation.AddRaceSpeakerIDs(ids...)
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
+func (lc *LanguageCreate) AddRaceIDs(ids ...int) *LanguageCreate {
+	lc.mutation.AddRaceIDs(ids...)
 	return lc
 }
 
-// AddRaceSpeakers adds the "race_speakers" edges to the Race entity.
-func (lc *LanguageCreate) AddRaceSpeakers(r ...*Race) *LanguageCreate {
+// AddRace adds the "race" edges to the Race entity.
+func (lc *LanguageCreate) AddRace(r ...*Race) *LanguageCreate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return lc.AddRaceSpeakerIDs(ids...)
+	return lc.AddRaceIDs(ids...)
+}
+
+// AddOptionIDs adds the "options" edge to the LanguageChoice entity by IDs.
+func (lc *LanguageCreate) AddOptionIDs(ids ...int) *LanguageCreate {
+	lc.mutation.AddOptionIDs(ids...)
+	return lc
+}
+
+// AddOptions adds the "options" edges to the LanguageChoice entity.
+func (lc *LanguageCreate) AddOptions(l ...*LanguageChoice) *LanguageCreate {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return lc.AddOptionIDs(ids...)
 }
 
 // Mutation returns the LanguageMutation object of the builder.
@@ -144,9 +160,6 @@ func (lc *LanguageCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Language.name": %w`, err)}
 		}
 	}
-	if _, ok := lc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Language.desc"`)}
-	}
 	if _, ok := lc.mutation.LanguageType(); !ok {
 		return &ValidationError{Name: "language_type", err: errors.New(`ent: missing required field "Language.language_type"`)}
 	}
@@ -154,6 +167,9 @@ func (lc *LanguageCreate) check() error {
 		if err := language.LanguageTypeValidator(v); err != nil {
 			return &ValidationError{Name: "language_type", err: fmt.Errorf(`ent: validator failed for field "Language.language_type": %w`, err)}
 		}
+	}
+	if _, ok := lc.mutation.Script(); !ok {
+		return &ValidationError{Name: "script", err: errors.New(`ent: missing required field "Language.script"`)}
 	}
 	if v, ok := lc.mutation.Script(); ok {
 		if err := language.ScriptValidator(v); err != nil {
@@ -195,7 +211,7 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := lc.mutation.Desc(); ok {
-		_spec.SetField(language.FieldDesc, field.TypeString, value)
+		_spec.SetField(language.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
 	}
 	if value, ok := lc.mutation.LanguageType(); ok {
@@ -206,15 +222,31 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 		_spec.SetField(language.FieldScript, field.TypeEnum, value)
 		_node.Script = value
 	}
-	if nodes := lc.mutation.RaceSpeakersIDs(); len(nodes) > 0 {
+	if nodes := lc.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   language.RaceSpeakersTable,
-			Columns: language.RaceSpeakersPrimaryKey,
+			Table:   language.RaceTable,
+			Columns: language.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := lc.mutation.OptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -228,11 +260,15 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 // LanguageCreateBulk is the builder for creating many Language entities in bulk.
 type LanguageCreateBulk struct {
 	config
+	err      error
 	builders []*LanguageCreate
 }
 
 // Save creates the Language entities in the database.
 func (lcb *LanguageCreateBulk) Save(ctx context.Context) ([]*Language, error) {
+	if lcb.err != nil {
+		return nil, lcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(lcb.builders))
 	nodes := make([]*Language, len(lcb.builders))
 	mutators := make([]Mutator, len(lcb.builders))

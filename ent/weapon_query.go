@@ -8,30 +8,31 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weapondamage"
-	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
 // WeaponQuery is the builder for querying Weapon entities.
 type WeaponQuery struct {
 	config
-	ctx                       *QueryContext
-	order                     []weapon.OrderOption
-	inters                    []Interceptor
-	predicates                []predicate.Weapon
-	withEquipment             *EquipmentQuery
-	withWeaponDamage          *WeaponDamageQuery
-	withWeaponProperties      *WeaponPropertyQuery
-	modifiers                 []func(*sql.Selector)
-	loadTotal                 []func(context.Context, []*Weapon) error
-	withNamedWeaponDamage     map[string]*WeaponDamageQuery
-	withNamedWeaponProperties map[string]*WeaponPropertyQuery
+	ctx                 *QueryContext
+	order               []weapon.OrderOption
+	inters              []Interceptor
+	predicates          []predicate.Weapon
+	withProperties      *PropertyQuery
+	withDamageType      *DamageTypeQuery
+	withEquipment       *EquipmentQuery
+	withFKs             bool
+	modifiers           []func(*sql.Selector)
+	loadTotal           []func(context.Context, []*Weapon) error
+	withNamedProperties map[string]*PropertyQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -68,6 +69,50 @@ func (wq *WeaponQuery) Order(o ...weapon.OrderOption) *WeaponQuery {
 	return wq
 }
 
+// QueryProperties chains the current query on the "properties" edge.
+func (wq *WeaponQuery) QueryProperties() *PropertyQuery {
+	query := (&PropertyClient{config: wq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := wq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := wq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapon.Table, weapon.FieldID, selector),
+			sqlgraph.To(property.Table, property.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, weapon.PropertiesTable, weapon.PropertiesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(wq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDamageType chains the current query on the "damage_type" edge.
+func (wq *WeaponQuery) QueryDamageType() *DamageTypeQuery {
+	query := (&DamageTypeClient{config: wq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := wq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := wq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapon.Table, weapon.FieldID, selector),
+			sqlgraph.To(damagetype.Table, damagetype.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, weapon.DamageTypeTable, weapon.DamageTypeColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(wq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryEquipment chains the current query on the "equipment" edge.
 func (wq *WeaponQuery) QueryEquipment() *EquipmentQuery {
 	query := (&EquipmentClient{config: wq.config}).Query()
@@ -90,54 +135,10 @@ func (wq *WeaponQuery) QueryEquipment() *EquipmentQuery {
 	return query
 }
 
-// QueryWeaponDamage chains the current query on the "weapon_damage" edge.
-func (wq *WeaponQuery) QueryWeaponDamage() *WeaponDamageQuery {
-	query := (&WeaponDamageClient{config: wq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := wq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := wq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(weapon.Table, weapon.FieldID, selector),
-			sqlgraph.To(weapondamage.Table, weapondamage.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, weapon.WeaponDamageTable, weapon.WeaponDamageColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(wq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryWeaponProperties chains the current query on the "weapon_properties" edge.
-func (wq *WeaponQuery) QueryWeaponProperties() *WeaponPropertyQuery {
-	query := (&WeaponPropertyClient{config: wq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := wq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := wq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(weapon.Table, weapon.FieldID, selector),
-			sqlgraph.To(weaponproperty.Table, weaponproperty.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, weapon.WeaponPropertiesTable, weapon.WeaponPropertiesPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(wq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // First returns the first Weapon entity from the query.
 // Returns a *NotFoundError when no Weapon was found.
 func (wq *WeaponQuery) First(ctx context.Context) (*Weapon, error) {
-	nodes, err := wq.Limit(1).All(setContextOp(ctx, wq.ctx, "First"))
+	nodes, err := wq.Limit(1).All(setContextOp(ctx, wq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +161,7 @@ func (wq *WeaponQuery) FirstX(ctx context.Context) *Weapon {
 // Returns a *NotFoundError when no Weapon ID was found.
 func (wq *WeaponQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = wq.Limit(1).IDs(setContextOp(ctx, wq.ctx, "FirstID")); err != nil {
+	if ids, err = wq.Limit(1).IDs(setContextOp(ctx, wq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -183,7 +184,7 @@ func (wq *WeaponQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one Weapon entity is found.
 // Returns a *NotFoundError when no Weapon entities are found.
 func (wq *WeaponQuery) Only(ctx context.Context) (*Weapon, error) {
-	nodes, err := wq.Limit(2).All(setContextOp(ctx, wq.ctx, "Only"))
+	nodes, err := wq.Limit(2).All(setContextOp(ctx, wq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -211,7 +212,7 @@ func (wq *WeaponQuery) OnlyX(ctx context.Context) *Weapon {
 // Returns a *NotFoundError when no entities are found.
 func (wq *WeaponQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = wq.Limit(2).IDs(setContextOp(ctx, wq.ctx, "OnlyID")); err != nil {
+	if ids, err = wq.Limit(2).IDs(setContextOp(ctx, wq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -236,7 +237,7 @@ func (wq *WeaponQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Weapons.
 func (wq *WeaponQuery) All(ctx context.Context) ([]*Weapon, error) {
-	ctx = setContextOp(ctx, wq.ctx, "All")
+	ctx = setContextOp(ctx, wq.ctx, ent.OpQueryAll)
 	if err := wq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -258,7 +259,7 @@ func (wq *WeaponQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if wq.ctx.Unique == nil && wq.path != nil {
 		wq.Unique(true)
 	}
-	ctx = setContextOp(ctx, wq.ctx, "IDs")
+	ctx = setContextOp(ctx, wq.ctx, ent.OpQueryIDs)
 	if err = wq.Select(weapon.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -276,7 +277,7 @@ func (wq *WeaponQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (wq *WeaponQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, wq.ctx, "Count")
+	ctx = setContextOp(ctx, wq.ctx, ent.OpQueryCount)
 	if err := wq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -294,7 +295,7 @@ func (wq *WeaponQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (wq *WeaponQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, wq.ctx, "Exist")
+	ctx = setContextOp(ctx, wq.ctx, ent.OpQueryExist)
 	switch _, err := wq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -321,18 +322,40 @@ func (wq *WeaponQuery) Clone() *WeaponQuery {
 		return nil
 	}
 	return &WeaponQuery{
-		config:               wq.config,
-		ctx:                  wq.ctx.Clone(),
-		order:                append([]weapon.OrderOption{}, wq.order...),
-		inters:               append([]Interceptor{}, wq.inters...),
-		predicates:           append([]predicate.Weapon{}, wq.predicates...),
-		withEquipment:        wq.withEquipment.Clone(),
-		withWeaponDamage:     wq.withWeaponDamage.Clone(),
-		withWeaponProperties: wq.withWeaponProperties.Clone(),
+		config:         wq.config,
+		ctx:            wq.ctx.Clone(),
+		order:          append([]weapon.OrderOption{}, wq.order...),
+		inters:         append([]Interceptor{}, wq.inters...),
+		predicates:     append([]predicate.Weapon{}, wq.predicates...),
+		withProperties: wq.withProperties.Clone(),
+		withDamageType: wq.withDamageType.Clone(),
+		withEquipment:  wq.withEquipment.Clone(),
 		// clone intermediate query.
 		sql:  wq.sql.Clone(),
 		path: wq.path,
 	}
+}
+
+// WithProperties tells the query-builder to eager-load the nodes that are connected to
+// the "properties" edge. The optional arguments are used to configure the query builder of the edge.
+func (wq *WeaponQuery) WithProperties(opts ...func(*PropertyQuery)) *WeaponQuery {
+	query := (&PropertyClient{config: wq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	wq.withProperties = query
+	return wq
+}
+
+// WithDamageType tells the query-builder to eager-load the nodes that are connected to
+// the "damage_type" edge. The optional arguments are used to configure the query builder of the edge.
+func (wq *WeaponQuery) WithDamageType(opts ...func(*DamageTypeQuery)) *WeaponQuery {
+	query := (&DamageTypeClient{config: wq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	wq.withDamageType = query
+	return wq
 }
 
 // WithEquipment tells the query-builder to eager-load the nodes that are connected to
@@ -346,40 +369,18 @@ func (wq *WeaponQuery) WithEquipment(opts ...func(*EquipmentQuery)) *WeaponQuery
 	return wq
 }
 
-// WithWeaponDamage tells the query-builder to eager-load the nodes that are connected to
-// the "weapon_damage" edge. The optional arguments are used to configure the query builder of the edge.
-func (wq *WeaponQuery) WithWeaponDamage(opts ...func(*WeaponDamageQuery)) *WeaponQuery {
-	query := (&WeaponDamageClient{config: wq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	wq.withWeaponDamage = query
-	return wq
-}
-
-// WithWeaponProperties tells the query-builder to eager-load the nodes that are connected to
-// the "weapon_properties" edge. The optional arguments are used to configure the query builder of the edge.
-func (wq *WeaponQuery) WithWeaponProperties(opts ...func(*WeaponPropertyQuery)) *WeaponQuery {
-	query := (&WeaponPropertyClient{config: wq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	wq.withWeaponProperties = query
-	return wq
-}
-
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"index"`
+//		WeaponCategory weapon.WeaponCategory `json:"weapon_category,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Weapon.Query().
-//		GroupBy(weapon.FieldIndx).
+//		GroupBy(weapon.FieldWeaponCategory).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (wq *WeaponQuery) GroupBy(field string, fields ...string) *WeaponGroupBy {
@@ -397,11 +398,11 @@ func (wq *WeaponQuery) GroupBy(field string, fields ...string) *WeaponGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"index"`
+//		WeaponCategory weapon.WeaponCategory `json:"weapon_category,omitempty"`
 //	}
 //
 //	client.Weapon.Query().
-//		Select(weapon.FieldIndx).
+//		Select(weapon.FieldWeaponCategory).
 //		Scan(ctx, &v)
 func (wq *WeaponQuery) Select(fields ...string) *WeaponSelect {
 	wq.ctx.Fields = append(wq.ctx.Fields, fields...)
@@ -445,13 +446,20 @@ func (wq *WeaponQuery) prepareQuery(ctx context.Context) error {
 func (wq *WeaponQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Weapon, error) {
 	var (
 		nodes       = []*Weapon{}
+		withFKs     = wq.withFKs
 		_spec       = wq.querySpec()
 		loadedTypes = [3]bool{
+			wq.withProperties != nil,
+			wq.withDamageType != nil,
 			wq.withEquipment != nil,
-			wq.withWeaponDamage != nil,
-			wq.withWeaponProperties != nil,
 		}
 	)
+	if wq.withDamageType != nil || wq.withEquipment != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, weapon.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Weapon).scanValues(nil, columns)
 	}
@@ -473,37 +481,29 @@ func (wq *WeaponQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Weapo
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := wq.withProperties; query != nil {
+		if err := wq.loadProperties(ctx, query, nodes,
+			func(n *Weapon) { n.Edges.Properties = []*Property{} },
+			func(n *Weapon, e *Property) { n.Edges.Properties = append(n.Edges.Properties, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := wq.withDamageType; query != nil {
+		if err := wq.loadDamageType(ctx, query, nodes, nil,
+			func(n *Weapon, e *DamageType) { n.Edges.DamageType = e }); err != nil {
+			return nil, err
+		}
+	}
 	if query := wq.withEquipment; query != nil {
 		if err := wq.loadEquipment(ctx, query, nodes, nil,
 			func(n *Weapon, e *Equipment) { n.Edges.Equipment = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := wq.withWeaponDamage; query != nil {
-		if err := wq.loadWeaponDamage(ctx, query, nodes,
-			func(n *Weapon) { n.Edges.WeaponDamage = []*WeaponDamage{} },
-			func(n *Weapon, e *WeaponDamage) { n.Edges.WeaponDamage = append(n.Edges.WeaponDamage, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := wq.withWeaponProperties; query != nil {
-		if err := wq.loadWeaponProperties(ctx, query, nodes,
-			func(n *Weapon) { n.Edges.WeaponProperties = []*WeaponProperty{} },
-			func(n *Weapon, e *WeaponProperty) { n.Edges.WeaponProperties = append(n.Edges.WeaponProperties, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range wq.withNamedWeaponDamage {
-		if err := wq.loadWeaponDamage(ctx, query, nodes,
-			func(n *Weapon) { n.appendNamedWeaponDamage(name) },
-			func(n *Weapon, e *WeaponDamage) { n.appendNamedWeaponDamage(name, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range wq.withNamedWeaponProperties {
-		if err := wq.loadWeaponProperties(ctx, query, nodes,
-			func(n *Weapon) { n.appendNamedWeaponProperties(name) },
-			func(n *Weapon, e *WeaponProperty) { n.appendNamedWeaponProperties(name, e) }); err != nil {
+	for name, query := range wq.withNamedProperties {
+		if err := wq.loadProperties(ctx, query, nodes,
+			func(n *Weapon) { n.appendNamedProperties(name) },
+			func(n *Weapon, e *Property) { n.appendNamedProperties(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -515,66 +515,7 @@ func (wq *WeaponQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Weapo
 	return nodes, nil
 }
 
-func (wq *WeaponQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, nodes []*Weapon, init func(*Weapon), assign func(*Weapon, *Equipment)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Weapon)
-	for i := range nodes {
-		fk := nodes[i].EquipmentID
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(equipment.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_id" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (wq *WeaponQuery) loadWeaponDamage(ctx context.Context, query *WeaponDamageQuery, nodes []*Weapon, init func(*Weapon), assign func(*Weapon, *WeaponDamage)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Weapon)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(weapondamage.FieldWeaponID)
-	}
-	query.Where(predicate.WeaponDamage(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(weapon.WeaponDamageColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.WeaponID
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "weapon_id" returned %v for node %v`, fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (wq *WeaponQuery) loadWeaponProperties(ctx context.Context, query *WeaponPropertyQuery, nodes []*Weapon, init func(*Weapon), assign func(*Weapon, *WeaponProperty)) error {
+func (wq *WeaponQuery) loadProperties(ctx context.Context, query *PropertyQuery, nodes []*Weapon, init func(*Weapon), assign func(*Weapon, *Property)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*Weapon)
 	nids := make(map[int]map[*Weapon]struct{})
@@ -586,11 +527,11 @@ func (wq *WeaponQuery) loadWeaponProperties(ctx context.Context, query *WeaponPr
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(weapon.WeaponPropertiesTable)
-		s.Join(joinT).On(s.C(weaponproperty.FieldID), joinT.C(weapon.WeaponPropertiesPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(weapon.WeaponPropertiesPrimaryKey[0]), edgeIDs...))
+		joinT := sql.Table(weapon.PropertiesTable)
+		s.Join(joinT).On(s.C(property.FieldID), joinT.C(weapon.PropertiesPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(weapon.PropertiesPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(weapon.WeaponPropertiesPrimaryKey[0]))
+		s.Select(joinT.C(weapon.PropertiesPrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -620,17 +561,81 @@ func (wq *WeaponQuery) loadWeaponProperties(ctx context.Context, query *WeaponPr
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*WeaponProperty](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*Property](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "weapon_properties" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "properties" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (wq *WeaponQuery) loadDamageType(ctx context.Context, query *DamageTypeQuery, nodes []*Weapon, init func(*Weapon), assign func(*Weapon, *DamageType)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Weapon)
+	for i := range nodes {
+		if nodes[i].weapon_damage_type == nil {
+			continue
+		}
+		fk := *nodes[i].weapon_damage_type
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(damagetype.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "weapon_damage_type" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (wq *WeaponQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, nodes []*Weapon, init func(*Weapon), assign func(*Weapon, *Equipment)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Weapon)
+	for i := range nodes {
+		if nodes[i].equipment_weapon == nil {
+			continue
+		}
+		fk := *nodes[i].equipment_weapon
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(equipment.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "equipment_weapon" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
 		}
 	}
 	return nil
@@ -663,9 +668,6 @@ func (wq *WeaponQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != weapon.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if wq.withEquipment != nil {
-			_spec.Node.AddColumnOnce(weapon.FieldEquipmentID)
 		}
 	}
 	if ps := wq.predicates; len(ps) > 0 {
@@ -723,31 +725,17 @@ func (wq *WeaponQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// WithNamedWeaponDamage tells the query-builder to eager-load the nodes that are connected to the "weapon_damage"
+// WithNamedProperties tells the query-builder to eager-load the nodes that are connected to the "properties"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (wq *WeaponQuery) WithNamedWeaponDamage(name string, opts ...func(*WeaponDamageQuery)) *WeaponQuery {
-	query := (&WeaponDamageClient{config: wq.config}).Query()
+func (wq *WeaponQuery) WithNamedProperties(name string, opts ...func(*PropertyQuery)) *WeaponQuery {
+	query := (&PropertyClient{config: wq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	if wq.withNamedWeaponDamage == nil {
-		wq.withNamedWeaponDamage = make(map[string]*WeaponDamageQuery)
+	if wq.withNamedProperties == nil {
+		wq.withNamedProperties = make(map[string]*PropertyQuery)
 	}
-	wq.withNamedWeaponDamage[name] = query
-	return wq
-}
-
-// WithNamedWeaponProperties tells the query-builder to eager-load the nodes that are connected to the "weapon_properties"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (wq *WeaponQuery) WithNamedWeaponProperties(name string, opts ...func(*WeaponPropertyQuery)) *WeaponQuery {
-	query := (&WeaponPropertyClient{config: wq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if wq.withNamedWeaponProperties == nil {
-		wq.withNamedWeaponProperties = make(map[string]*WeaponPropertyQuery)
-	}
-	wq.withNamedWeaponProperties[name] = query
+	wq.withNamedProperties[name] = query
 	return wq
 }
 
@@ -765,7 +753,7 @@ func (wgb *WeaponGroupBy) Aggregate(fns ...AggregateFunc) *WeaponGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (wgb *WeaponGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, wgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, wgb.build.ctx, ent.OpQueryGroupBy)
 	if err := wgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -813,7 +801,7 @@ func (ws *WeaponSelect) Aggregate(fns ...AggregateFunc) *WeaponSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ws *WeaponSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ws.ctx, "Select")
+	ctx = setContextOp(ctx, ws.ctx, ent.OpQuerySelect)
 	if err := ws.prepareQuery(ctx); err != nil {
 		return err
 	}

@@ -18,17 +18,17 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
-	// EdgeWeaponDamage holds the string denoting the weapon_damage edge name in mutations.
-	EdgeWeaponDamage = "weapon_damage"
+	// EdgeWeapons holds the string denoting the weapons edge name in mutations.
+	EdgeWeapons = "weapons"
 	// Table holds the table name of the damagetype in the database.
 	Table = "damage_types"
-	// WeaponDamageTable is the table that holds the weapon_damage relation/edge.
-	WeaponDamageTable = "weapon_damages"
-	// WeaponDamageInverseTable is the table name for the WeaponDamage entity.
-	// It exists in this package in order to avoid circular dependency with the "weapondamage" package.
-	WeaponDamageInverseTable = "weapon_damages"
-	// WeaponDamageColumn is the table column denoting the weapon_damage relation/edge.
-	WeaponDamageColumn = "damage_type_id"
+	// WeaponsTable is the table that holds the weapons relation/edge.
+	WeaponsTable = "weapons"
+	// WeaponsInverseTable is the table name for the Weapon entity.
+	// It exists in this package in order to avoid circular dependency with the "weapon" package.
+	WeaponsInverseTable = "weapons"
+	// WeaponsColumn is the table column denoting the weapons relation/edge.
+	WeaponsColumn = "weapon_damage_type"
 )
 
 // Columns holds all SQL columns for damagetype fields.
@@ -74,23 +74,23 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByWeaponDamageCount orders the results by weapon_damage count.
-func ByWeaponDamageCount(opts ...sql.OrderTermOption) OrderOption {
+// ByWeaponsCount orders the results by weapons count.
+func ByWeaponsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newWeaponDamageStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newWeaponsStep(), opts...)
 	}
 }
 
-// ByWeaponDamage orders the results by weapon_damage terms.
-func ByWeaponDamage(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByWeapons orders the results by weapons terms.
+func ByWeapons(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newWeaponDamageStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newWeaponsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newWeaponDamageStep() *sqlgraph.Step {
+func newWeaponsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(WeaponDamageInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, WeaponDamageTable, WeaponDamageColumn),
+		sqlgraph.To(WeaponsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, WeaponsTable, WeaponsColumn),
 	)
 }

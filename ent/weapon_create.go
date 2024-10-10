@@ -9,10 +9,10 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weapondamage"
-	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
 // WeaponCreate is the builder for creating a Weapon entity.
@@ -22,69 +22,131 @@ type WeaponCreate struct {
 	hooks    []Hook
 }
 
-// SetIndx sets the "indx" field.
-func (wc *WeaponCreate) SetIndx(s string) *WeaponCreate {
-	wc.mutation.SetIndx(s)
-	return wc
-}
-
-// SetName sets the "name" field.
-func (wc *WeaponCreate) SetName(s string) *WeaponCreate {
-	wc.mutation.SetName(s)
-	return wc
-}
-
-// SetEquipmentID sets the "equipment_id" field.
-func (wc *WeaponCreate) SetEquipmentID(i int) *WeaponCreate {
-	wc.mutation.SetEquipmentID(i)
-	return wc
-}
-
 // SetWeaponCategory sets the "weapon_category" field.
-func (wc *WeaponCreate) SetWeaponCategory(s string) *WeaponCreate {
-	wc.mutation.SetWeaponCategory(s)
+func (wc *WeaponCreate) SetWeaponCategory(value weapon.WeaponCategory) *WeaponCreate {
+	wc.mutation.SetWeaponCategory(value)
 	return wc
 }
 
-// SetWeaponRange sets the "weapon_range" field.
-func (wc *WeaponCreate) SetWeaponRange(s string) *WeaponCreate {
-	wc.mutation.SetWeaponRange(s)
+// SetWeaponSubcategory sets the "weapon_subcategory" field.
+func (wc *WeaponCreate) SetWeaponSubcategory(ws weapon.WeaponSubcategory) *WeaponCreate {
+	wc.mutation.SetWeaponSubcategory(ws)
+	return wc
+}
+
+// SetRangeNormal sets the "range_normal" field.
+func (wc *WeaponCreate) SetRangeNormal(i int) *WeaponCreate {
+	wc.mutation.SetRangeNormal(i)
+	return wc
+}
+
+// SetNillableRangeNormal sets the "range_normal" field if the given value is not nil.
+func (wc *WeaponCreate) SetNillableRangeNormal(i *int) *WeaponCreate {
+	if i != nil {
+		wc.SetRangeNormal(*i)
+	}
+	return wc
+}
+
+// SetRangeLong sets the "range_long" field.
+func (wc *WeaponCreate) SetRangeLong(i int) *WeaponCreate {
+	wc.mutation.SetRangeLong(i)
+	return wc
+}
+
+// SetNillableRangeLong sets the "range_long" field if the given value is not nil.
+func (wc *WeaponCreate) SetNillableRangeLong(i *int) *WeaponCreate {
+	if i != nil {
+		wc.SetRangeLong(*i)
+	}
+	return wc
+}
+
+// SetThrowRangeNormal sets the "throw_range_normal" field.
+func (wc *WeaponCreate) SetThrowRangeNormal(i int) *WeaponCreate {
+	wc.mutation.SetThrowRangeNormal(i)
+	return wc
+}
+
+// SetNillableThrowRangeNormal sets the "throw_range_normal" field if the given value is not nil.
+func (wc *WeaponCreate) SetNillableThrowRangeNormal(i *int) *WeaponCreate {
+	if i != nil {
+		wc.SetThrowRangeNormal(*i)
+	}
+	return wc
+}
+
+// SetThrowRangeLong sets the "throw_range_long" field.
+func (wc *WeaponCreate) SetThrowRangeLong(i int) *WeaponCreate {
+	wc.mutation.SetThrowRangeLong(i)
+	return wc
+}
+
+// SetNillableThrowRangeLong sets the "throw_range_long" field if the given value is not nil.
+func (wc *WeaponCreate) SetNillableThrowRangeLong(i *int) *WeaponCreate {
+	if i != nil {
+		wc.SetThrowRangeLong(*i)
+	}
+	return wc
+}
+
+// SetDamageDice sets the "damage_dice" field.
+func (wc *WeaponCreate) SetDamageDice(s string) *WeaponCreate {
+	wc.mutation.SetDamageDice(s)
+	return wc
+}
+
+// SetNillableDamageDice sets the "damage_dice" field if the given value is not nil.
+func (wc *WeaponCreate) SetNillableDamageDice(s *string) *WeaponCreate {
+	if s != nil {
+		wc.SetDamageDice(*s)
+	}
+	return wc
+}
+
+// AddPropertyIDs adds the "properties" edge to the Property entity by IDs.
+func (wc *WeaponCreate) AddPropertyIDs(ids ...int) *WeaponCreate {
+	wc.mutation.AddPropertyIDs(ids...)
+	return wc
+}
+
+// AddProperties adds the "properties" edges to the Property entity.
+func (wc *WeaponCreate) AddProperties(p ...*Property) *WeaponCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return wc.AddPropertyIDs(ids...)
+}
+
+// SetDamageTypeID sets the "damage_type" edge to the DamageType entity by ID.
+func (wc *WeaponCreate) SetDamageTypeID(id int) *WeaponCreate {
+	wc.mutation.SetDamageTypeID(id)
+	return wc
+}
+
+// SetNillableDamageTypeID sets the "damage_type" edge to the DamageType entity by ID if the given value is not nil.
+func (wc *WeaponCreate) SetNillableDamageTypeID(id *int) *WeaponCreate {
+	if id != nil {
+		wc = wc.SetDamageTypeID(*id)
+	}
+	return wc
+}
+
+// SetDamageType sets the "damage_type" edge to the DamageType entity.
+func (wc *WeaponCreate) SetDamageType(d *DamageType) *WeaponCreate {
+	return wc.SetDamageTypeID(d.ID)
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (wc *WeaponCreate) SetEquipmentID(id int) *WeaponCreate {
+	wc.mutation.SetEquipmentID(id)
 	return wc
 }
 
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (wc *WeaponCreate) SetEquipment(e *Equipment) *WeaponCreate {
 	return wc.SetEquipmentID(e.ID)
-}
-
-// AddWeaponDamageIDs adds the "weapon_damage" edge to the WeaponDamage entity by IDs.
-func (wc *WeaponCreate) AddWeaponDamageIDs(ids ...int) *WeaponCreate {
-	wc.mutation.AddWeaponDamageIDs(ids...)
-	return wc
-}
-
-// AddWeaponDamage adds the "weapon_damage" edges to the WeaponDamage entity.
-func (wc *WeaponCreate) AddWeaponDamage(w ...*WeaponDamage) *WeaponCreate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wc.AddWeaponDamageIDs(ids...)
-}
-
-// AddWeaponPropertyIDs adds the "weapon_properties" edge to the WeaponProperty entity by IDs.
-func (wc *WeaponCreate) AddWeaponPropertyIDs(ids ...int) *WeaponCreate {
-	wc.mutation.AddWeaponPropertyIDs(ids...)
-	return wc
-}
-
-// AddWeaponProperties adds the "weapon_properties" edges to the WeaponProperty entity.
-func (wc *WeaponCreate) AddWeaponProperties(w ...*WeaponProperty) *WeaponCreate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wc.AddWeaponPropertyIDs(ids...)
 }
 
 // Mutation returns the WeaponMutation object of the builder.
@@ -121,32 +183,23 @@ func (wc *WeaponCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (wc *WeaponCreate) check() error {
-	if _, ok := wc.mutation.Indx(); !ok {
-		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Weapon.indx"`)}
-	}
-	if v, ok := wc.mutation.Indx(); ok {
-		if err := weapon.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Weapon.indx": %w`, err)}
-		}
-	}
-	if _, ok := wc.mutation.Name(); !ok {
-		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Weapon.name"`)}
-	}
-	if v, ok := wc.mutation.Name(); ok {
-		if err := weapon.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Weapon.name": %w`, err)}
-		}
-	}
-	if _, ok := wc.mutation.EquipmentID(); !ok {
-		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "Weapon.equipment_id"`)}
-	}
 	if _, ok := wc.mutation.WeaponCategory(); !ok {
 		return &ValidationError{Name: "weapon_category", err: errors.New(`ent: missing required field "Weapon.weapon_category"`)}
 	}
-	if _, ok := wc.mutation.WeaponRange(); !ok {
-		return &ValidationError{Name: "weapon_range", err: errors.New(`ent: missing required field "Weapon.weapon_range"`)}
+	if v, ok := wc.mutation.WeaponCategory(); ok {
+		if err := weapon.WeaponCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "weapon_category", err: fmt.Errorf(`ent: validator failed for field "Weapon.weapon_category": %w`, err)}
+		}
 	}
-	if _, ok := wc.mutation.EquipmentID(); !ok {
+	if _, ok := wc.mutation.WeaponSubcategory(); !ok {
+		return &ValidationError{Name: "weapon_subcategory", err: errors.New(`ent: missing required field "Weapon.weapon_subcategory"`)}
+	}
+	if v, ok := wc.mutation.WeaponSubcategory(); ok {
+		if err := weapon.WeaponSubcategoryValidator(v); err != nil {
+			return &ValidationError{Name: "weapon_subcategory", err: fmt.Errorf(`ent: validator failed for field "Weapon.weapon_subcategory": %w`, err)}
+		}
+	}
+	if len(wc.mutation.EquipmentIDs()) == 0 {
 		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Weapon.equipment"`)}
 	}
 	return nil
@@ -175,21 +228,66 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 		_node = &Weapon{config: wc.config}
 		_spec = sqlgraph.NewCreateSpec(weapon.Table, sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt))
 	)
-	if value, ok := wc.mutation.Indx(); ok {
-		_spec.SetField(weapon.FieldIndx, field.TypeString, value)
-		_node.Indx = value
-	}
-	if value, ok := wc.mutation.Name(); ok {
-		_spec.SetField(weapon.FieldName, field.TypeString, value)
-		_node.Name = value
-	}
 	if value, ok := wc.mutation.WeaponCategory(); ok {
-		_spec.SetField(weapon.FieldWeaponCategory, field.TypeString, value)
+		_spec.SetField(weapon.FieldWeaponCategory, field.TypeEnum, value)
 		_node.WeaponCategory = value
 	}
-	if value, ok := wc.mutation.WeaponRange(); ok {
-		_spec.SetField(weapon.FieldWeaponRange, field.TypeString, value)
-		_node.WeaponRange = value
+	if value, ok := wc.mutation.WeaponSubcategory(); ok {
+		_spec.SetField(weapon.FieldWeaponSubcategory, field.TypeEnum, value)
+		_node.WeaponSubcategory = value
+	}
+	if value, ok := wc.mutation.RangeNormal(); ok {
+		_spec.SetField(weapon.FieldRangeNormal, field.TypeInt, value)
+		_node.RangeNormal = value
+	}
+	if value, ok := wc.mutation.RangeLong(); ok {
+		_spec.SetField(weapon.FieldRangeLong, field.TypeInt, value)
+		_node.RangeLong = value
+	}
+	if value, ok := wc.mutation.ThrowRangeNormal(); ok {
+		_spec.SetField(weapon.FieldThrowRangeNormal, field.TypeInt, value)
+		_node.ThrowRangeNormal = value
+	}
+	if value, ok := wc.mutation.ThrowRangeLong(); ok {
+		_spec.SetField(weapon.FieldThrowRangeLong, field.TypeInt, value)
+		_node.ThrowRangeLong = value
+	}
+	if value, ok := wc.mutation.DamageDice(); ok {
+		_spec.SetField(weapon.FieldDamageDice, field.TypeString, value)
+		_node.DamageDice = value
+	}
+	if nodes := wc.mutation.PropertiesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   weapon.PropertiesTable,
+			Columns: weapon.PropertiesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(property.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := wc.mutation.DamageTypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapon.DamageTypeTable,
+			Columns: []string{weapon.DamageTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.weapon_damage_type = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := wc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -205,39 +303,7 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.EquipmentID = nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := wc.mutation.WeaponDamageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapon.WeaponDamageTable,
-			Columns: []string{weapon.WeaponDamageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := wc.mutation.WeaponPropertiesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   weapon.WeaponPropertiesTable,
-			Columns: weapon.WeaponPropertiesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weaponproperty.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
+		_node.equipment_weapon = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -246,11 +312,15 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 // WeaponCreateBulk is the builder for creating many Weapon entities in bulk.
 type WeaponCreateBulk struct {
 	config
+	err      error
 	builders []*WeaponCreate
 }
 
 // Save creates the Weapon entities in the database.
 func (wcb *WeaponCreateBulk) Save(ctx context.Context) ([]*Weapon, error) {
+	if wcb.err != nil {
+		return nil, wcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(wcb.builders))
 	nodes := make([]*Weapon, len(wcb.builders))
 	mutators := make([]Mutator, len(wcb.builders))

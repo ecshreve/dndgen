@@ -16,14 +16,20 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldFullName holds the string denoting the full_name field in the database.
-	FieldFullName = "full_name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
+	// FieldFullName holds the string denoting the full_name field in the database.
+	FieldFullName = "full_name"
 	// EdgeSkills holds the string denoting the skills edge name in mutations.
 	EdgeSkills = "skills"
-	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
-	EdgeAbilityBonuses = "ability_bonuses"
+	// EdgeCharacterAbilityScore holds the string denoting the character_ability_score edge name in mutations.
+	EdgeCharacterAbilityScore = "character_ability_score"
+	// EdgeClasses holds the string denoting the classes edge name in mutations.
+	EdgeClasses = "classes"
+	// EdgeRace holds the string denoting the race edge name in mutations.
+	EdgeRace = "race"
+	// EdgeRaceAbilityBonuses holds the string denoting the race_ability_bonuses edge name in mutations.
+	EdgeRaceAbilityBonuses = "race_ability_bonuses"
 	// Table holds the table name of the abilityscore in the database.
 	Table = "ability_scores"
 	// SkillsTable is the table that holds the skills relation/edge.
@@ -32,14 +38,31 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "skill" package.
 	SkillsInverseTable = "skills"
 	// SkillsColumn is the table column denoting the skills relation/edge.
-	SkillsColumn = "skill_ability_score"
-	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge.
-	AbilityBonusesTable = "ability_bonus"
-	// AbilityBonusesInverseTable is the table name for the AbilityBonus entity.
+	SkillsColumn = "ability_score_skills"
+	// CharacterAbilityScoreTable is the table that holds the character_ability_score relation/edge.
+	CharacterAbilityScoreTable = "character_ability_scores"
+	// CharacterAbilityScoreInverseTable is the table name for the CharacterAbilityScore entity.
+	// It exists in this package in order to avoid circular dependency with the "characterabilityscore" package.
+	CharacterAbilityScoreInverseTable = "character_ability_scores"
+	// CharacterAbilityScoreColumn is the table column denoting the character_ability_score relation/edge.
+	CharacterAbilityScoreColumn = "character_ability_score_ability_score"
+	// ClassesTable is the table that holds the classes relation/edge. The primary key declared below.
+	ClassesTable = "class_saving_throws"
+	// ClassesInverseTable is the table name for the Class entity.
+	// It exists in this package in order to avoid circular dependency with the "class" package.
+	ClassesInverseTable = "classes"
+	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
+	RaceTable = "ability_bonus"
+	// RaceInverseTable is the table name for the Race entity.
+	// It exists in this package in order to avoid circular dependency with the "race" package.
+	RaceInverseTable = "races"
+	// RaceAbilityBonusesTable is the table that holds the race_ability_bonuses relation/edge.
+	RaceAbilityBonusesTable = "ability_bonus"
+	// RaceAbilityBonusesInverseTable is the table name for the AbilityBonus entity.
 	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
-	AbilityBonusesInverseTable = "ability_bonus"
-	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
-	AbilityBonusesColumn = "ability_score_id"
+	RaceAbilityBonusesInverseTable = "ability_bonus"
+	// RaceAbilityBonusesColumn is the table column denoting the race_ability_bonuses relation/edge.
+	RaceAbilityBonusesColumn = "ability_score_id"
 )
 
 // Columns holds all SQL columns for abilityscore fields.
@@ -47,25 +70,23 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
-	FieldFullName,
 	FieldDesc,
+	FieldFullName,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "ability_scores"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"proficiency_saving_throw",
-}
+var (
+	// ClassesPrimaryKey and ClassesColumn2 are the table columns denoting the
+	// primary key for the classes relation (M2M).
+	ClassesPrimaryKey = []string{"class_id", "ability_score_id"}
+	// RacePrimaryKey and RaceColumn2 are the table columns denoting the
+	// primary key for the race relation (M2M).
+	RacePrimaryKey = []string{"race_id", "ability_score_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -116,30 +137,93 @@ func BySkills(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByAbilityBonusesCount orders the results by ability_bonuses count.
-func ByAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByCharacterAbilityScoreCount orders the results by character_ability_score count.
+func ByCharacterAbilityScoreCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAbilityBonusesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newCharacterAbilityScoreStep(), opts...)
 	}
 }
 
-// ByAbilityBonuses orders the results by ability_bonuses terms.
-func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByCharacterAbilityScore orders the results by character_ability_score terms.
+func ByCharacterAbilityScore(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newCharacterAbilityScoreStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByClassesCount orders the results by classes count.
+func ByClassesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newClassesStep(), opts...)
+	}
+}
+
+// ByClasses orders the results by classes terms.
+func ByClasses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newClassesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRaceCount orders the results by race count.
+func ByRaceCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRaceStep(), opts...)
+	}
+}
+
+// ByRace orders the results by race terms.
+func ByRace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRaceAbilityBonusesCount orders the results by race_ability_bonuses count.
+func ByRaceAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRaceAbilityBonusesStep(), opts...)
+	}
+}
+
+// ByRaceAbilityBonuses orders the results by race_ability_bonuses terms.
+func ByRaceAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRaceAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newSkillsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SkillsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, SkillsTable, SkillsColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, SkillsTable, SkillsColumn),
 	)
 }
-func newAbilityBonusesStep() *sqlgraph.Step {
+func newCharacterAbilityScoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
+		sqlgraph.To(CharacterAbilityScoreInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CharacterAbilityScoreTable, CharacterAbilityScoreColumn),
+	)
+}
+func newClassesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ClassesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
+	)
+}
+func newRaceStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RaceInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
+	)
+}
+func newRaceAbilityBonusesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RaceAbilityBonusesInverseTable, RaceAbilityBonusesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, RaceAbilityBonusesTable, RaceAbilityBonusesColumn),
 	)
 }

@@ -3,6 +3,10 @@
 package vehicle
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -12,16 +16,16 @@ const (
 	Label = "vehicle"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldIndx holds the string denoting the indx field in the database.
-	FieldIndx = "indx"
-	// FieldName holds the string denoting the name field in the database.
-	FieldName = "name"
 	// FieldVehicleCategory holds the string denoting the vehicle_category field in the database.
 	FieldVehicleCategory = "vehicle_category"
 	// FieldCapacity holds the string denoting the capacity field in the database.
 	FieldCapacity = "capacity"
-	// FieldEquipmentID holds the string denoting the equipment_id field in the database.
-	FieldEquipmentID = "equipment_id"
+	// FieldDesc holds the string denoting the desc field in the database.
+	FieldDesc = "desc"
+	// FieldSpeedQuantity holds the string denoting the speed_quantity field in the database.
+	FieldSpeedQuantity = "speed_quantity"
+	// FieldSpeedUnits holds the string denoting the speed_units field in the database.
+	FieldSpeedUnits = "speed_units"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
 	// Table holds the table name of the vehicle in the database.
@@ -32,17 +36,23 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "equipment_id"
+	EquipmentColumn = "equipment_vehicle"
 )
 
 // Columns holds all SQL columns for vehicle fields.
 var Columns = []string{
 	FieldID,
-	FieldIndx,
-	FieldName,
 	FieldVehicleCategory,
 	FieldCapacity,
-	FieldEquipmentID,
+	FieldDesc,
+	FieldSpeedQuantity,
+	FieldSpeedUnits,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "vehicles"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"equipment_vehicle",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -52,15 +62,60 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
 
-var (
-	// IndxValidator is a validator for the "indx" field. It is called by the builders before save.
-	IndxValidator func(string) error
-	// NameValidator is a validator for the "name" field. It is called by the builders before save.
-	NameValidator func(string) error
+// VehicleCategory defines the type for the "vehicle_category" enum field.
+type VehicleCategory string
+
+// VehicleCategory values.
+const (
+	VehicleCategoryMountsAndOtherAnimals       VehicleCategory = "mounts_and_other_animals"
+	VehicleCategoryTackHarnessAndDrawnVehicles VehicleCategory = "tack_harness_and_drawn_vehicles"
+	VehicleCategoryWaterborne                  VehicleCategory = "waterborne"
 )
+
+func (vc VehicleCategory) String() string {
+	return string(vc)
+}
+
+// VehicleCategoryValidator is a validator for the "vehicle_category" field enum values. It is called by the builders before save.
+func VehicleCategoryValidator(vc VehicleCategory) error {
+	switch vc {
+	case VehicleCategoryMountsAndOtherAnimals, VehicleCategoryTackHarnessAndDrawnVehicles, VehicleCategoryWaterborne:
+		return nil
+	default:
+		return fmt.Errorf("vehicle: invalid enum value for vehicle_category field: %q", vc)
+	}
+}
+
+// SpeedUnits defines the type for the "speed_units" enum field.
+type SpeedUnits string
+
+// SpeedUnits values.
+const (
+	SpeedUnitsMilesPerHour SpeedUnits = "miles_per_hour"
+	SpeedUnitsFeetPerRound SpeedUnits = "feet_per_round"
+)
+
+func (su SpeedUnits) String() string {
+	return string(su)
+}
+
+// SpeedUnitsValidator is a validator for the "speed_units" field enum values. It is called by the builders before save.
+func SpeedUnitsValidator(su SpeedUnits) error {
+	switch su {
+	case SpeedUnitsMilesPerHour, SpeedUnitsFeetPerRound:
+		return nil
+	default:
+		return fmt.Errorf("vehicle: invalid enum value for speed_units field: %q", su)
+	}
+}
 
 // OrderOption defines the ordering options for the Vehicle queries.
 type OrderOption func(*sql.Selector)
@@ -68,16 +123,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByIndx orders the results by the indx field.
-func ByIndx(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIndx, opts...).ToFunc()
-}
-
-// ByName orders the results by the name field.
-func ByName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
 // ByVehicleCategory orders the results by the vehicle_category field.
@@ -90,9 +135,14 @@ func ByCapacity(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCapacity, opts...).ToFunc()
 }
 
-// ByEquipmentID orders the results by the equipment_id field.
-func ByEquipmentID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEquipmentID, opts...).ToFunc()
+// BySpeedQuantity orders the results by the speed_quantity field.
+func BySpeedQuantity(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpeedQuantity, opts...).ToFunc()
+}
+
+// BySpeedUnits orders the results by the speed_units field.
+func BySpeedUnits(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpeedUnits, opts...).ToFunc()
 }
 
 // ByEquipmentField orders the results by equipment field.
@@ -107,4 +157,40 @@ func newEquipmentStep() *sqlgraph.Step {
 		sqlgraph.To(EquipmentInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
 	)
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e VehicleCategory) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *VehicleCategory) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = VehicleCategory(str)
+	if err := VehicleCategoryValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid VehicleCategory", str)
+	}
+	return nil
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e SpeedUnits) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *SpeedUnits) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = SpeedUnits(str)
+	if err := SpeedUnitsValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid SpeedUnits", str)
+	}
+	return nil
 }

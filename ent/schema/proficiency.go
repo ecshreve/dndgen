@@ -3,7 +3,6 @@ package schema
 import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
-	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -13,50 +12,41 @@ type Proficiency struct {
 	ent.Schema
 }
 
-// Mixin of the Proficiency.
-func (Proficiency) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		CommonMixin{},
-	}
-}
-
 // Fields of the Proficiency.
 func (Proficiency) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("proficiency_category").StructTag(`json:"type"`),
-		// field.Enum("proficiency_category").
-		// 	Values("weapons",
-		// 		"armor",
-		// 		"artisans_tools",
-		// 		"vehicles",
-		// 		"gaming_sets",
-		// 		"musical_instruments",
-		// 		"saving_throws",
-		// 		"skills",
-		// 		"other").Default("other"),
+		field.String("indx").
+			NotEmpty().
+			Unique().
+			Annotations(
+				entgql.OrderField("INDX"),
+			),
+		field.String("name").
+			NotEmpty().
+			Annotations(
+				entgql.OrderField("NAME"),
+			),
+		field.String("reference").
+			NotEmpty(),
 	}
 }
 
 // Edges of the Proficiency.
 func (Proficiency) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("classes", Class.Type).
+		edge.From("race", Race.Type).
+			Ref("starting_proficiencies"),
+		edge.From("options", ProficiencyChoice.Type).
+			Ref("proficiencies").
+			Annotations(
+				entgql.Skip(entgql.SkipAll),
+			),
+		edge.From("class", Class.Type).
 			Ref("proficiencies"),
-		edge.From("races", Race.Type).
-			Ref("proficiencies"),
-		edge.From("subraces", Subrace.Type).
-			Ref("proficiencies"),
-		edge.To("choice", ProficiencyChoice.Type),
-		edge.To("skill", Skill.Type),
-		edge.To("equipment", Equipment.Type),
-		edge.To("equipment_category", EquipmentCategory.Type),
-		edge.To("saving_throw", AbilityScore.Type),
-	}
-}
-
-// Annotations of the Proficiency.
-func (Proficiency) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
+		edge.From("character_proficiencies", CharacterProficiency.Type).
+			Ref("proficiency").
+			Annotations(
+				entgql.Skip(entgql.SkipAll),
+			),
 	}
 }

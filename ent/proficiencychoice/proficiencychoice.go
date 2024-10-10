@@ -16,41 +16,33 @@ const (
 	FieldChoose = "choose"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
-	// EdgeProficiency holds the string denoting the proficiency edge name in mutations.
-	EdgeProficiency = "proficiency"
-	// EdgeParentChoice holds the string denoting the parent_choice edge name in mutations.
-	EdgeParentChoice = "parent_choice"
-	// EdgeSubChoice holds the string denoting the sub_choice edge name in mutations.
-	EdgeSubChoice = "sub_choice"
-	// EdgeClass holds the string denoting the class edge name in mutations.
-	EdgeClass = "class"
+	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
+	EdgeProficiencies = "proficiencies"
 	// EdgeRace holds the string denoting the race edge name in mutations.
 	EdgeRace = "race"
+	// EdgeClass holds the string denoting the class edge name in mutations.
+	EdgeClass = "class"
 	// Table holds the table name of the proficiencychoice in the database.
 	Table = "proficiency_choices"
-	// ProficiencyTable is the table that holds the proficiency relation/edge. The primary key declared below.
-	ProficiencyTable = "proficiency_choice"
-	// ProficiencyInverseTable is the table name for the Proficiency entity.
+	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
+	ProficienciesTable = "proficiency_choice_proficiencies"
+	// ProficienciesInverseTable is the table name for the Proficiency entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
-	ProficiencyInverseTable = "proficiencies"
-	// ParentChoiceTable is the table that holds the parent_choice relation/edge.
-	ParentChoiceTable = "proficiency_choices"
-	// ParentChoiceColumn is the table column denoting the parent_choice relation/edge.
-	ParentChoiceColumn = "proficiency_choice_sub_choice"
-	// SubChoiceTable is the table that holds the sub_choice relation/edge.
-	SubChoiceTable = "proficiency_choices"
-	// SubChoiceColumn is the table column denoting the sub_choice relation/edge.
-	SubChoiceColumn = "proficiency_choice_sub_choice"
-	// ClassTable is the table that holds the class relation/edge. The primary key declared below.
-	ClassTable = "class_proficiency_choices"
-	// ClassInverseTable is the table name for the Class entity.
-	// It exists in this package in order to avoid circular dependency with the "class" package.
-	ClassInverseTable = "classes"
-	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
-	RaceTable = "race_proficiency_choice"
+	ProficienciesInverseTable = "proficiencies"
+	// RaceTable is the table that holds the race relation/edge.
+	RaceTable = "proficiency_choices"
 	// RaceInverseTable is the table name for the Race entity.
 	// It exists in this package in order to avoid circular dependency with the "race" package.
 	RaceInverseTable = "races"
+	// RaceColumn is the table column denoting the race relation/edge.
+	RaceColumn = "race_starting_proficiency_options"
+	// ClassTable is the table that holds the class relation/edge.
+	ClassTable = "proficiency_choices"
+	// ClassInverseTable is the table name for the Class entity.
+	// It exists in this package in order to avoid circular dependency with the "class" package.
+	ClassInverseTable = "classes"
+	// ClassColumn is the table column denoting the class relation/edge.
+	ClassColumn = "class_proficiency_options"
 )
 
 // Columns holds all SQL columns for proficiencychoice fields.
@@ -63,19 +55,14 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "proficiency_choices"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"proficiency_choice_sub_choice",
+	"class_proficiency_options",
+	"race_starting_proficiency_options",
 }
 
 var (
-	// ProficiencyPrimaryKey and ProficiencyColumn2 are the table columns denoting the
-	// primary key for the proficiency relation (M2M).
-	ProficiencyPrimaryKey = []string{"proficiency_id", "proficiency_choice_id"}
-	// ClassPrimaryKey and ClassColumn2 are the table columns denoting the
-	// primary key for the class relation (M2M).
-	ClassPrimaryKey = []string{"class_id", "proficiency_choice_id"}
-	// RacePrimaryKey and RaceColumn2 are the table columns denoting the
-	// primary key for the race relation (M2M).
-	RacePrimaryKey = []string{"race_id", "proficiency_choice_id"}
+	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
+	// primary key for the proficiencies relation (M2M).
+	ProficienciesPrimaryKey = []string{"proficiency_choice_id", "proficiency_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -93,6 +80,11 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// ChooseValidator is a validator for the "choose" field. It is called by the builders before save.
+	ChooseValidator func(int) error
+)
+
 // OrderOption defines the ordering options for the ProficiencyChoice queries.
 type OrderOption func(*sql.Selector)
 
@@ -106,105 +98,51 @@ func ByChoose(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldChoose, opts...).ToFunc()
 }
 
-// ByDesc orders the results by the desc field.
-func ByDesc(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDesc, opts...).ToFunc()
-}
-
-// ByProficiencyCount orders the results by proficiency count.
-func ByProficiencyCount(opts ...sql.OrderTermOption) OrderOption {
+// ByProficienciesCount orders the results by proficiencies count.
+func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newProficiencyStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
 	}
 }
 
-// ByProficiency orders the results by proficiency terms.
-func ByProficiency(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByProficiencies orders the results by proficiencies terms.
+func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProficiencyStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByParentChoiceField orders the results by parent_choice field.
-func ByParentChoiceField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByRaceField orders the results by race field.
+func ByRaceField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newParentChoiceStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// BySubChoiceCount orders the results by sub_choice count.
-func BySubChoiceCount(opts ...sql.OrderTermOption) OrderOption {
+// ByClassField orders the results by class field.
+func ByClassField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubChoiceStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newClassStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// BySubChoice orders the results by sub_choice terms.
-func BySubChoice(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubChoiceStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByClassCount orders the results by class count.
-func ByClassCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newClassStep(), opts...)
-	}
-}
-
-// ByClass orders the results by class terms.
-func ByClass(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newClassStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByRaceCount orders the results by race count.
-func ByRaceCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRaceStep(), opts...)
-	}
-}
-
-// ByRace orders the results by race terms.
-func ByRace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newProficiencyStep() *sqlgraph.Step {
+func newProficienciesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProficiencyInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ProficiencyTable, ProficiencyPrimaryKey...),
-	)
-}
-func newParentChoiceStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, ParentChoiceTable, ParentChoiceColumn),
-	)
-}
-func newSubChoiceStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, SubChoiceTable, SubChoiceColumn),
-	)
-}
-func newClassStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ClassInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
+		sqlgraph.To(ProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
 	)
 }
 func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RaceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2O, true, RaceTable, RaceColumn),
+	)
+}
+func newClassStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ClassInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ClassTable, ClassColumn),
 	)
 }

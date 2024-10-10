@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
 )
 
@@ -39,34 +38,19 @@ func (tc *TraitCreate) SetDesc(s []string) *TraitCreate {
 	return tc
 }
 
-// AddRaceIDs adds the "races" edge to the Race entity by IDs.
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
 func (tc *TraitCreate) AddRaceIDs(ids ...int) *TraitCreate {
 	tc.mutation.AddRaceIDs(ids...)
 	return tc
 }
 
-// AddRaces adds the "races" edges to the Race entity.
-func (tc *TraitCreate) AddRaces(r ...*Race) *TraitCreate {
+// AddRace adds the "race" edges to the Race entity.
+func (tc *TraitCreate) AddRace(r ...*Race) *TraitCreate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
 	return tc.AddRaceIDs(ids...)
-}
-
-// AddSubraceIDs adds the "subraces" edge to the Subrace entity by IDs.
-func (tc *TraitCreate) AddSubraceIDs(ids ...int) *TraitCreate {
-	tc.mutation.AddSubraceIDs(ids...)
-	return tc
-}
-
-// AddSubraces adds the "subraces" edges to the Subrace entity.
-func (tc *TraitCreate) AddSubraces(s ...*Subrace) *TraitCreate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return tc.AddSubraceIDs(ids...)
 }
 
 // Mutation returns the TraitMutation object of the builder.
@@ -119,9 +103,6 @@ func (tc *TraitCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Trait.name": %w`, err)}
 		}
 	}
-	if _, ok := tc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Trait.desc"`)}
-	}
 	return nil
 }
 
@@ -160,31 +141,15 @@ func (tc *TraitCreate) createSpec() (*Trait, *sqlgraph.CreateSpec) {
 		_spec.SetField(trait.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
 	}
-	if nodes := tc.mutation.RacesIDs(); len(nodes) > 0 {
+	if nodes := tc.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   trait.RacesTable,
-			Columns: trait.RacesPrimaryKey,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := tc.mutation.SubracesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   trait.SubracesTable,
-			Columns: trait.SubracesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -198,11 +163,15 @@ func (tc *TraitCreate) createSpec() (*Trait, *sqlgraph.CreateSpec) {
 // TraitCreateBulk is the builder for creating many Trait entities in bulk.
 type TraitCreateBulk struct {
 	config
+	err      error
 	builders []*TraitCreate
 }
 
 // Save creates the Trait entities in the database.
 func (tcb *TraitCreateBulk) Save(ctx context.Context) ([]*Trait, error) {
+	if tcb.err != nil {
+		return nil, tcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(tcb.builders))
 	nodes := make([]*Trait, len(tcb.builders))
 	mutators := make([]Mutator, len(tcb.builders))

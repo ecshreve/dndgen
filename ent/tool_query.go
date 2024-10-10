@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -23,6 +24,7 @@ type ToolQuery struct {
 	inters        []Interceptor
 	predicates    []predicate.Tool
 	withEquipment *EquipmentQuery
+	withFKs       bool
 	modifiers     []func(*sql.Selector)
 	loadTotal     []func(context.Context, []*Tool) error
 	// intermediate query (i.e. traversal path).
@@ -86,7 +88,7 @@ func (tq *ToolQuery) QueryEquipment() *EquipmentQuery {
 // First returns the first Tool entity from the query.
 // Returns a *NotFoundError when no Tool was found.
 func (tq *ToolQuery) First(ctx context.Context) (*Tool, error) {
-	nodes, err := tq.Limit(1).All(setContextOp(ctx, tq.ctx, "First"))
+	nodes, err := tq.Limit(1).All(setContextOp(ctx, tq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +111,7 @@ func (tq *ToolQuery) FirstX(ctx context.Context) *Tool {
 // Returns a *NotFoundError when no Tool ID was found.
 func (tq *ToolQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = tq.Limit(1).IDs(setContextOp(ctx, tq.ctx, "FirstID")); err != nil {
+	if ids, err = tq.Limit(1).IDs(setContextOp(ctx, tq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -132,7 +134,7 @@ func (tq *ToolQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one Tool entity is found.
 // Returns a *NotFoundError when no Tool entities are found.
 func (tq *ToolQuery) Only(ctx context.Context) (*Tool, error) {
-	nodes, err := tq.Limit(2).All(setContextOp(ctx, tq.ctx, "Only"))
+	nodes, err := tq.Limit(2).All(setContextOp(ctx, tq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +162,7 @@ func (tq *ToolQuery) OnlyX(ctx context.Context) *Tool {
 // Returns a *NotFoundError when no entities are found.
 func (tq *ToolQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = tq.Limit(2).IDs(setContextOp(ctx, tq.ctx, "OnlyID")); err != nil {
+	if ids, err = tq.Limit(2).IDs(setContextOp(ctx, tq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -185,7 +187,7 @@ func (tq *ToolQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Tools.
 func (tq *ToolQuery) All(ctx context.Context) ([]*Tool, error) {
-	ctx = setContextOp(ctx, tq.ctx, "All")
+	ctx = setContextOp(ctx, tq.ctx, ent.OpQueryAll)
 	if err := tq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -207,7 +209,7 @@ func (tq *ToolQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if tq.ctx.Unique == nil && tq.path != nil {
 		tq.Unique(true)
 	}
-	ctx = setContextOp(ctx, tq.ctx, "IDs")
+	ctx = setContextOp(ctx, tq.ctx, ent.OpQueryIDs)
 	if err = tq.Select(tool.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -225,7 +227,7 @@ func (tq *ToolQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (tq *ToolQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, tq.ctx, "Count")
+	ctx = setContextOp(ctx, tq.ctx, ent.OpQueryCount)
 	if err := tq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -243,7 +245,7 @@ func (tq *ToolQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (tq *ToolQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, tq.ctx, "Exist")
+	ctx = setContextOp(ctx, tq.ctx, ent.OpQueryExist)
 	switch _, err := tq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -299,12 +301,12 @@ func (tq *ToolQuery) WithEquipment(opts ...func(*EquipmentQuery)) *ToolQuery {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"index"`
+//		ToolCategory string `json:"tool_category,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Tool.Query().
-//		GroupBy(tool.FieldIndx).
+//		GroupBy(tool.FieldToolCategory).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (tq *ToolQuery) GroupBy(field string, fields ...string) *ToolGroupBy {
@@ -322,11 +324,11 @@ func (tq *ToolQuery) GroupBy(field string, fields ...string) *ToolGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"index"`
+//		ToolCategory string `json:"tool_category,omitempty"`
 //	}
 //
 //	client.Tool.Query().
-//		Select(tool.FieldIndx).
+//		Select(tool.FieldToolCategory).
 //		Scan(ctx, &v)
 func (tq *ToolQuery) Select(fields ...string) *ToolSelect {
 	tq.ctx.Fields = append(tq.ctx.Fields, fields...)
@@ -370,11 +372,18 @@ func (tq *ToolQuery) prepareQuery(ctx context.Context) error {
 func (tq *ToolQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tool, error) {
 	var (
 		nodes       = []*Tool{}
+		withFKs     = tq.withFKs
 		_spec       = tq.querySpec()
 		loadedTypes = [1]bool{
 			tq.withEquipment != nil,
 		}
 	)
+	if tq.withEquipment != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, tool.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Tool).scanValues(nil, columns)
 	}
@@ -414,7 +423,10 @@ func (tq *ToolQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Tool)
 	for i := range nodes {
-		fk := nodes[i].EquipmentID
+		if nodes[i].equipment_tool == nil {
+			continue
+		}
+		fk := *nodes[i].equipment_tool
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -431,7 +443,7 @@ func (tq *ToolQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_tool" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -467,9 +479,6 @@ func (tq *ToolQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != tool.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if tq.withEquipment != nil {
-			_spec.Node.AddColumnOnce(tool.FieldEquipmentID)
 		}
 	}
 	if ps := tq.predicates; len(ps) > 0 {
@@ -541,7 +550,7 @@ func (tgb *ToolGroupBy) Aggregate(fns ...AggregateFunc) *ToolGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (tgb *ToolGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, tgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, tgb.build.ctx, ent.OpQueryGroupBy)
 	if err := tgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -589,7 +598,7 @@ func (ts *ToolSelect) Aggregate(fns ...AggregateFunc) *ToolSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ts *ToolSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ts.ctx, "Select")
+	ctx = setContextOp(ctx, ts.ctx, ent.OpQuerySelect)
 	if err := ts.prepareQuery(ctx); err != nil {
 		return err
 	}

@@ -20,21 +20,9 @@ type VehicleCreate struct {
 	hooks    []Hook
 }
 
-// SetIndx sets the "indx" field.
-func (vc *VehicleCreate) SetIndx(s string) *VehicleCreate {
-	vc.mutation.SetIndx(s)
-	return vc
-}
-
-// SetName sets the "name" field.
-func (vc *VehicleCreate) SetName(s string) *VehicleCreate {
-	vc.mutation.SetName(s)
-	return vc
-}
-
 // SetVehicleCategory sets the "vehicle_category" field.
-func (vc *VehicleCreate) SetVehicleCategory(s string) *VehicleCreate {
-	vc.mutation.SetVehicleCategory(s)
+func (vc *VehicleCreate) SetVehicleCategory(value vehicle.VehicleCategory) *VehicleCreate {
+	vc.mutation.SetVehicleCategory(value)
 	return vc
 }
 
@@ -44,9 +32,51 @@ func (vc *VehicleCreate) SetCapacity(s string) *VehicleCreate {
 	return vc
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (vc *VehicleCreate) SetEquipmentID(i int) *VehicleCreate {
-	vc.mutation.SetEquipmentID(i)
+// SetNillableCapacity sets the "capacity" field if the given value is not nil.
+func (vc *VehicleCreate) SetNillableCapacity(s *string) *VehicleCreate {
+	if s != nil {
+		vc.SetCapacity(*s)
+	}
+	return vc
+}
+
+// SetDesc sets the "desc" field.
+func (vc *VehicleCreate) SetDesc(s []string) *VehicleCreate {
+	vc.mutation.SetDesc(s)
+	return vc
+}
+
+// SetSpeedQuantity sets the "speed_quantity" field.
+func (vc *VehicleCreate) SetSpeedQuantity(f float64) *VehicleCreate {
+	vc.mutation.SetSpeedQuantity(f)
+	return vc
+}
+
+// SetNillableSpeedQuantity sets the "speed_quantity" field if the given value is not nil.
+func (vc *VehicleCreate) SetNillableSpeedQuantity(f *float64) *VehicleCreate {
+	if f != nil {
+		vc.SetSpeedQuantity(*f)
+	}
+	return vc
+}
+
+// SetSpeedUnits sets the "speed_units" field.
+func (vc *VehicleCreate) SetSpeedUnits(vu vehicle.SpeedUnits) *VehicleCreate {
+	vc.mutation.SetSpeedUnits(vu)
+	return vc
+}
+
+// SetNillableSpeedUnits sets the "speed_units" field if the given value is not nil.
+func (vc *VehicleCreate) SetNillableSpeedUnits(vu *vehicle.SpeedUnits) *VehicleCreate {
+	if vu != nil {
+		vc.SetSpeedUnits(*vu)
+	}
+	return vc
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (vc *VehicleCreate) SetEquipmentID(id int) *VehicleCreate {
+	vc.mutation.SetEquipmentID(id)
 	return vc
 }
 
@@ -89,32 +119,20 @@ func (vc *VehicleCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (vc *VehicleCreate) check() error {
-	if _, ok := vc.mutation.Indx(); !ok {
-		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Vehicle.indx"`)}
-	}
-	if v, ok := vc.mutation.Indx(); ok {
-		if err := vehicle.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Vehicle.indx": %w`, err)}
-		}
-	}
-	if _, ok := vc.mutation.Name(); !ok {
-		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Vehicle.name"`)}
-	}
-	if v, ok := vc.mutation.Name(); ok {
-		if err := vehicle.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Vehicle.name": %w`, err)}
-		}
-	}
 	if _, ok := vc.mutation.VehicleCategory(); !ok {
 		return &ValidationError{Name: "vehicle_category", err: errors.New(`ent: missing required field "Vehicle.vehicle_category"`)}
 	}
-	if _, ok := vc.mutation.Capacity(); !ok {
-		return &ValidationError{Name: "capacity", err: errors.New(`ent: missing required field "Vehicle.capacity"`)}
+	if v, ok := vc.mutation.VehicleCategory(); ok {
+		if err := vehicle.VehicleCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "vehicle_category", err: fmt.Errorf(`ent: validator failed for field "Vehicle.vehicle_category": %w`, err)}
+		}
 	}
-	if _, ok := vc.mutation.EquipmentID(); !ok {
-		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "Vehicle.equipment_id"`)}
+	if v, ok := vc.mutation.SpeedUnits(); ok {
+		if err := vehicle.SpeedUnitsValidator(v); err != nil {
+			return &ValidationError{Name: "speed_units", err: fmt.Errorf(`ent: validator failed for field "Vehicle.speed_units": %w`, err)}
+		}
 	}
-	if _, ok := vc.mutation.EquipmentID(); !ok {
+	if len(vc.mutation.EquipmentIDs()) == 0 {
 		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Vehicle.equipment"`)}
 	}
 	return nil
@@ -143,21 +161,25 @@ func (vc *VehicleCreate) createSpec() (*Vehicle, *sqlgraph.CreateSpec) {
 		_node = &Vehicle{config: vc.config}
 		_spec = sqlgraph.NewCreateSpec(vehicle.Table, sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt))
 	)
-	if value, ok := vc.mutation.Indx(); ok {
-		_spec.SetField(vehicle.FieldIndx, field.TypeString, value)
-		_node.Indx = value
-	}
-	if value, ok := vc.mutation.Name(); ok {
-		_spec.SetField(vehicle.FieldName, field.TypeString, value)
-		_node.Name = value
-	}
 	if value, ok := vc.mutation.VehicleCategory(); ok {
-		_spec.SetField(vehicle.FieldVehicleCategory, field.TypeString, value)
+		_spec.SetField(vehicle.FieldVehicleCategory, field.TypeEnum, value)
 		_node.VehicleCategory = value
 	}
 	if value, ok := vc.mutation.Capacity(); ok {
 		_spec.SetField(vehicle.FieldCapacity, field.TypeString, value)
 		_node.Capacity = value
+	}
+	if value, ok := vc.mutation.Desc(); ok {
+		_spec.SetField(vehicle.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
+	}
+	if value, ok := vc.mutation.SpeedQuantity(); ok {
+		_spec.SetField(vehicle.FieldSpeedQuantity, field.TypeFloat64, value)
+		_node.SpeedQuantity = value
+	}
+	if value, ok := vc.mutation.SpeedUnits(); ok {
+		_spec.SetField(vehicle.FieldSpeedUnits, field.TypeEnum, value)
+		_node.SpeedUnits = value
 	}
 	if nodes := vc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -173,7 +195,7 @@ func (vc *VehicleCreate) createSpec() (*Vehicle, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.EquipmentID = nodes[0]
+		_node.equipment_vehicle = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -182,11 +204,15 @@ func (vc *VehicleCreate) createSpec() (*Vehicle, *sqlgraph.CreateSpec) {
 // VehicleCreateBulk is the builder for creating many Vehicle entities in bulk.
 type VehicleCreateBulk struct {
 	config
+	err      error
 	builders []*VehicleCreate
 }
 
 // Save creates the Vehicle entities in the database.
 func (vcb *VehicleCreateBulk) Save(ctx context.Context) ([]*Vehicle, error) {
+	if vcb.err != nil {
+		return nil, vcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(vcb.builders))
 	nodes := make([]*Vehicle, len(vcb.builders))
 	mutators := make([]Mutator, len(vcb.builders))

@@ -1,9 +1,7 @@
 package schema
 
 import (
-	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
-	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -16,33 +14,40 @@ type Language struct {
 // Mixin of the Language.
 func (Language) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		BaseGQLMixin{},
 	}
 }
 
 // Fields of the Language.
 func (Language) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("desc").StructTag(`json:"desc,omitempty"`),
-		field.Enum("language_type").
-			Values("STANDARD", "EXOTIC").Default("STANDARD").
-			StructTag(`json:"type"`),
-		field.Enum("script").Optional().
-			Values("Common", "Dwarvish", "Elvish", "Infernal", "Draconic", "Celestial", "Abyssal", "Giant", "Gnomish", "Goblin", "Halfling", "Orc", "Other").Default("Common"),
+		field.Enum("language_type").StructTag(`json:"type"`).
+			Values(
+				"STANDARD",
+				"EXOTIC",
+			).
+			Default("STANDARD"),
+		field.Enum("script").
+			Values(
+				"Common",
+				"Dwarvish",
+				"Elvish",
+				"Infernal",
+				"Draconic",
+				"Celestial",
+				"Abyssal",
+				"Giant",
+				"Gnomish", "Goblin", "Halfling", "Orc", "Other").
+			Default("Common"),
 	}
 }
 
 // Edges of the Language.
 func (Language) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("race_speakers", Race.Type).
+		edge.From("race", Race.Type).
 			Ref("languages"),
-	}
-}
-
-// Annotations of the Language.
-func (Language) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
+		edge.From("options", LanguageChoice.Type).
+			Ref("languages"),
 	}
 }

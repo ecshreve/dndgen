@@ -13,7 +13,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
 )
 
@@ -36,9 +35,25 @@ func (tu *TraitUpdate) SetIndx(s string) *TraitUpdate {
 	return tu
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (tu *TraitUpdate) SetNillableIndx(s *string) *TraitUpdate {
+	if s != nil {
+		tu.SetIndx(*s)
+	}
+	return tu
+}
+
 // SetName sets the "name" field.
 func (tu *TraitUpdate) SetName(s string) *TraitUpdate {
 	tu.mutation.SetName(s)
+	return tu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (tu *TraitUpdate) SetNillableName(s *string) *TraitUpdate {
+	if s != nil {
+		tu.SetName(*s)
+	}
 	return tu
 }
 
@@ -54,14 +69,20 @@ func (tu *TraitUpdate) AppendDesc(s []string) *TraitUpdate {
 	return tu
 }
 
-// AddRaceIDs adds the "races" edge to the Race entity by IDs.
+// ClearDesc clears the value of the "desc" field.
+func (tu *TraitUpdate) ClearDesc() *TraitUpdate {
+	tu.mutation.ClearDesc()
+	return tu
+}
+
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
 func (tu *TraitUpdate) AddRaceIDs(ids ...int) *TraitUpdate {
 	tu.mutation.AddRaceIDs(ids...)
 	return tu
 }
 
-// AddRaces adds the "races" edges to the Race entity.
-func (tu *TraitUpdate) AddRaces(r ...*Race) *TraitUpdate {
+// AddRace adds the "race" edges to the Race entity.
+func (tu *TraitUpdate) AddRace(r ...*Race) *TraitUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -69,66 +90,30 @@ func (tu *TraitUpdate) AddRaces(r ...*Race) *TraitUpdate {
 	return tu.AddRaceIDs(ids...)
 }
 
-// AddSubraceIDs adds the "subraces" edge to the Subrace entity by IDs.
-func (tu *TraitUpdate) AddSubraceIDs(ids ...int) *TraitUpdate {
-	tu.mutation.AddSubraceIDs(ids...)
-	return tu
-}
-
-// AddSubraces adds the "subraces" edges to the Subrace entity.
-func (tu *TraitUpdate) AddSubraces(s ...*Subrace) *TraitUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return tu.AddSubraceIDs(ids...)
-}
-
 // Mutation returns the TraitMutation object of the builder.
 func (tu *TraitUpdate) Mutation() *TraitMutation {
 	return tu.mutation
 }
 
-// ClearRaces clears all "races" edges to the Race entity.
-func (tu *TraitUpdate) ClearRaces() *TraitUpdate {
-	tu.mutation.ClearRaces()
+// ClearRace clears all "race" edges to the Race entity.
+func (tu *TraitUpdate) ClearRace() *TraitUpdate {
+	tu.mutation.ClearRace()
 	return tu
 }
 
-// RemoveRaceIDs removes the "races" edge to Race entities by IDs.
+// RemoveRaceIDs removes the "race" edge to Race entities by IDs.
 func (tu *TraitUpdate) RemoveRaceIDs(ids ...int) *TraitUpdate {
 	tu.mutation.RemoveRaceIDs(ids...)
 	return tu
 }
 
-// RemoveRaces removes "races" edges to Race entities.
-func (tu *TraitUpdate) RemoveRaces(r ...*Race) *TraitUpdate {
+// RemoveRace removes "race" edges to Race entities.
+func (tu *TraitUpdate) RemoveRace(r ...*Race) *TraitUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
 	return tu.RemoveRaceIDs(ids...)
-}
-
-// ClearSubraces clears all "subraces" edges to the Subrace entity.
-func (tu *TraitUpdate) ClearSubraces() *TraitUpdate {
-	tu.mutation.ClearSubraces()
-	return tu
-}
-
-// RemoveSubraceIDs removes the "subraces" edge to Subrace entities by IDs.
-func (tu *TraitUpdate) RemoveSubraceIDs(ids ...int) *TraitUpdate {
-	tu.mutation.RemoveSubraceIDs(ids...)
-	return tu
-}
-
-// RemoveSubraces removes "subraces" edges to Subrace entities.
-func (tu *TraitUpdate) RemoveSubraces(s ...*Subrace) *TraitUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return tu.RemoveSubraceIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -199,12 +184,15 @@ func (tu *TraitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, trait.FieldDesc, value)
 		})
 	}
-	if tu.mutation.RacesCleared() {
+	if tu.mutation.DescCleared() {
+		_spec.ClearField(trait.FieldDesc, field.TypeJSON)
+	}
+	if tu.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   trait.RacesTable,
-			Columns: trait.RacesPrimaryKey,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -212,28 +200,12 @@ func (tu *TraitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedRacesIDs(); len(nodes) > 0 && !tu.mutation.RacesCleared() {
+	if nodes := tu.mutation.RemovedRaceIDs(); len(nodes) > 0 && !tu.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   trait.RacesTable,
-			Columns: trait.RacesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.RacesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   trait.RacesTable,
-			Columns: trait.RacesPrimaryKey,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -242,46 +214,17 @@ func (tu *TraitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if tu.mutation.SubracesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   trait.SubracesTable,
-			Columns: trait.SubracesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedSubracesIDs(); len(nodes) > 0 && !tu.mutation.SubracesCleared() {
+	if nodes := tu.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   trait.SubracesTable,
-			Columns: trait.SubracesPrimaryKey,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.SubracesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   trait.SubracesTable,
-			Columns: trait.SubracesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -315,9 +258,25 @@ func (tuo *TraitUpdateOne) SetIndx(s string) *TraitUpdateOne {
 	return tuo
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (tuo *TraitUpdateOne) SetNillableIndx(s *string) *TraitUpdateOne {
+	if s != nil {
+		tuo.SetIndx(*s)
+	}
+	return tuo
+}
+
 // SetName sets the "name" field.
 func (tuo *TraitUpdateOne) SetName(s string) *TraitUpdateOne {
 	tuo.mutation.SetName(s)
+	return tuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (tuo *TraitUpdateOne) SetNillableName(s *string) *TraitUpdateOne {
+	if s != nil {
+		tuo.SetName(*s)
+	}
 	return tuo
 }
 
@@ -333,14 +292,20 @@ func (tuo *TraitUpdateOne) AppendDesc(s []string) *TraitUpdateOne {
 	return tuo
 }
 
-// AddRaceIDs adds the "races" edge to the Race entity by IDs.
+// ClearDesc clears the value of the "desc" field.
+func (tuo *TraitUpdateOne) ClearDesc() *TraitUpdateOne {
+	tuo.mutation.ClearDesc()
+	return tuo
+}
+
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
 func (tuo *TraitUpdateOne) AddRaceIDs(ids ...int) *TraitUpdateOne {
 	tuo.mutation.AddRaceIDs(ids...)
 	return tuo
 }
 
-// AddRaces adds the "races" edges to the Race entity.
-func (tuo *TraitUpdateOne) AddRaces(r ...*Race) *TraitUpdateOne {
+// AddRace adds the "race" edges to the Race entity.
+func (tuo *TraitUpdateOne) AddRace(r ...*Race) *TraitUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
@@ -348,66 +313,30 @@ func (tuo *TraitUpdateOne) AddRaces(r ...*Race) *TraitUpdateOne {
 	return tuo.AddRaceIDs(ids...)
 }
 
-// AddSubraceIDs adds the "subraces" edge to the Subrace entity by IDs.
-func (tuo *TraitUpdateOne) AddSubraceIDs(ids ...int) *TraitUpdateOne {
-	tuo.mutation.AddSubraceIDs(ids...)
-	return tuo
-}
-
-// AddSubraces adds the "subraces" edges to the Subrace entity.
-func (tuo *TraitUpdateOne) AddSubraces(s ...*Subrace) *TraitUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return tuo.AddSubraceIDs(ids...)
-}
-
 // Mutation returns the TraitMutation object of the builder.
 func (tuo *TraitUpdateOne) Mutation() *TraitMutation {
 	return tuo.mutation
 }
 
-// ClearRaces clears all "races" edges to the Race entity.
-func (tuo *TraitUpdateOne) ClearRaces() *TraitUpdateOne {
-	tuo.mutation.ClearRaces()
+// ClearRace clears all "race" edges to the Race entity.
+func (tuo *TraitUpdateOne) ClearRace() *TraitUpdateOne {
+	tuo.mutation.ClearRace()
 	return tuo
 }
 
-// RemoveRaceIDs removes the "races" edge to Race entities by IDs.
+// RemoveRaceIDs removes the "race" edge to Race entities by IDs.
 func (tuo *TraitUpdateOne) RemoveRaceIDs(ids ...int) *TraitUpdateOne {
 	tuo.mutation.RemoveRaceIDs(ids...)
 	return tuo
 }
 
-// RemoveRaces removes "races" edges to Race entities.
-func (tuo *TraitUpdateOne) RemoveRaces(r ...*Race) *TraitUpdateOne {
+// RemoveRace removes "race" edges to Race entities.
+func (tuo *TraitUpdateOne) RemoveRace(r ...*Race) *TraitUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
 	return tuo.RemoveRaceIDs(ids...)
-}
-
-// ClearSubraces clears all "subraces" edges to the Subrace entity.
-func (tuo *TraitUpdateOne) ClearSubraces() *TraitUpdateOne {
-	tuo.mutation.ClearSubraces()
-	return tuo
-}
-
-// RemoveSubraceIDs removes the "subraces" edge to Subrace entities by IDs.
-func (tuo *TraitUpdateOne) RemoveSubraceIDs(ids ...int) *TraitUpdateOne {
-	tuo.mutation.RemoveSubraceIDs(ids...)
-	return tuo
-}
-
-// RemoveSubraces removes "subraces" edges to Subrace entities.
-func (tuo *TraitUpdateOne) RemoveSubraces(s ...*Subrace) *TraitUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return tuo.RemoveSubraceIDs(ids...)
 }
 
 // Where appends a list predicates to the TraitUpdate builder.
@@ -508,12 +437,15 @@ func (tuo *TraitUpdateOne) sqlSave(ctx context.Context) (_node *Trait, err error
 			sqljson.Append(u, trait.FieldDesc, value)
 		})
 	}
-	if tuo.mutation.RacesCleared() {
+	if tuo.mutation.DescCleared() {
+		_spec.ClearField(trait.FieldDesc, field.TypeJSON)
+	}
+	if tuo.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   trait.RacesTable,
-			Columns: trait.RacesPrimaryKey,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -521,28 +453,12 @@ func (tuo *TraitUpdateOne) sqlSave(ctx context.Context) (_node *Trait, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedRacesIDs(); len(nodes) > 0 && !tuo.mutation.RacesCleared() {
+	if nodes := tuo.mutation.RemovedRaceIDs(); len(nodes) > 0 && !tuo.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   trait.RacesTable,
-			Columns: trait.RacesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.RacesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   trait.RacesTable,
-			Columns: trait.RacesPrimaryKey,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -551,46 +467,17 @@ func (tuo *TraitUpdateOne) sqlSave(ctx context.Context) (_node *Trait, err error
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if tuo.mutation.SubracesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   trait.SubracesTable,
-			Columns: trait.SubracesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedSubracesIDs(); len(nodes) > 0 && !tuo.mutation.SubracesCleared() {
+	if nodes := tuo.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   trait.SubracesTable,
-			Columns: trait.SubracesPrimaryKey,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.SubracesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   trait.SubracesTable,
-			Columns: trait.SubracesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

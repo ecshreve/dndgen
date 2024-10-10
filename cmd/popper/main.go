@@ -1,6 +1,3 @@
-//go:build ignore
-// +build ignore
-
 // Populates a sqlite database file with data.
 //
 // Usage:
@@ -10,29 +7,46 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"strings"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql/schema"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
-
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/internal/popper"
 
+	_ "github.com/ecshreve/dndgen/ent/runtime"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
 	log.SetLevel(log.DebugLevel)
 	log.SetReportCaller(true)
+	log.SetCallerFormatter(func(file string, line int, _ string) string {
+		return fmt.Sprintf("%s:%d", strings.Replace(file, "/home/eric/repos/dndgen/", "", 1), line)
+	})
+	log.SetTimeFormat("15:04:05")
+	styles := log.DefaultStyles()
+	styles.Keys["ceq"] = lipgloss.NewStyle().Background(lipgloss.Color("204"))
+	styles.Keys["weapon"] = lipgloss.NewStyle().Background(lipgloss.Color("120"))
+	styles.Keys["armor"] = lipgloss.NewStyle().Background(lipgloss.Color("135"))
+	styles.Keys["tool"] = lipgloss.NewStyle().Background(lipgloss.Color("184"))
+	styles.Keys["gear"] = lipgloss.NewStyle().Background(lipgloss.Color("130"))
+	styles.Keys["vehicle"] = lipgloss.NewStyle().Background(lipgloss.Color("166"))
+	styles.Keys["choice"] = lipgloss.NewStyle().Background(lipgloss.Color("202"))
+	styles.Keys["proficiency"] = lipgloss.NewStyle().Background(lipgloss.Color("204"))
+	log.SetStyles(styles)
 	log.Info("Starting dndgen/popper...")
 
 	ctx := context.Background()
 
+	dbname := "dev.db"
 	// Get command-line arguments
-	dbname := os.Args[1]
-	if dbname == "" {
-		dbname = "dev_default.db"
+	if len(os.Args) == 2 {
+		dbname = os.Args[1]
 	}
 
 	log.Info("Using database", "dbname", dbname)
@@ -55,8 +69,11 @@ func main() {
 	}
 
 	log.Info("Populating database...")
-	p := popper.NewPopper(ctx, client)
+	p := popper.NewPopper(ctx, client, "data")
 	if err := p.PopulateAll(ctx); err != nil {
+		log.Fatal(err)
+	}
+	if err := p.PopulateCustom(ctx); err != nil {
 		log.Fatal(err)
 	}
 

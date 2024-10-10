@@ -6,73 +6,71 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-type EquipmentChoice struct {
-	ent.Schema
-}
-
-func (EquipmentChoice) Fields() []ent.Field {
-	return []ent.Field{
-		field.Int("choose"),
-		field.String("desc").Optional(),
-	}
-}
-
-func (EquipmentChoice) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("class", Class.Type).
-			Ref("equipment_choices"),
-		edge.To("equipment", Equipment.Type),
-	}
-}
-
 type ProficiencyChoice struct {
 	ent.Schema
 }
 
+// Fields of the Choice.
 func (ProficiencyChoice) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("choose"),
-		field.String("desc").Optional(),
+		field.Int("choose").
+			Positive(),
+		field.Strings("desc"),
 	}
 }
 
+// Edges of the Choice.
 func (ProficiencyChoice) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("proficiency", Proficiency.Type).
-			Ref("choice"),
-		edge.To("sub_choice", ProficiencyChoice.Type).
-			From("parent_choice").
+		edge.To("proficiencies", Proficiency.Type),
+		edge.From("race", Race.Type).
+			Ref("starting_proficiency_options").
 			Unique(),
 		edge.From("class", Class.Type).
-			Ref("proficiency_choices"),
-		edge.From("race", Race.Type).
-			Ref("proficiency_choice"),
+			Ref("proficiency_options").
+			Unique(),
 	}
 }
 
-// // Choice holds the schema definition for the Choice entity.
-// type Choice struct {
+// type AbilityBonusChoice struct {
 // 	ent.Schema
 // }
 
 // // Fields of the Choice.
-// func (Choice) Fields() []ent.Field {
+// func (AbilityBonusChoice) Fields() []ent.Field {
 // 	return []ent.Field{
-// 		field.Int("choose"),
-// 		field.String("desc").Optional(),
+// 		field.Int("choose").
+// 			Positive(),
 // 	}
 // }
 
 // // Edges of the Choice.
-// func (Choice) Edges() []ent.Edge {
+// func (AbilityBonusChoice) Edges() []ent.Edge {
 // 	return []ent.Edge{
-// 		edge.To("sub_choices", Choice.Type).
-// 			From("parent_choice").
-// 			Unique(),
-// 		edge.To("proficiency_options", Proficiency.Type),
-// 		edge.From("class", Class.Type).
-// 			Ref("proficiency_choices"),
+// 		edge.To("ability_bonuses", AbilityBonus.Type),
 // 		edge.From("race", Race.Type).
-// 			Ref("starting_proficiency_options"),
+// 			Ref("ability_bonus_options"),
 // 	}
 // }
+
+type LanguageChoice struct {
+	ent.Schema
+}
+
+// Fields of the Choice.
+func (LanguageChoice) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("choose").
+			Positive(),
+	}
+}
+
+// Edges of the Choice.
+func (LanguageChoice) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("languages", Language.Type),
+		edge.From("race", Race.Type).
+			Ref("language_options").
+			Unique(),
+	}
+}

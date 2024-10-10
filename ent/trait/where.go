@@ -193,44 +193,31 @@ func NameContainsFold(v string) predicate.Trait {
 	return predicate.Trait(sql.FieldContainsFold(FieldName, v))
 }
 
-// HasRaces applies the HasEdge predicate on the "races" edge.
-func HasRaces() predicate.Trait {
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.Trait {
+	return predicate.Trait(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.Trait {
+	return predicate.Trait(sql.FieldNotNull(FieldDesc))
+}
+
+// HasRace applies the HasEdge predicate on the "race" edge.
+func HasRace() predicate.Trait {
 	return predicate.Trait(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, RacesTable, RacesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasRacesWith applies the HasEdge predicate on the "races" edge with a given conditions (other predicates).
-func HasRacesWith(preds ...predicate.Race) predicate.Trait {
+// HasRaceWith applies the HasEdge predicate on the "race" edge with a given conditions (other predicates).
+func HasRaceWith(preds ...predicate.Race) predicate.Trait {
 	return predicate.Trait(func(s *sql.Selector) {
-		step := newRacesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasSubraces applies the HasEdge predicate on the "subraces" edge.
-func HasSubraces() predicate.Trait {
-	return predicate.Trait(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, SubracesTable, SubracesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSubracesWith applies the HasEdge predicate on the "subraces" edge with a given conditions (other predicates).
-func HasSubracesWith(preds ...predicate.Subrace) predicate.Trait {
-	return predicate.Trait(func(s *sql.Selector) {
-		step := newSubracesStep()
+		step := newRaceStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -241,32 +228,15 @@ func HasSubracesWith(preds ...predicate.Subrace) predicate.Trait {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Trait) predicate.Trait {
-	return predicate.Trait(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Trait(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Trait) predicate.Trait {
-	return predicate.Trait(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Trait(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Trait) predicate.Trait {
-	return predicate.Trait(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Trait(sql.NotPredicates(p))
 }

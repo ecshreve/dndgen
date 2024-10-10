@@ -4,6 +4,7 @@ package coin
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -60,11 +61,6 @@ func Indx(v string) predicate.Coin {
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Coin {
 	return predicate.Coin(sql.FieldEQ(FieldName, v))
-}
-
-// Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
-func Desc(v string) predicate.Coin {
-	return predicate.Coin(sql.FieldEQ(FieldDesc, v))
 }
 
 // GoldConversionRate applies equality check predicate on the "gold_conversion_rate" field. It's identical to GoldConversionRateEQ.
@@ -202,69 +198,14 @@ func NameContainsFold(v string) predicate.Coin {
 	return predicate.Coin(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescEQ applies the EQ predicate on the "desc" field.
-func DescEQ(v string) predicate.Coin {
-	return predicate.Coin(sql.FieldEQ(FieldDesc, v))
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.Coin {
+	return predicate.Coin(sql.FieldIsNull(FieldDesc))
 }
 
-// DescNEQ applies the NEQ predicate on the "desc" field.
-func DescNEQ(v string) predicate.Coin {
-	return predicate.Coin(sql.FieldNEQ(FieldDesc, v))
-}
-
-// DescIn applies the In predicate on the "desc" field.
-func DescIn(vs ...string) predicate.Coin {
-	return predicate.Coin(sql.FieldIn(FieldDesc, vs...))
-}
-
-// DescNotIn applies the NotIn predicate on the "desc" field.
-func DescNotIn(vs ...string) predicate.Coin {
-	return predicate.Coin(sql.FieldNotIn(FieldDesc, vs...))
-}
-
-// DescGT applies the GT predicate on the "desc" field.
-func DescGT(v string) predicate.Coin {
-	return predicate.Coin(sql.FieldGT(FieldDesc, v))
-}
-
-// DescGTE applies the GTE predicate on the "desc" field.
-func DescGTE(v string) predicate.Coin {
-	return predicate.Coin(sql.FieldGTE(FieldDesc, v))
-}
-
-// DescLT applies the LT predicate on the "desc" field.
-func DescLT(v string) predicate.Coin {
-	return predicate.Coin(sql.FieldLT(FieldDesc, v))
-}
-
-// DescLTE applies the LTE predicate on the "desc" field.
-func DescLTE(v string) predicate.Coin {
-	return predicate.Coin(sql.FieldLTE(FieldDesc, v))
-}
-
-// DescContains applies the Contains predicate on the "desc" field.
-func DescContains(v string) predicate.Coin {
-	return predicate.Coin(sql.FieldContains(FieldDesc, v))
-}
-
-// DescHasPrefix applies the HasPrefix predicate on the "desc" field.
-func DescHasPrefix(v string) predicate.Coin {
-	return predicate.Coin(sql.FieldHasPrefix(FieldDesc, v))
-}
-
-// DescHasSuffix applies the HasSuffix predicate on the "desc" field.
-func DescHasSuffix(v string) predicate.Coin {
-	return predicate.Coin(sql.FieldHasSuffix(FieldDesc, v))
-}
-
-// DescEqualFold applies the EqualFold predicate on the "desc" field.
-func DescEqualFold(v string) predicate.Coin {
-	return predicate.Coin(sql.FieldEqualFold(FieldDesc, v))
-}
-
-// DescContainsFold applies the ContainsFold predicate on the "desc" field.
-func DescContainsFold(v string) predicate.Coin {
-	return predicate.Coin(sql.FieldContainsFold(FieldDesc, v))
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.Coin {
+	return predicate.Coin(sql.FieldNotNull(FieldDesc))
 }
 
 // GoldConversionRateEQ applies the EQ predicate on the "gold_conversion_rate" field.
@@ -307,34 +248,40 @@ func GoldConversionRateLTE(v float64) predicate.Coin {
 	return predicate.Coin(sql.FieldLTE(FieldGoldConversionRate, v))
 }
 
+// HasCosts applies the HasEdge predicate on the "costs" edge.
+func HasCosts() predicate.Coin {
+	return predicate.Coin(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CostsTable, CostsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCostsWith applies the HasEdge predicate on the "costs" edge with a given conditions (other predicates).
+func HasCostsWith(preds ...predicate.Cost) predicate.Coin {
+	return predicate.Coin(func(s *sql.Selector) {
+		step := newCostsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Coin) predicate.Coin {
-	return predicate.Coin(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Coin(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Coin) predicate.Coin {
-	return predicate.Coin(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Coin(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Coin) predicate.Coin {
-	return predicate.Coin(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Coin(sql.NotPredicates(p))
 }

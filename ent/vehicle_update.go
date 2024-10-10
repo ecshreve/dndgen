@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -28,21 +29,17 @@ func (vu *VehicleUpdate) Where(ps ...predicate.Vehicle) *VehicleUpdate {
 	return vu
 }
 
-// SetIndx sets the "indx" field.
-func (vu *VehicleUpdate) SetIndx(s string) *VehicleUpdate {
-	vu.mutation.SetIndx(s)
-	return vu
-}
-
-// SetName sets the "name" field.
-func (vu *VehicleUpdate) SetName(s string) *VehicleUpdate {
-	vu.mutation.SetName(s)
-	return vu
-}
-
 // SetVehicleCategory sets the "vehicle_category" field.
-func (vu *VehicleUpdate) SetVehicleCategory(s string) *VehicleUpdate {
-	vu.mutation.SetVehicleCategory(s)
+func (vu *VehicleUpdate) SetVehicleCategory(vc vehicle.VehicleCategory) *VehicleUpdate {
+	vu.mutation.SetVehicleCategory(vc)
+	return vu
+}
+
+// SetNillableVehicleCategory sets the "vehicle_category" field if the given value is not nil.
+func (vu *VehicleUpdate) SetNillableVehicleCategory(vc *vehicle.VehicleCategory) *VehicleUpdate {
+	if vc != nil {
+		vu.SetVehicleCategory(*vc)
+	}
 	return vu
 }
 
@@ -52,9 +49,88 @@ func (vu *VehicleUpdate) SetCapacity(s string) *VehicleUpdate {
 	return vu
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (vu *VehicleUpdate) SetEquipmentID(i int) *VehicleUpdate {
-	vu.mutation.SetEquipmentID(i)
+// SetNillableCapacity sets the "capacity" field if the given value is not nil.
+func (vu *VehicleUpdate) SetNillableCapacity(s *string) *VehicleUpdate {
+	if s != nil {
+		vu.SetCapacity(*s)
+	}
+	return vu
+}
+
+// ClearCapacity clears the value of the "capacity" field.
+func (vu *VehicleUpdate) ClearCapacity() *VehicleUpdate {
+	vu.mutation.ClearCapacity()
+	return vu
+}
+
+// SetDesc sets the "desc" field.
+func (vu *VehicleUpdate) SetDesc(s []string) *VehicleUpdate {
+	vu.mutation.SetDesc(s)
+	return vu
+}
+
+// AppendDesc appends s to the "desc" field.
+func (vu *VehicleUpdate) AppendDesc(s []string) *VehicleUpdate {
+	vu.mutation.AppendDesc(s)
+	return vu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (vu *VehicleUpdate) ClearDesc() *VehicleUpdate {
+	vu.mutation.ClearDesc()
+	return vu
+}
+
+// SetSpeedQuantity sets the "speed_quantity" field.
+func (vu *VehicleUpdate) SetSpeedQuantity(f float64) *VehicleUpdate {
+	vu.mutation.ResetSpeedQuantity()
+	vu.mutation.SetSpeedQuantity(f)
+	return vu
+}
+
+// SetNillableSpeedQuantity sets the "speed_quantity" field if the given value is not nil.
+func (vu *VehicleUpdate) SetNillableSpeedQuantity(f *float64) *VehicleUpdate {
+	if f != nil {
+		vu.SetSpeedQuantity(*f)
+	}
+	return vu
+}
+
+// AddSpeedQuantity adds f to the "speed_quantity" field.
+func (vu *VehicleUpdate) AddSpeedQuantity(f float64) *VehicleUpdate {
+	vu.mutation.AddSpeedQuantity(f)
+	return vu
+}
+
+// ClearSpeedQuantity clears the value of the "speed_quantity" field.
+func (vu *VehicleUpdate) ClearSpeedQuantity() *VehicleUpdate {
+	vu.mutation.ClearSpeedQuantity()
+	return vu
+}
+
+// SetSpeedUnits sets the "speed_units" field.
+func (vu *VehicleUpdate) SetSpeedUnits(value vehicle.SpeedUnits) *VehicleUpdate {
+	vu.mutation.SetSpeedUnits(value)
+	return vu
+}
+
+// SetNillableSpeedUnits sets the "speed_units" field if the given value is not nil.
+func (vu *VehicleUpdate) SetNillableSpeedUnits(value *vehicle.SpeedUnits) *VehicleUpdate {
+	if value != nil {
+		vu.SetSpeedUnits(*value)
+	}
+	return vu
+}
+
+// ClearSpeedUnits clears the value of the "speed_units" field.
+func (vu *VehicleUpdate) ClearSpeedUnits() *VehicleUpdate {
+	vu.mutation.ClearSpeedUnits()
+	return vu
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (vu *VehicleUpdate) SetEquipmentID(id int) *VehicleUpdate {
+	vu.mutation.SetEquipmentID(id)
 	return vu
 }
 
@@ -103,17 +179,17 @@ func (vu *VehicleUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (vu *VehicleUpdate) check() error {
-	if v, ok := vu.mutation.Indx(); ok {
-		if err := vehicle.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Vehicle.indx": %w`, err)}
+	if v, ok := vu.mutation.VehicleCategory(); ok {
+		if err := vehicle.VehicleCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "vehicle_category", err: fmt.Errorf(`ent: validator failed for field "Vehicle.vehicle_category": %w`, err)}
 		}
 	}
-	if v, ok := vu.mutation.Name(); ok {
-		if err := vehicle.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Vehicle.name": %w`, err)}
+	if v, ok := vu.mutation.SpeedUnits(); ok {
+		if err := vehicle.SpeedUnitsValidator(v); err != nil {
+			return &ValidationError{Name: "speed_units", err: fmt.Errorf(`ent: validator failed for field "Vehicle.speed_units": %w`, err)}
 		}
 	}
-	if _, ok := vu.mutation.EquipmentID(); vu.mutation.EquipmentCleared() && !ok {
+	if vu.mutation.EquipmentCleared() && len(vu.mutation.EquipmentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Vehicle.equipment"`)
 	}
 	return nil
@@ -131,17 +207,40 @@ func (vu *VehicleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := vu.mutation.Indx(); ok {
-		_spec.SetField(vehicle.FieldIndx, field.TypeString, value)
-	}
-	if value, ok := vu.mutation.Name(); ok {
-		_spec.SetField(vehicle.FieldName, field.TypeString, value)
-	}
 	if value, ok := vu.mutation.VehicleCategory(); ok {
-		_spec.SetField(vehicle.FieldVehicleCategory, field.TypeString, value)
+		_spec.SetField(vehicle.FieldVehicleCategory, field.TypeEnum, value)
 	}
 	if value, ok := vu.mutation.Capacity(); ok {
 		_spec.SetField(vehicle.FieldCapacity, field.TypeString, value)
+	}
+	if vu.mutation.CapacityCleared() {
+		_spec.ClearField(vehicle.FieldCapacity, field.TypeString)
+	}
+	if value, ok := vu.mutation.Desc(); ok {
+		_spec.SetField(vehicle.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := vu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, vehicle.FieldDesc, value)
+		})
+	}
+	if vu.mutation.DescCleared() {
+		_spec.ClearField(vehicle.FieldDesc, field.TypeJSON)
+	}
+	if value, ok := vu.mutation.SpeedQuantity(); ok {
+		_spec.SetField(vehicle.FieldSpeedQuantity, field.TypeFloat64, value)
+	}
+	if value, ok := vu.mutation.AddedSpeedQuantity(); ok {
+		_spec.AddField(vehicle.FieldSpeedQuantity, field.TypeFloat64, value)
+	}
+	if vu.mutation.SpeedQuantityCleared() {
+		_spec.ClearField(vehicle.FieldSpeedQuantity, field.TypeFloat64)
+	}
+	if value, ok := vu.mutation.SpeedUnits(); ok {
+		_spec.SetField(vehicle.FieldSpeedUnits, field.TypeEnum, value)
+	}
+	if vu.mutation.SpeedUnitsCleared() {
+		_spec.ClearField(vehicle.FieldSpeedUnits, field.TypeEnum)
 	}
 	if vu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -192,21 +291,17 @@ type VehicleUpdateOne struct {
 	mutation *VehicleMutation
 }
 
-// SetIndx sets the "indx" field.
-func (vuo *VehicleUpdateOne) SetIndx(s string) *VehicleUpdateOne {
-	vuo.mutation.SetIndx(s)
-	return vuo
-}
-
-// SetName sets the "name" field.
-func (vuo *VehicleUpdateOne) SetName(s string) *VehicleUpdateOne {
-	vuo.mutation.SetName(s)
-	return vuo
-}
-
 // SetVehicleCategory sets the "vehicle_category" field.
-func (vuo *VehicleUpdateOne) SetVehicleCategory(s string) *VehicleUpdateOne {
-	vuo.mutation.SetVehicleCategory(s)
+func (vuo *VehicleUpdateOne) SetVehicleCategory(vc vehicle.VehicleCategory) *VehicleUpdateOne {
+	vuo.mutation.SetVehicleCategory(vc)
+	return vuo
+}
+
+// SetNillableVehicleCategory sets the "vehicle_category" field if the given value is not nil.
+func (vuo *VehicleUpdateOne) SetNillableVehicleCategory(vc *vehicle.VehicleCategory) *VehicleUpdateOne {
+	if vc != nil {
+		vuo.SetVehicleCategory(*vc)
+	}
 	return vuo
 }
 
@@ -216,9 +311,88 @@ func (vuo *VehicleUpdateOne) SetCapacity(s string) *VehicleUpdateOne {
 	return vuo
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (vuo *VehicleUpdateOne) SetEquipmentID(i int) *VehicleUpdateOne {
-	vuo.mutation.SetEquipmentID(i)
+// SetNillableCapacity sets the "capacity" field if the given value is not nil.
+func (vuo *VehicleUpdateOne) SetNillableCapacity(s *string) *VehicleUpdateOne {
+	if s != nil {
+		vuo.SetCapacity(*s)
+	}
+	return vuo
+}
+
+// ClearCapacity clears the value of the "capacity" field.
+func (vuo *VehicleUpdateOne) ClearCapacity() *VehicleUpdateOne {
+	vuo.mutation.ClearCapacity()
+	return vuo
+}
+
+// SetDesc sets the "desc" field.
+func (vuo *VehicleUpdateOne) SetDesc(s []string) *VehicleUpdateOne {
+	vuo.mutation.SetDesc(s)
+	return vuo
+}
+
+// AppendDesc appends s to the "desc" field.
+func (vuo *VehicleUpdateOne) AppendDesc(s []string) *VehicleUpdateOne {
+	vuo.mutation.AppendDesc(s)
+	return vuo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (vuo *VehicleUpdateOne) ClearDesc() *VehicleUpdateOne {
+	vuo.mutation.ClearDesc()
+	return vuo
+}
+
+// SetSpeedQuantity sets the "speed_quantity" field.
+func (vuo *VehicleUpdateOne) SetSpeedQuantity(f float64) *VehicleUpdateOne {
+	vuo.mutation.ResetSpeedQuantity()
+	vuo.mutation.SetSpeedQuantity(f)
+	return vuo
+}
+
+// SetNillableSpeedQuantity sets the "speed_quantity" field if the given value is not nil.
+func (vuo *VehicleUpdateOne) SetNillableSpeedQuantity(f *float64) *VehicleUpdateOne {
+	if f != nil {
+		vuo.SetSpeedQuantity(*f)
+	}
+	return vuo
+}
+
+// AddSpeedQuantity adds f to the "speed_quantity" field.
+func (vuo *VehicleUpdateOne) AddSpeedQuantity(f float64) *VehicleUpdateOne {
+	vuo.mutation.AddSpeedQuantity(f)
+	return vuo
+}
+
+// ClearSpeedQuantity clears the value of the "speed_quantity" field.
+func (vuo *VehicleUpdateOne) ClearSpeedQuantity() *VehicleUpdateOne {
+	vuo.mutation.ClearSpeedQuantity()
+	return vuo
+}
+
+// SetSpeedUnits sets the "speed_units" field.
+func (vuo *VehicleUpdateOne) SetSpeedUnits(vu vehicle.SpeedUnits) *VehicleUpdateOne {
+	vuo.mutation.SetSpeedUnits(vu)
+	return vuo
+}
+
+// SetNillableSpeedUnits sets the "speed_units" field if the given value is not nil.
+func (vuo *VehicleUpdateOne) SetNillableSpeedUnits(vu *vehicle.SpeedUnits) *VehicleUpdateOne {
+	if vu != nil {
+		vuo.SetSpeedUnits(*vu)
+	}
+	return vuo
+}
+
+// ClearSpeedUnits clears the value of the "speed_units" field.
+func (vuo *VehicleUpdateOne) ClearSpeedUnits() *VehicleUpdateOne {
+	vuo.mutation.ClearSpeedUnits()
+	return vuo
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (vuo *VehicleUpdateOne) SetEquipmentID(id int) *VehicleUpdateOne {
+	vuo.mutation.SetEquipmentID(id)
 	return vuo
 }
 
@@ -280,17 +454,17 @@ func (vuo *VehicleUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (vuo *VehicleUpdateOne) check() error {
-	if v, ok := vuo.mutation.Indx(); ok {
-		if err := vehicle.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Vehicle.indx": %w`, err)}
+	if v, ok := vuo.mutation.VehicleCategory(); ok {
+		if err := vehicle.VehicleCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "vehicle_category", err: fmt.Errorf(`ent: validator failed for field "Vehicle.vehicle_category": %w`, err)}
 		}
 	}
-	if v, ok := vuo.mutation.Name(); ok {
-		if err := vehicle.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Vehicle.name": %w`, err)}
+	if v, ok := vuo.mutation.SpeedUnits(); ok {
+		if err := vehicle.SpeedUnitsValidator(v); err != nil {
+			return &ValidationError{Name: "speed_units", err: fmt.Errorf(`ent: validator failed for field "Vehicle.speed_units": %w`, err)}
 		}
 	}
-	if _, ok := vuo.mutation.EquipmentID(); vuo.mutation.EquipmentCleared() && !ok {
+	if vuo.mutation.EquipmentCleared() && len(vuo.mutation.EquipmentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Vehicle.equipment"`)
 	}
 	return nil
@@ -325,17 +499,40 @@ func (vuo *VehicleUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle, err e
 			}
 		}
 	}
-	if value, ok := vuo.mutation.Indx(); ok {
-		_spec.SetField(vehicle.FieldIndx, field.TypeString, value)
-	}
-	if value, ok := vuo.mutation.Name(); ok {
-		_spec.SetField(vehicle.FieldName, field.TypeString, value)
-	}
 	if value, ok := vuo.mutation.VehicleCategory(); ok {
-		_spec.SetField(vehicle.FieldVehicleCategory, field.TypeString, value)
+		_spec.SetField(vehicle.FieldVehicleCategory, field.TypeEnum, value)
 	}
 	if value, ok := vuo.mutation.Capacity(); ok {
 		_spec.SetField(vehicle.FieldCapacity, field.TypeString, value)
+	}
+	if vuo.mutation.CapacityCleared() {
+		_spec.ClearField(vehicle.FieldCapacity, field.TypeString)
+	}
+	if value, ok := vuo.mutation.Desc(); ok {
+		_spec.SetField(vehicle.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := vuo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, vehicle.FieldDesc, value)
+		})
+	}
+	if vuo.mutation.DescCleared() {
+		_spec.ClearField(vehicle.FieldDesc, field.TypeJSON)
+	}
+	if value, ok := vuo.mutation.SpeedQuantity(); ok {
+		_spec.SetField(vehicle.FieldSpeedQuantity, field.TypeFloat64, value)
+	}
+	if value, ok := vuo.mutation.AddedSpeedQuantity(); ok {
+		_spec.AddField(vehicle.FieldSpeedQuantity, field.TypeFloat64, value)
+	}
+	if vuo.mutation.SpeedQuantityCleared() {
+		_spec.ClearField(vehicle.FieldSpeedQuantity, field.TypeFloat64)
+	}
+	if value, ok := vuo.mutation.SpeedUnits(); ok {
+		_spec.SetField(vehicle.FieldSpeedUnits, field.TypeEnum, value)
+	}
+	if vuo.mutation.SpeedUnitsCleared() {
+		_spec.ClearField(vehicle.FieldSpeedUnits, field.TypeEnum)
 	}
 	if vuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{

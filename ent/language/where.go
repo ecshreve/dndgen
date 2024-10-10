@@ -63,11 +63,6 @@ func Name(v string) predicate.Language {
 	return predicate.Language(sql.FieldEQ(FieldName, v))
 }
 
-// Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
-func Desc(v string) predicate.Language {
-	return predicate.Language(sql.FieldEQ(FieldDesc, v))
-}
-
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Language {
 	return predicate.Language(sql.FieldEQ(FieldIndx, v))
@@ -198,69 +193,14 @@ func NameContainsFold(v string) predicate.Language {
 	return predicate.Language(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescEQ applies the EQ predicate on the "desc" field.
-func DescEQ(v string) predicate.Language {
-	return predicate.Language(sql.FieldEQ(FieldDesc, v))
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.Language {
+	return predicate.Language(sql.FieldIsNull(FieldDesc))
 }
 
-// DescNEQ applies the NEQ predicate on the "desc" field.
-func DescNEQ(v string) predicate.Language {
-	return predicate.Language(sql.FieldNEQ(FieldDesc, v))
-}
-
-// DescIn applies the In predicate on the "desc" field.
-func DescIn(vs ...string) predicate.Language {
-	return predicate.Language(sql.FieldIn(FieldDesc, vs...))
-}
-
-// DescNotIn applies the NotIn predicate on the "desc" field.
-func DescNotIn(vs ...string) predicate.Language {
-	return predicate.Language(sql.FieldNotIn(FieldDesc, vs...))
-}
-
-// DescGT applies the GT predicate on the "desc" field.
-func DescGT(v string) predicate.Language {
-	return predicate.Language(sql.FieldGT(FieldDesc, v))
-}
-
-// DescGTE applies the GTE predicate on the "desc" field.
-func DescGTE(v string) predicate.Language {
-	return predicate.Language(sql.FieldGTE(FieldDesc, v))
-}
-
-// DescLT applies the LT predicate on the "desc" field.
-func DescLT(v string) predicate.Language {
-	return predicate.Language(sql.FieldLT(FieldDesc, v))
-}
-
-// DescLTE applies the LTE predicate on the "desc" field.
-func DescLTE(v string) predicate.Language {
-	return predicate.Language(sql.FieldLTE(FieldDesc, v))
-}
-
-// DescContains applies the Contains predicate on the "desc" field.
-func DescContains(v string) predicate.Language {
-	return predicate.Language(sql.FieldContains(FieldDesc, v))
-}
-
-// DescHasPrefix applies the HasPrefix predicate on the "desc" field.
-func DescHasPrefix(v string) predicate.Language {
-	return predicate.Language(sql.FieldHasPrefix(FieldDesc, v))
-}
-
-// DescHasSuffix applies the HasSuffix predicate on the "desc" field.
-func DescHasSuffix(v string) predicate.Language {
-	return predicate.Language(sql.FieldHasSuffix(FieldDesc, v))
-}
-
-// DescEqualFold applies the EqualFold predicate on the "desc" field.
-func DescEqualFold(v string) predicate.Language {
-	return predicate.Language(sql.FieldEqualFold(FieldDesc, v))
-}
-
-// DescContainsFold applies the ContainsFold predicate on the "desc" field.
-func DescContainsFold(v string) predicate.Language {
-	return predicate.Language(sql.FieldContainsFold(FieldDesc, v))
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.Language {
+	return predicate.Language(sql.FieldNotNull(FieldDesc))
 }
 
 // LanguageTypeEQ applies the EQ predicate on the "language_type" field.
@@ -303,31 +243,44 @@ func ScriptNotIn(vs ...Script) predicate.Language {
 	return predicate.Language(sql.FieldNotIn(FieldScript, vs...))
 }
 
-// ScriptIsNil applies the IsNil predicate on the "script" field.
-func ScriptIsNil() predicate.Language {
-	return predicate.Language(sql.FieldIsNull(FieldScript))
-}
-
-// ScriptNotNil applies the NotNil predicate on the "script" field.
-func ScriptNotNil() predicate.Language {
-	return predicate.Language(sql.FieldNotNull(FieldScript))
-}
-
-// HasRaceSpeakers applies the HasEdge predicate on the "race_speakers" edge.
-func HasRaceSpeakers() predicate.Language {
+// HasRace applies the HasEdge predicate on the "race" edge.
+func HasRace() predicate.Language {
 	return predicate.Language(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, RaceSpeakersTable, RaceSpeakersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasRaceSpeakersWith applies the HasEdge predicate on the "race_speakers" edge with a given conditions (other predicates).
-func HasRaceSpeakersWith(preds ...predicate.Race) predicate.Language {
+// HasRaceWith applies the HasEdge predicate on the "race" edge with a given conditions (other predicates).
+func HasRaceWith(preds ...predicate.Race) predicate.Language {
 	return predicate.Language(func(s *sql.Selector) {
-		step := newRaceSpeakersStep()
+		step := newRaceStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasOptions applies the HasEdge predicate on the "options" edge.
+func HasOptions() predicate.Language {
+	return predicate.Language(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, OptionsTable, OptionsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOptionsWith applies the HasEdge predicate on the "options" edge with a given conditions (other predicates).
+func HasOptionsWith(preds ...predicate.LanguageChoice) predicate.Language {
+	return predicate.Language(func(s *sql.Selector) {
+		step := newOptionsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -338,32 +291,15 @@ func HasRaceSpeakersWith(preds ...predicate.Race) predicate.Language {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Language) predicate.Language {
-	return predicate.Language(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Language(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Language) predicate.Language {
-	return predicate.Language(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Language(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Language) predicate.Language {
-	return predicate.Language(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Language(sql.NotPredicates(p))
 }

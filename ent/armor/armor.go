@@ -3,6 +3,10 @@
 package armor
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -12,22 +16,20 @@ const (
 	Label = "armor"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldIndx holds the string denoting the indx field in the database.
-	FieldIndx = "indx"
-	// FieldName holds the string denoting the name field in the database.
-	FieldName = "name"
 	// FieldArmorCategory holds the string denoting the armor_category field in the database.
 	FieldArmorCategory = "armor_category"
+	// FieldStrMinimum holds the string denoting the str_minimum field in the database.
+	FieldStrMinimum = "str_minimum"
 	// FieldStealthDisadvantage holds the string denoting the stealth_disadvantage field in the database.
 	FieldStealthDisadvantage = "stealth_disadvantage"
-	// FieldMinStrength holds the string denoting the min_strength field in the database.
-	FieldMinStrength = "min_strength"
-	// FieldEquipmentID holds the string denoting the equipment_id field in the database.
-	FieldEquipmentID = "equipment_id"
+	// FieldAcBase holds the string denoting the ac_base field in the database.
+	FieldAcBase = "ac_base"
+	// FieldAcDexBonus holds the string denoting the ac_dex_bonus field in the database.
+	FieldAcDexBonus = "ac_dex_bonus"
+	// FieldAcMaxBonus holds the string denoting the ac_max_bonus field in the database.
+	FieldAcMaxBonus = "ac_max_bonus"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
-	// EdgeArmorClass holds the string denoting the armor_class edge name in mutations.
-	EdgeArmorClass = "armor_class"
 	// Table holds the table name of the armor in the database.
 	Table = "armors"
 	// EquipmentTable is the table that holds the equipment relation/edge.
@@ -36,25 +38,24 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "equipment_id"
-	// ArmorClassTable is the table that holds the armor_class relation/edge.
-	ArmorClassTable = "armor_classes"
-	// ArmorClassInverseTable is the table name for the ArmorClass entity.
-	// It exists in this package in order to avoid circular dependency with the "armorclass" package.
-	ArmorClassInverseTable = "armor_classes"
-	// ArmorClassColumn is the table column denoting the armor_class relation/edge.
-	ArmorClassColumn = "armor_armor_class"
+	EquipmentColumn = "equipment_armor"
 )
 
 // Columns holds all SQL columns for armor fields.
 var Columns = []string{
 	FieldID,
-	FieldIndx,
-	FieldName,
 	FieldArmorCategory,
+	FieldStrMinimum,
 	FieldStealthDisadvantage,
-	FieldMinStrength,
-	FieldEquipmentID,
+	FieldAcBase,
+	FieldAcDexBonus,
+	FieldAcMaxBonus,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "armors"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"equipment_armor",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -64,15 +65,47 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
 
 var (
-	// IndxValidator is a validator for the "indx" field. It is called by the builders before save.
-	IndxValidator func(string) error
-	// NameValidator is a validator for the "name" field. It is called by the builders before save.
-	NameValidator func(string) error
+	// AcBaseValidator is a validator for the "ac_base" field. It is called by the builders before save.
+	AcBaseValidator func(int) error
+	// DefaultAcDexBonus holds the default value on creation for the "ac_dex_bonus" field.
+	DefaultAcDexBonus bool
+	// DefaultAcMaxBonus holds the default value on creation for the "ac_max_bonus" field.
+	DefaultAcMaxBonus int
 )
+
+// ArmorCategory defines the type for the "armor_category" enum field.
+type ArmorCategory string
+
+// ArmorCategory values.
+const (
+	ArmorCategoryLight  ArmorCategory = "light"
+	ArmorCategoryMedium ArmorCategory = "medium"
+	ArmorCategoryHeavy  ArmorCategory = "heavy"
+	ArmorCategoryShield ArmorCategory = "shield"
+)
+
+func (ac ArmorCategory) String() string {
+	return string(ac)
+}
+
+// ArmorCategoryValidator is a validator for the "armor_category" field enum values. It is called by the builders before save.
+func ArmorCategoryValidator(ac ArmorCategory) error {
+	switch ac {
+	case ArmorCategoryLight, ArmorCategoryMedium, ArmorCategoryHeavy, ArmorCategoryShield:
+		return nil
+	default:
+		return fmt.Errorf("armor: invalid enum value for armor_category field: %q", ac)
+	}
+}
 
 // OrderOption defines the ordering options for the Armor queries.
 type OrderOption func(*sql.Selector)
@@ -82,19 +115,14 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByIndx orders the results by the indx field.
-func ByIndx(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIndx, opts...).ToFunc()
-}
-
-// ByName orders the results by the name field.
-func ByName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldName, opts...).ToFunc()
-}
-
 // ByArmorCategory orders the results by the armor_category field.
 func ByArmorCategory(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldArmorCategory, opts...).ToFunc()
+}
+
+// ByStrMinimum orders the results by the str_minimum field.
+func ByStrMinimum(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStrMinimum, opts...).ToFunc()
 }
 
 // ByStealthDisadvantage orders the results by the stealth_disadvantage field.
@@ -102,34 +130,25 @@ func ByStealthDisadvantage(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStealthDisadvantage, opts...).ToFunc()
 }
 
-// ByMinStrength orders the results by the min_strength field.
-func ByMinStrength(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldMinStrength, opts...).ToFunc()
+// ByAcBase orders the results by the ac_base field.
+func ByAcBase(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAcBase, opts...).ToFunc()
 }
 
-// ByEquipmentID orders the results by the equipment_id field.
-func ByEquipmentID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEquipmentID, opts...).ToFunc()
+// ByAcDexBonus orders the results by the ac_dex_bonus field.
+func ByAcDexBonus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAcDexBonus, opts...).ToFunc()
+}
+
+// ByAcMaxBonus orders the results by the ac_max_bonus field.
+func ByAcMaxBonus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAcMaxBonus, opts...).ToFunc()
 }
 
 // ByEquipmentField orders the results by equipment field.
 func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), sql.OrderByField(field, opts...))
-	}
-}
-
-// ByArmorClassCount orders the results by armor_class count.
-func ByArmorClassCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newArmorClassStep(), opts...)
-	}
-}
-
-// ByArmorClass orders the results by armor_class terms.
-func ByArmorClass(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newArmorClassStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newEquipmentStep() *sqlgraph.Step {
@@ -139,10 +158,21 @@ func newEquipmentStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
 	)
 }
-func newArmorClassStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ArmorClassInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ArmorClassTable, ArmorClassColumn),
-	)
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e ArmorCategory) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *ArmorCategory) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = ArmorCategory(str)
+	if err := ArmorCategoryValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid ArmorCategory", str)
+	}
+	return nil
 }

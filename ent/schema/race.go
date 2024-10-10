@@ -13,34 +13,49 @@ type Race struct {
 	ent.Schema
 }
 
-func (Race) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		CommonMixin{},
-	}
-}
-
 // Fields of the Race.
 func (Race) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("alignment"),
-		field.String("age"),
-		field.String("size"),
-		field.String("size_description"),
+		field.String("indx").StructTag(`json:"index"`).
+			NotEmpty().
+			Unique().
+			Annotations(
+				entgql.OrderField("INDX"),
+			),
+		field.String("name").
+			NotEmpty().
+			Annotations(
+				entgql.OrderField("NAME"),
+			),
+		field.Int("speed").Positive(),
+		field.Enum("size").Values(
+			"Small",
+			"Medium",
+			"Large",
+		).Default("Medium"),
+		field.String("size_desc").StructTag(`json:"size_description"`),
+		field.String("alignment_desc").StructTag(`json:"alignment"`),
+		field.String("age_desc").StructTag(`json:"age"`),
 		field.String("language_desc"),
-		field.Int("speed"),
 	}
 }
 
 // Edges of the Race.
 func (Race) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("proficiencies", Proficiency.Type),
-		edge.To("proficiency_choice", ProficiencyChoice.Type),
-		edge.To("languages", Language.Type),
-		edge.From("subrace", Subrace.Type).
-			Ref("race"),
 		edge.To("traits", Trait.Type),
-		edge.To("ability_bonuses", AbilityBonus.Type),
+		edge.To("starting_proficiencies", Proficiency.Type),
+		edge.To("starting_proficiency_options", ProficiencyChoice.Type),
+		edge.To("ability_bonuses", AbilityScore.Type).
+			Through("race_ability_bonuses", AbilityBonus.Type),
+		// edge.To("ability_bonus_options", AbilityBonusChoice.Type).
+		// 	Unique(),
+		edge.To("languages", Language.Type),
+		edge.To("language_options", LanguageChoice.Type).
+			Unique(),
+		// edge.To("subraces", Subrace.Type),
+		edge.From("characters", Character.Type).
+			Ref("race"),
 	}
 }
 
@@ -51,38 +66,36 @@ func (Race) Annotations() []schema.Annotation {
 	}
 }
 
-// Subrace holds the schema definition for the Subrace entity.
-type Subrace struct {
-	ent.Schema
-}
+// type Subrace struct {
+// 	ent.Schema
+// }
 
-func (Subrace) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		CommonMixin{},
-	}
-}
+// func (Subrace) Fields() []ent.Field {
+// 	return []ent.Field{
+// 		field.String("indx").StructTag(`json:"index"`).
+// 			NotEmpty().
+// 			Unique().
+// 			Annotations(
+// 				entgql.OrderField("INDX"),
+// 			),
+// 		field.String("name").
+// 			NotEmpty().
+// 			Annotations(
+// 				entgql.OrderField("NAME"),
+// 			),
+// 		field.Strings("desc"),
+// 	}
 
-// Fields of the Subrace.
-func (Subrace) Fields() []ent.Field {
-	return []ent.Field{
-		field.String("desc"),
-	}
-}
+// }
 
-// Edges of the Subrace.
-func (Subrace) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("race", Race.Type).
-			Unique(),
-		edge.To("proficiencies", Proficiency.Type),
-		edge.To("traits", Trait.Type),
-		edge.To("ability_bonuses", AbilityBonus.Type),
-	}
-}
-
-// Annotations of the Subrace.
-func (Subrace) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
-	}
-}
+// func (Subrace) Edges() []ent.Edge {
+// 	return []ent.Edge{
+// 		edge.From("race", Race.Type).
+// 			Ref("subraces").
+// 			Unique(),
+// 		edge.To("ability_bonuses", AbilityBonus.Type),
+// 		edge.To("proficiencies", Proficiency.Type),
+// 		edge.To("traits", Trait.Type),
+// 		edge.To("language_options", LanguageChoice.Type),
+// 	}
+// }

@@ -261,21 +261,21 @@ func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Class {
 	})
 }
 
-// HasProficiencyChoices applies the HasEdge predicate on the "proficiency_choices" edge.
-func HasProficiencyChoices() predicate.Class {
+// HasProficiencyOptions applies the HasEdge predicate on the "proficiency_options" edge.
+func HasProficiencyOptions() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ProficiencyChoicesTable, ProficiencyChoicesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, ProficiencyOptionsTable, ProficiencyOptionsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasProficiencyChoicesWith applies the HasEdge predicate on the "proficiency_choices" edge with a given conditions (other predicates).
-func HasProficiencyChoicesWith(preds ...predicate.ProficiencyChoice) predicate.Class {
+// HasProficiencyOptionsWith applies the HasEdge predicate on the "proficiency_options" edge with a given conditions (other predicates).
+func HasProficiencyOptionsWith(preds ...predicate.ProficiencyChoice) predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
-		step := newProficiencyChoicesStep()
+		step := newProficiencyOptionsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -284,21 +284,21 @@ func HasProficiencyChoicesWith(preds ...predicate.ProficiencyChoice) predicate.C
 	})
 }
 
-// HasEquipment applies the HasEdge predicate on the "equipment" edge.
-func HasEquipment() predicate.Class {
+// HasStartingEquipment applies the HasEdge predicate on the "starting_equipment" edge.
+func HasStartingEquipment() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, EquipmentTable, EquipmentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, StartingEquipmentTable, StartingEquipmentPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasEquipmentWith applies the HasEdge predicate on the "equipment" edge with a given conditions (other predicates).
-func HasEquipmentWith(preds ...predicate.Equipment) predicate.Class {
+// HasStartingEquipmentWith applies the HasEdge predicate on the "starting_equipment" edge with a given conditions (other predicates).
+func HasStartingEquipmentWith(preds ...predicate.EquipmentEntry) predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
-		step := newEquipmentStep()
+		step := newStartingEquipmentStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -307,21 +307,21 @@ func HasEquipmentWith(preds ...predicate.Equipment) predicate.Class {
 	})
 }
 
-// HasEquipmentChoices applies the HasEdge predicate on the "equipment_choices" edge.
-func HasEquipmentChoices() predicate.Class {
+// HasSavingThrows applies the HasEdge predicate on the "saving_throws" edge.
+func HasSavingThrows() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, EquipmentChoicesTable, EquipmentChoicesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, SavingThrowsTable, SavingThrowsPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasEquipmentChoicesWith applies the HasEdge predicate on the "equipment_choices" edge with a given conditions (other predicates).
-func HasEquipmentChoicesWith(preds ...predicate.EquipmentChoice) predicate.Class {
+// HasSavingThrowsWith applies the HasEdge predicate on the "saving_throws" edge with a given conditions (other predicates).
+func HasSavingThrowsWith(preds ...predicate.AbilityScore) predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
-		step := newEquipmentChoicesStep()
+		step := newSavingThrowsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -330,21 +330,21 @@ func HasEquipmentChoicesWith(preds ...predicate.EquipmentChoice) predicate.Class
 	})
 }
 
-// HasClassEquipment applies the HasEdge predicate on the "class_equipment" edge.
-func HasClassEquipment() predicate.Class {
+// HasCharacters applies the HasEdge predicate on the "characters" edge.
+func HasCharacters() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, ClassEquipmentTable, ClassEquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, CharactersTable, CharactersColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasClassEquipmentWith applies the HasEdge predicate on the "class_equipment" edge with a given conditions (other predicates).
-func HasClassEquipmentWith(preds ...predicate.ClassEquipment) predicate.Class {
+// HasCharactersWith applies the HasEdge predicate on the "characters" edge with a given conditions (other predicates).
+func HasCharactersWith(preds ...predicate.Character) predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
-		step := newClassEquipmentStep()
+		step := newCharactersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -355,32 +355,15 @@ func HasClassEquipmentWith(preds ...predicate.ClassEquipment) predicate.Class {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Class) predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Class(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Class) predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Class(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Class) predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Class(sql.NotPredicates(p))
 }

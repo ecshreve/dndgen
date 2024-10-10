@@ -9,8 +9,10 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/coin"
+	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -33,15 +35,43 @@ func (cu *CoinUpdate) SetIndx(s string) *CoinUpdate {
 	return cu
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (cu *CoinUpdate) SetNillableIndx(s *string) *CoinUpdate {
+	if s != nil {
+		cu.SetIndx(*s)
+	}
+	return cu
+}
+
 // SetName sets the "name" field.
 func (cu *CoinUpdate) SetName(s string) *CoinUpdate {
 	cu.mutation.SetName(s)
 	return cu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cu *CoinUpdate) SetNillableName(s *string) *CoinUpdate {
+	if s != nil {
+		cu.SetName(*s)
+	}
+	return cu
+}
+
 // SetDesc sets the "desc" field.
-func (cu *CoinUpdate) SetDesc(s string) *CoinUpdate {
+func (cu *CoinUpdate) SetDesc(s []string) *CoinUpdate {
 	cu.mutation.SetDesc(s)
+	return cu
+}
+
+// AppendDesc appends s to the "desc" field.
+func (cu *CoinUpdate) AppendDesc(s []string) *CoinUpdate {
+	cu.mutation.AppendDesc(s)
+	return cu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (cu *CoinUpdate) ClearDesc() *CoinUpdate {
+	cu.mutation.ClearDesc()
 	return cu
 }
 
@@ -52,15 +82,59 @@ func (cu *CoinUpdate) SetGoldConversionRate(f float64) *CoinUpdate {
 	return cu
 }
 
+// SetNillableGoldConversionRate sets the "gold_conversion_rate" field if the given value is not nil.
+func (cu *CoinUpdate) SetNillableGoldConversionRate(f *float64) *CoinUpdate {
+	if f != nil {
+		cu.SetGoldConversionRate(*f)
+	}
+	return cu
+}
+
 // AddGoldConversionRate adds f to the "gold_conversion_rate" field.
 func (cu *CoinUpdate) AddGoldConversionRate(f float64) *CoinUpdate {
 	cu.mutation.AddGoldConversionRate(f)
 	return cu
 }
 
+// AddCostIDs adds the "costs" edge to the Cost entity by IDs.
+func (cu *CoinUpdate) AddCostIDs(ids ...int) *CoinUpdate {
+	cu.mutation.AddCostIDs(ids...)
+	return cu
+}
+
+// AddCosts adds the "costs" edges to the Cost entity.
+func (cu *CoinUpdate) AddCosts(c ...*Cost) *CoinUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.AddCostIDs(ids...)
+}
+
 // Mutation returns the CoinMutation object of the builder.
 func (cu *CoinUpdate) Mutation() *CoinMutation {
 	return cu.mutation
+}
+
+// ClearCosts clears all "costs" edges to the Cost entity.
+func (cu *CoinUpdate) ClearCosts() *CoinUpdate {
+	cu.mutation.ClearCosts()
+	return cu
+}
+
+// RemoveCostIDs removes the "costs" edge to Cost entities by IDs.
+func (cu *CoinUpdate) RemoveCostIDs(ids ...int) *CoinUpdate {
+	cu.mutation.RemoveCostIDs(ids...)
+	return cu
+}
+
+// RemoveCosts removes "costs" edges to Cost entities.
+func (cu *CoinUpdate) RemoveCosts(c ...*Cost) *CoinUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.RemoveCostIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -124,13 +198,66 @@ func (cu *CoinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(coin.FieldName, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.Desc(); ok {
-		_spec.SetField(coin.FieldDesc, field.TypeString, value)
+		_spec.SetField(coin.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, coin.FieldDesc, value)
+		})
+	}
+	if cu.mutation.DescCleared() {
+		_spec.ClearField(coin.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := cu.mutation.GoldConversionRate(); ok {
 		_spec.SetField(coin.FieldGoldConversionRate, field.TypeFloat64, value)
 	}
 	if value, ok := cu.mutation.AddedGoldConversionRate(); ok {
 		_spec.AddField(coin.FieldGoldConversionRate, field.TypeFloat64, value)
+	}
+	if cu.mutation.CostsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   coin.CostsTable,
+			Columns: []string{coin.CostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedCostsIDs(); len(nodes) > 0 && !cu.mutation.CostsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   coin.CostsTable,
+			Columns: []string{coin.CostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.CostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   coin.CostsTable,
+			Columns: []string{coin.CostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -158,15 +285,43 @@ func (cuo *CoinUpdateOne) SetIndx(s string) *CoinUpdateOne {
 	return cuo
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (cuo *CoinUpdateOne) SetNillableIndx(s *string) *CoinUpdateOne {
+	if s != nil {
+		cuo.SetIndx(*s)
+	}
+	return cuo
+}
+
 // SetName sets the "name" field.
 func (cuo *CoinUpdateOne) SetName(s string) *CoinUpdateOne {
 	cuo.mutation.SetName(s)
 	return cuo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cuo *CoinUpdateOne) SetNillableName(s *string) *CoinUpdateOne {
+	if s != nil {
+		cuo.SetName(*s)
+	}
+	return cuo
+}
+
 // SetDesc sets the "desc" field.
-func (cuo *CoinUpdateOne) SetDesc(s string) *CoinUpdateOne {
+func (cuo *CoinUpdateOne) SetDesc(s []string) *CoinUpdateOne {
 	cuo.mutation.SetDesc(s)
+	return cuo
+}
+
+// AppendDesc appends s to the "desc" field.
+func (cuo *CoinUpdateOne) AppendDesc(s []string) *CoinUpdateOne {
+	cuo.mutation.AppendDesc(s)
+	return cuo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (cuo *CoinUpdateOne) ClearDesc() *CoinUpdateOne {
+	cuo.mutation.ClearDesc()
 	return cuo
 }
 
@@ -177,15 +332,59 @@ func (cuo *CoinUpdateOne) SetGoldConversionRate(f float64) *CoinUpdateOne {
 	return cuo
 }
 
+// SetNillableGoldConversionRate sets the "gold_conversion_rate" field if the given value is not nil.
+func (cuo *CoinUpdateOne) SetNillableGoldConversionRate(f *float64) *CoinUpdateOne {
+	if f != nil {
+		cuo.SetGoldConversionRate(*f)
+	}
+	return cuo
+}
+
 // AddGoldConversionRate adds f to the "gold_conversion_rate" field.
 func (cuo *CoinUpdateOne) AddGoldConversionRate(f float64) *CoinUpdateOne {
 	cuo.mutation.AddGoldConversionRate(f)
 	return cuo
 }
 
+// AddCostIDs adds the "costs" edge to the Cost entity by IDs.
+func (cuo *CoinUpdateOne) AddCostIDs(ids ...int) *CoinUpdateOne {
+	cuo.mutation.AddCostIDs(ids...)
+	return cuo
+}
+
+// AddCosts adds the "costs" edges to the Cost entity.
+func (cuo *CoinUpdateOne) AddCosts(c ...*Cost) *CoinUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.AddCostIDs(ids...)
+}
+
 // Mutation returns the CoinMutation object of the builder.
 func (cuo *CoinUpdateOne) Mutation() *CoinMutation {
 	return cuo.mutation
+}
+
+// ClearCosts clears all "costs" edges to the Cost entity.
+func (cuo *CoinUpdateOne) ClearCosts() *CoinUpdateOne {
+	cuo.mutation.ClearCosts()
+	return cuo
+}
+
+// RemoveCostIDs removes the "costs" edge to Cost entities by IDs.
+func (cuo *CoinUpdateOne) RemoveCostIDs(ids ...int) *CoinUpdateOne {
+	cuo.mutation.RemoveCostIDs(ids...)
+	return cuo
+}
+
+// RemoveCosts removes "costs" edges to Cost entities.
+func (cuo *CoinUpdateOne) RemoveCosts(c ...*Cost) *CoinUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.RemoveCostIDs(ids...)
 }
 
 // Where appends a list predicates to the CoinUpdate builder.
@@ -279,13 +478,66 @@ func (cuo *CoinUpdateOne) sqlSave(ctx context.Context) (_node *Coin, err error) 
 		_spec.SetField(coin.FieldName, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.Desc(); ok {
-		_spec.SetField(coin.FieldDesc, field.TypeString, value)
+		_spec.SetField(coin.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, coin.FieldDesc, value)
+		})
+	}
+	if cuo.mutation.DescCleared() {
+		_spec.ClearField(coin.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := cuo.mutation.GoldConversionRate(); ok {
 		_spec.SetField(coin.FieldGoldConversionRate, field.TypeFloat64, value)
 	}
 	if value, ok := cuo.mutation.AddedGoldConversionRate(); ok {
 		_spec.AddField(coin.FieldGoldConversionRate, field.TypeFloat64, value)
+	}
+	if cuo.mutation.CostsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   coin.CostsTable,
+			Columns: []string{coin.CostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedCostsIDs(); len(nodes) > 0 && !cuo.mutation.CostsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   coin.CostsTable,
+			Columns: []string{coin.CostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.CostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   coin.CostsTable,
+			Columns: []string{coin.CostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Coin{config: cuo.config}
 	_spec.Assign = _node.assignValues

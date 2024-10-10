@@ -10,11 +10,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weapondamage"
-	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
 // WeaponUpdate is the builder for updating Weapon entities.
@@ -30,33 +30,199 @@ func (wu *WeaponUpdate) Where(ps ...predicate.Weapon) *WeaponUpdate {
 	return wu
 }
 
-// SetIndx sets the "indx" field.
-func (wu *WeaponUpdate) SetIndx(s string) *WeaponUpdate {
-	wu.mutation.SetIndx(s)
-	return wu
-}
-
-// SetName sets the "name" field.
-func (wu *WeaponUpdate) SetName(s string) *WeaponUpdate {
-	wu.mutation.SetName(s)
-	return wu
-}
-
-// SetEquipmentID sets the "equipment_id" field.
-func (wu *WeaponUpdate) SetEquipmentID(i int) *WeaponUpdate {
-	wu.mutation.SetEquipmentID(i)
-	return wu
-}
-
 // SetWeaponCategory sets the "weapon_category" field.
-func (wu *WeaponUpdate) SetWeaponCategory(s string) *WeaponUpdate {
-	wu.mutation.SetWeaponCategory(s)
+func (wu *WeaponUpdate) SetWeaponCategory(wc weapon.WeaponCategory) *WeaponUpdate {
+	wu.mutation.SetWeaponCategory(wc)
 	return wu
 }
 
-// SetWeaponRange sets the "weapon_range" field.
-func (wu *WeaponUpdate) SetWeaponRange(s string) *WeaponUpdate {
-	wu.mutation.SetWeaponRange(s)
+// SetNillableWeaponCategory sets the "weapon_category" field if the given value is not nil.
+func (wu *WeaponUpdate) SetNillableWeaponCategory(wc *weapon.WeaponCategory) *WeaponUpdate {
+	if wc != nil {
+		wu.SetWeaponCategory(*wc)
+	}
+	return wu
+}
+
+// SetWeaponSubcategory sets the "weapon_subcategory" field.
+func (wu *WeaponUpdate) SetWeaponSubcategory(ws weapon.WeaponSubcategory) *WeaponUpdate {
+	wu.mutation.SetWeaponSubcategory(ws)
+	return wu
+}
+
+// SetNillableWeaponSubcategory sets the "weapon_subcategory" field if the given value is not nil.
+func (wu *WeaponUpdate) SetNillableWeaponSubcategory(ws *weapon.WeaponSubcategory) *WeaponUpdate {
+	if ws != nil {
+		wu.SetWeaponSubcategory(*ws)
+	}
+	return wu
+}
+
+// SetRangeNormal sets the "range_normal" field.
+func (wu *WeaponUpdate) SetRangeNormal(i int) *WeaponUpdate {
+	wu.mutation.ResetRangeNormal()
+	wu.mutation.SetRangeNormal(i)
+	return wu
+}
+
+// SetNillableRangeNormal sets the "range_normal" field if the given value is not nil.
+func (wu *WeaponUpdate) SetNillableRangeNormal(i *int) *WeaponUpdate {
+	if i != nil {
+		wu.SetRangeNormal(*i)
+	}
+	return wu
+}
+
+// AddRangeNormal adds i to the "range_normal" field.
+func (wu *WeaponUpdate) AddRangeNormal(i int) *WeaponUpdate {
+	wu.mutation.AddRangeNormal(i)
+	return wu
+}
+
+// ClearRangeNormal clears the value of the "range_normal" field.
+func (wu *WeaponUpdate) ClearRangeNormal() *WeaponUpdate {
+	wu.mutation.ClearRangeNormal()
+	return wu
+}
+
+// SetRangeLong sets the "range_long" field.
+func (wu *WeaponUpdate) SetRangeLong(i int) *WeaponUpdate {
+	wu.mutation.ResetRangeLong()
+	wu.mutation.SetRangeLong(i)
+	return wu
+}
+
+// SetNillableRangeLong sets the "range_long" field if the given value is not nil.
+func (wu *WeaponUpdate) SetNillableRangeLong(i *int) *WeaponUpdate {
+	if i != nil {
+		wu.SetRangeLong(*i)
+	}
+	return wu
+}
+
+// AddRangeLong adds i to the "range_long" field.
+func (wu *WeaponUpdate) AddRangeLong(i int) *WeaponUpdate {
+	wu.mutation.AddRangeLong(i)
+	return wu
+}
+
+// ClearRangeLong clears the value of the "range_long" field.
+func (wu *WeaponUpdate) ClearRangeLong() *WeaponUpdate {
+	wu.mutation.ClearRangeLong()
+	return wu
+}
+
+// SetThrowRangeNormal sets the "throw_range_normal" field.
+func (wu *WeaponUpdate) SetThrowRangeNormal(i int) *WeaponUpdate {
+	wu.mutation.ResetThrowRangeNormal()
+	wu.mutation.SetThrowRangeNormal(i)
+	return wu
+}
+
+// SetNillableThrowRangeNormal sets the "throw_range_normal" field if the given value is not nil.
+func (wu *WeaponUpdate) SetNillableThrowRangeNormal(i *int) *WeaponUpdate {
+	if i != nil {
+		wu.SetThrowRangeNormal(*i)
+	}
+	return wu
+}
+
+// AddThrowRangeNormal adds i to the "throw_range_normal" field.
+func (wu *WeaponUpdate) AddThrowRangeNormal(i int) *WeaponUpdate {
+	wu.mutation.AddThrowRangeNormal(i)
+	return wu
+}
+
+// ClearThrowRangeNormal clears the value of the "throw_range_normal" field.
+func (wu *WeaponUpdate) ClearThrowRangeNormal() *WeaponUpdate {
+	wu.mutation.ClearThrowRangeNormal()
+	return wu
+}
+
+// SetThrowRangeLong sets the "throw_range_long" field.
+func (wu *WeaponUpdate) SetThrowRangeLong(i int) *WeaponUpdate {
+	wu.mutation.ResetThrowRangeLong()
+	wu.mutation.SetThrowRangeLong(i)
+	return wu
+}
+
+// SetNillableThrowRangeLong sets the "throw_range_long" field if the given value is not nil.
+func (wu *WeaponUpdate) SetNillableThrowRangeLong(i *int) *WeaponUpdate {
+	if i != nil {
+		wu.SetThrowRangeLong(*i)
+	}
+	return wu
+}
+
+// AddThrowRangeLong adds i to the "throw_range_long" field.
+func (wu *WeaponUpdate) AddThrowRangeLong(i int) *WeaponUpdate {
+	wu.mutation.AddThrowRangeLong(i)
+	return wu
+}
+
+// ClearThrowRangeLong clears the value of the "throw_range_long" field.
+func (wu *WeaponUpdate) ClearThrowRangeLong() *WeaponUpdate {
+	wu.mutation.ClearThrowRangeLong()
+	return wu
+}
+
+// SetDamageDice sets the "damage_dice" field.
+func (wu *WeaponUpdate) SetDamageDice(s string) *WeaponUpdate {
+	wu.mutation.SetDamageDice(s)
+	return wu
+}
+
+// SetNillableDamageDice sets the "damage_dice" field if the given value is not nil.
+func (wu *WeaponUpdate) SetNillableDamageDice(s *string) *WeaponUpdate {
+	if s != nil {
+		wu.SetDamageDice(*s)
+	}
+	return wu
+}
+
+// ClearDamageDice clears the value of the "damage_dice" field.
+func (wu *WeaponUpdate) ClearDamageDice() *WeaponUpdate {
+	wu.mutation.ClearDamageDice()
+	return wu
+}
+
+// AddPropertyIDs adds the "properties" edge to the Property entity by IDs.
+func (wu *WeaponUpdate) AddPropertyIDs(ids ...int) *WeaponUpdate {
+	wu.mutation.AddPropertyIDs(ids...)
+	return wu
+}
+
+// AddProperties adds the "properties" edges to the Property entity.
+func (wu *WeaponUpdate) AddProperties(p ...*Property) *WeaponUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return wu.AddPropertyIDs(ids...)
+}
+
+// SetDamageTypeID sets the "damage_type" edge to the DamageType entity by ID.
+func (wu *WeaponUpdate) SetDamageTypeID(id int) *WeaponUpdate {
+	wu.mutation.SetDamageTypeID(id)
+	return wu
+}
+
+// SetNillableDamageTypeID sets the "damage_type" edge to the DamageType entity by ID if the given value is not nil.
+func (wu *WeaponUpdate) SetNillableDamageTypeID(id *int) *WeaponUpdate {
+	if id != nil {
+		wu = wu.SetDamageTypeID(*id)
+	}
+	return wu
+}
+
+// SetDamageType sets the "damage_type" edge to the DamageType entity.
+func (wu *WeaponUpdate) SetDamageType(d *DamageType) *WeaponUpdate {
+	return wu.SetDamageTypeID(d.ID)
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (wu *WeaponUpdate) SetEquipmentID(id int) *WeaponUpdate {
+	wu.mutation.SetEquipmentID(id)
 	return wu
 }
 
@@ -65,87 +231,42 @@ func (wu *WeaponUpdate) SetEquipment(e *Equipment) *WeaponUpdate {
 	return wu.SetEquipmentID(e.ID)
 }
 
-// AddWeaponDamageIDs adds the "weapon_damage" edge to the WeaponDamage entity by IDs.
-func (wu *WeaponUpdate) AddWeaponDamageIDs(ids ...int) *WeaponUpdate {
-	wu.mutation.AddWeaponDamageIDs(ids...)
-	return wu
-}
-
-// AddWeaponDamage adds the "weapon_damage" edges to the WeaponDamage entity.
-func (wu *WeaponUpdate) AddWeaponDamage(w ...*WeaponDamage) *WeaponUpdate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wu.AddWeaponDamageIDs(ids...)
-}
-
-// AddWeaponPropertyIDs adds the "weapon_properties" edge to the WeaponProperty entity by IDs.
-func (wu *WeaponUpdate) AddWeaponPropertyIDs(ids ...int) *WeaponUpdate {
-	wu.mutation.AddWeaponPropertyIDs(ids...)
-	return wu
-}
-
-// AddWeaponProperties adds the "weapon_properties" edges to the WeaponProperty entity.
-func (wu *WeaponUpdate) AddWeaponProperties(w ...*WeaponProperty) *WeaponUpdate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wu.AddWeaponPropertyIDs(ids...)
-}
-
 // Mutation returns the WeaponMutation object of the builder.
 func (wu *WeaponUpdate) Mutation() *WeaponMutation {
 	return wu.mutation
+}
+
+// ClearProperties clears all "properties" edges to the Property entity.
+func (wu *WeaponUpdate) ClearProperties() *WeaponUpdate {
+	wu.mutation.ClearProperties()
+	return wu
+}
+
+// RemovePropertyIDs removes the "properties" edge to Property entities by IDs.
+func (wu *WeaponUpdate) RemovePropertyIDs(ids ...int) *WeaponUpdate {
+	wu.mutation.RemovePropertyIDs(ids...)
+	return wu
+}
+
+// RemoveProperties removes "properties" edges to Property entities.
+func (wu *WeaponUpdate) RemoveProperties(p ...*Property) *WeaponUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return wu.RemovePropertyIDs(ids...)
+}
+
+// ClearDamageType clears the "damage_type" edge to the DamageType entity.
+func (wu *WeaponUpdate) ClearDamageType() *WeaponUpdate {
+	wu.mutation.ClearDamageType()
+	return wu
 }
 
 // ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (wu *WeaponUpdate) ClearEquipment() *WeaponUpdate {
 	wu.mutation.ClearEquipment()
 	return wu
-}
-
-// ClearWeaponDamage clears all "weapon_damage" edges to the WeaponDamage entity.
-func (wu *WeaponUpdate) ClearWeaponDamage() *WeaponUpdate {
-	wu.mutation.ClearWeaponDamage()
-	return wu
-}
-
-// RemoveWeaponDamageIDs removes the "weapon_damage" edge to WeaponDamage entities by IDs.
-func (wu *WeaponUpdate) RemoveWeaponDamageIDs(ids ...int) *WeaponUpdate {
-	wu.mutation.RemoveWeaponDamageIDs(ids...)
-	return wu
-}
-
-// RemoveWeaponDamage removes "weapon_damage" edges to WeaponDamage entities.
-func (wu *WeaponUpdate) RemoveWeaponDamage(w ...*WeaponDamage) *WeaponUpdate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wu.RemoveWeaponDamageIDs(ids...)
-}
-
-// ClearWeaponProperties clears all "weapon_properties" edges to the WeaponProperty entity.
-func (wu *WeaponUpdate) ClearWeaponProperties() *WeaponUpdate {
-	wu.mutation.ClearWeaponProperties()
-	return wu
-}
-
-// RemoveWeaponPropertyIDs removes the "weapon_properties" edge to WeaponProperty entities by IDs.
-func (wu *WeaponUpdate) RemoveWeaponPropertyIDs(ids ...int) *WeaponUpdate {
-	wu.mutation.RemoveWeaponPropertyIDs(ids...)
-	return wu
-}
-
-// RemoveWeaponProperties removes "weapon_properties" edges to WeaponProperty entities.
-func (wu *WeaponUpdate) RemoveWeaponProperties(w ...*WeaponProperty) *WeaponUpdate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wu.RemoveWeaponPropertyIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -177,17 +298,17 @@ func (wu *WeaponUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (wu *WeaponUpdate) check() error {
-	if v, ok := wu.mutation.Indx(); ok {
-		if err := weapon.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Weapon.indx": %w`, err)}
+	if v, ok := wu.mutation.WeaponCategory(); ok {
+		if err := weapon.WeaponCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "weapon_category", err: fmt.Errorf(`ent: validator failed for field "Weapon.weapon_category": %w`, err)}
 		}
 	}
-	if v, ok := wu.mutation.Name(); ok {
-		if err := weapon.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Weapon.name": %w`, err)}
+	if v, ok := wu.mutation.WeaponSubcategory(); ok {
+		if err := weapon.WeaponSubcategoryValidator(v); err != nil {
+			return &ValidationError{Name: "weapon_subcategory", err: fmt.Errorf(`ent: validator failed for field "Weapon.weapon_subcategory": %w`, err)}
 		}
 	}
-	if _, ok := wu.mutation.EquipmentID(); wu.mutation.EquipmentCleared() && !ok {
+	if wu.mutation.EquipmentCleared() && len(wu.mutation.EquipmentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Weapon.equipment"`)
 	}
 	return nil
@@ -205,17 +326,127 @@ func (wu *WeaponUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := wu.mutation.Indx(); ok {
-		_spec.SetField(weapon.FieldIndx, field.TypeString, value)
-	}
-	if value, ok := wu.mutation.Name(); ok {
-		_spec.SetField(weapon.FieldName, field.TypeString, value)
-	}
 	if value, ok := wu.mutation.WeaponCategory(); ok {
-		_spec.SetField(weapon.FieldWeaponCategory, field.TypeString, value)
+		_spec.SetField(weapon.FieldWeaponCategory, field.TypeEnum, value)
 	}
-	if value, ok := wu.mutation.WeaponRange(); ok {
-		_spec.SetField(weapon.FieldWeaponRange, field.TypeString, value)
+	if value, ok := wu.mutation.WeaponSubcategory(); ok {
+		_spec.SetField(weapon.FieldWeaponSubcategory, field.TypeEnum, value)
+	}
+	if value, ok := wu.mutation.RangeNormal(); ok {
+		_spec.SetField(weapon.FieldRangeNormal, field.TypeInt, value)
+	}
+	if value, ok := wu.mutation.AddedRangeNormal(); ok {
+		_spec.AddField(weapon.FieldRangeNormal, field.TypeInt, value)
+	}
+	if wu.mutation.RangeNormalCleared() {
+		_spec.ClearField(weapon.FieldRangeNormal, field.TypeInt)
+	}
+	if value, ok := wu.mutation.RangeLong(); ok {
+		_spec.SetField(weapon.FieldRangeLong, field.TypeInt, value)
+	}
+	if value, ok := wu.mutation.AddedRangeLong(); ok {
+		_spec.AddField(weapon.FieldRangeLong, field.TypeInt, value)
+	}
+	if wu.mutation.RangeLongCleared() {
+		_spec.ClearField(weapon.FieldRangeLong, field.TypeInt)
+	}
+	if value, ok := wu.mutation.ThrowRangeNormal(); ok {
+		_spec.SetField(weapon.FieldThrowRangeNormal, field.TypeInt, value)
+	}
+	if value, ok := wu.mutation.AddedThrowRangeNormal(); ok {
+		_spec.AddField(weapon.FieldThrowRangeNormal, field.TypeInt, value)
+	}
+	if wu.mutation.ThrowRangeNormalCleared() {
+		_spec.ClearField(weapon.FieldThrowRangeNormal, field.TypeInt)
+	}
+	if value, ok := wu.mutation.ThrowRangeLong(); ok {
+		_spec.SetField(weapon.FieldThrowRangeLong, field.TypeInt, value)
+	}
+	if value, ok := wu.mutation.AddedThrowRangeLong(); ok {
+		_spec.AddField(weapon.FieldThrowRangeLong, field.TypeInt, value)
+	}
+	if wu.mutation.ThrowRangeLongCleared() {
+		_spec.ClearField(weapon.FieldThrowRangeLong, field.TypeInt)
+	}
+	if value, ok := wu.mutation.DamageDice(); ok {
+		_spec.SetField(weapon.FieldDamageDice, field.TypeString, value)
+	}
+	if wu.mutation.DamageDiceCleared() {
+		_spec.ClearField(weapon.FieldDamageDice, field.TypeString)
+	}
+	if wu.mutation.PropertiesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   weapon.PropertiesTable,
+			Columns: weapon.PropertiesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(property.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wu.mutation.RemovedPropertiesIDs(); len(nodes) > 0 && !wu.mutation.PropertiesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   weapon.PropertiesTable,
+			Columns: weapon.PropertiesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(property.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wu.mutation.PropertiesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   weapon.PropertiesTable,
+			Columns: weapon.PropertiesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(property.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if wu.mutation.DamageTypeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapon.DamageTypeTable,
+			Columns: []string{weapon.DamageTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wu.mutation.DamageTypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapon.DamageTypeTable,
+			Columns: []string{weapon.DamageTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if wu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -246,96 +477,6 @@ func (wu *WeaponUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if wu.mutation.WeaponDamageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapon.WeaponDamageTable,
-			Columns: []string{weapon.WeaponDamageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := wu.mutation.RemovedWeaponDamageIDs(); len(nodes) > 0 && !wu.mutation.WeaponDamageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapon.WeaponDamageTable,
-			Columns: []string{weapon.WeaponDamageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := wu.mutation.WeaponDamageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapon.WeaponDamageTable,
-			Columns: []string{weapon.WeaponDamageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if wu.mutation.WeaponPropertiesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   weapon.WeaponPropertiesTable,
-			Columns: weapon.WeaponPropertiesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weaponproperty.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := wu.mutation.RemovedWeaponPropertiesIDs(); len(nodes) > 0 && !wu.mutation.WeaponPropertiesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   weapon.WeaponPropertiesTable,
-			Columns: weapon.WeaponPropertiesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weaponproperty.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := wu.mutation.WeaponPropertiesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   weapon.WeaponPropertiesTable,
-			Columns: weapon.WeaponPropertiesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weaponproperty.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, wu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{weapon.Label}
@@ -356,33 +497,199 @@ type WeaponUpdateOne struct {
 	mutation *WeaponMutation
 }
 
-// SetIndx sets the "indx" field.
-func (wuo *WeaponUpdateOne) SetIndx(s string) *WeaponUpdateOne {
-	wuo.mutation.SetIndx(s)
-	return wuo
-}
-
-// SetName sets the "name" field.
-func (wuo *WeaponUpdateOne) SetName(s string) *WeaponUpdateOne {
-	wuo.mutation.SetName(s)
-	return wuo
-}
-
-// SetEquipmentID sets the "equipment_id" field.
-func (wuo *WeaponUpdateOne) SetEquipmentID(i int) *WeaponUpdateOne {
-	wuo.mutation.SetEquipmentID(i)
-	return wuo
-}
-
 // SetWeaponCategory sets the "weapon_category" field.
-func (wuo *WeaponUpdateOne) SetWeaponCategory(s string) *WeaponUpdateOne {
-	wuo.mutation.SetWeaponCategory(s)
+func (wuo *WeaponUpdateOne) SetWeaponCategory(wc weapon.WeaponCategory) *WeaponUpdateOne {
+	wuo.mutation.SetWeaponCategory(wc)
 	return wuo
 }
 
-// SetWeaponRange sets the "weapon_range" field.
-func (wuo *WeaponUpdateOne) SetWeaponRange(s string) *WeaponUpdateOne {
-	wuo.mutation.SetWeaponRange(s)
+// SetNillableWeaponCategory sets the "weapon_category" field if the given value is not nil.
+func (wuo *WeaponUpdateOne) SetNillableWeaponCategory(wc *weapon.WeaponCategory) *WeaponUpdateOne {
+	if wc != nil {
+		wuo.SetWeaponCategory(*wc)
+	}
+	return wuo
+}
+
+// SetWeaponSubcategory sets the "weapon_subcategory" field.
+func (wuo *WeaponUpdateOne) SetWeaponSubcategory(ws weapon.WeaponSubcategory) *WeaponUpdateOne {
+	wuo.mutation.SetWeaponSubcategory(ws)
+	return wuo
+}
+
+// SetNillableWeaponSubcategory sets the "weapon_subcategory" field if the given value is not nil.
+func (wuo *WeaponUpdateOne) SetNillableWeaponSubcategory(ws *weapon.WeaponSubcategory) *WeaponUpdateOne {
+	if ws != nil {
+		wuo.SetWeaponSubcategory(*ws)
+	}
+	return wuo
+}
+
+// SetRangeNormal sets the "range_normal" field.
+func (wuo *WeaponUpdateOne) SetRangeNormal(i int) *WeaponUpdateOne {
+	wuo.mutation.ResetRangeNormal()
+	wuo.mutation.SetRangeNormal(i)
+	return wuo
+}
+
+// SetNillableRangeNormal sets the "range_normal" field if the given value is not nil.
+func (wuo *WeaponUpdateOne) SetNillableRangeNormal(i *int) *WeaponUpdateOne {
+	if i != nil {
+		wuo.SetRangeNormal(*i)
+	}
+	return wuo
+}
+
+// AddRangeNormal adds i to the "range_normal" field.
+func (wuo *WeaponUpdateOne) AddRangeNormal(i int) *WeaponUpdateOne {
+	wuo.mutation.AddRangeNormal(i)
+	return wuo
+}
+
+// ClearRangeNormal clears the value of the "range_normal" field.
+func (wuo *WeaponUpdateOne) ClearRangeNormal() *WeaponUpdateOne {
+	wuo.mutation.ClearRangeNormal()
+	return wuo
+}
+
+// SetRangeLong sets the "range_long" field.
+func (wuo *WeaponUpdateOne) SetRangeLong(i int) *WeaponUpdateOne {
+	wuo.mutation.ResetRangeLong()
+	wuo.mutation.SetRangeLong(i)
+	return wuo
+}
+
+// SetNillableRangeLong sets the "range_long" field if the given value is not nil.
+func (wuo *WeaponUpdateOne) SetNillableRangeLong(i *int) *WeaponUpdateOne {
+	if i != nil {
+		wuo.SetRangeLong(*i)
+	}
+	return wuo
+}
+
+// AddRangeLong adds i to the "range_long" field.
+func (wuo *WeaponUpdateOne) AddRangeLong(i int) *WeaponUpdateOne {
+	wuo.mutation.AddRangeLong(i)
+	return wuo
+}
+
+// ClearRangeLong clears the value of the "range_long" field.
+func (wuo *WeaponUpdateOne) ClearRangeLong() *WeaponUpdateOne {
+	wuo.mutation.ClearRangeLong()
+	return wuo
+}
+
+// SetThrowRangeNormal sets the "throw_range_normal" field.
+func (wuo *WeaponUpdateOne) SetThrowRangeNormal(i int) *WeaponUpdateOne {
+	wuo.mutation.ResetThrowRangeNormal()
+	wuo.mutation.SetThrowRangeNormal(i)
+	return wuo
+}
+
+// SetNillableThrowRangeNormal sets the "throw_range_normal" field if the given value is not nil.
+func (wuo *WeaponUpdateOne) SetNillableThrowRangeNormal(i *int) *WeaponUpdateOne {
+	if i != nil {
+		wuo.SetThrowRangeNormal(*i)
+	}
+	return wuo
+}
+
+// AddThrowRangeNormal adds i to the "throw_range_normal" field.
+func (wuo *WeaponUpdateOne) AddThrowRangeNormal(i int) *WeaponUpdateOne {
+	wuo.mutation.AddThrowRangeNormal(i)
+	return wuo
+}
+
+// ClearThrowRangeNormal clears the value of the "throw_range_normal" field.
+func (wuo *WeaponUpdateOne) ClearThrowRangeNormal() *WeaponUpdateOne {
+	wuo.mutation.ClearThrowRangeNormal()
+	return wuo
+}
+
+// SetThrowRangeLong sets the "throw_range_long" field.
+func (wuo *WeaponUpdateOne) SetThrowRangeLong(i int) *WeaponUpdateOne {
+	wuo.mutation.ResetThrowRangeLong()
+	wuo.mutation.SetThrowRangeLong(i)
+	return wuo
+}
+
+// SetNillableThrowRangeLong sets the "throw_range_long" field if the given value is not nil.
+func (wuo *WeaponUpdateOne) SetNillableThrowRangeLong(i *int) *WeaponUpdateOne {
+	if i != nil {
+		wuo.SetThrowRangeLong(*i)
+	}
+	return wuo
+}
+
+// AddThrowRangeLong adds i to the "throw_range_long" field.
+func (wuo *WeaponUpdateOne) AddThrowRangeLong(i int) *WeaponUpdateOne {
+	wuo.mutation.AddThrowRangeLong(i)
+	return wuo
+}
+
+// ClearThrowRangeLong clears the value of the "throw_range_long" field.
+func (wuo *WeaponUpdateOne) ClearThrowRangeLong() *WeaponUpdateOne {
+	wuo.mutation.ClearThrowRangeLong()
+	return wuo
+}
+
+// SetDamageDice sets the "damage_dice" field.
+func (wuo *WeaponUpdateOne) SetDamageDice(s string) *WeaponUpdateOne {
+	wuo.mutation.SetDamageDice(s)
+	return wuo
+}
+
+// SetNillableDamageDice sets the "damage_dice" field if the given value is not nil.
+func (wuo *WeaponUpdateOne) SetNillableDamageDice(s *string) *WeaponUpdateOne {
+	if s != nil {
+		wuo.SetDamageDice(*s)
+	}
+	return wuo
+}
+
+// ClearDamageDice clears the value of the "damage_dice" field.
+func (wuo *WeaponUpdateOne) ClearDamageDice() *WeaponUpdateOne {
+	wuo.mutation.ClearDamageDice()
+	return wuo
+}
+
+// AddPropertyIDs adds the "properties" edge to the Property entity by IDs.
+func (wuo *WeaponUpdateOne) AddPropertyIDs(ids ...int) *WeaponUpdateOne {
+	wuo.mutation.AddPropertyIDs(ids...)
+	return wuo
+}
+
+// AddProperties adds the "properties" edges to the Property entity.
+func (wuo *WeaponUpdateOne) AddProperties(p ...*Property) *WeaponUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return wuo.AddPropertyIDs(ids...)
+}
+
+// SetDamageTypeID sets the "damage_type" edge to the DamageType entity by ID.
+func (wuo *WeaponUpdateOne) SetDamageTypeID(id int) *WeaponUpdateOne {
+	wuo.mutation.SetDamageTypeID(id)
+	return wuo
+}
+
+// SetNillableDamageTypeID sets the "damage_type" edge to the DamageType entity by ID if the given value is not nil.
+func (wuo *WeaponUpdateOne) SetNillableDamageTypeID(id *int) *WeaponUpdateOne {
+	if id != nil {
+		wuo = wuo.SetDamageTypeID(*id)
+	}
+	return wuo
+}
+
+// SetDamageType sets the "damage_type" edge to the DamageType entity.
+func (wuo *WeaponUpdateOne) SetDamageType(d *DamageType) *WeaponUpdateOne {
+	return wuo.SetDamageTypeID(d.ID)
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (wuo *WeaponUpdateOne) SetEquipmentID(id int) *WeaponUpdateOne {
+	wuo.mutation.SetEquipmentID(id)
 	return wuo
 }
 
@@ -391,87 +698,42 @@ func (wuo *WeaponUpdateOne) SetEquipment(e *Equipment) *WeaponUpdateOne {
 	return wuo.SetEquipmentID(e.ID)
 }
 
-// AddWeaponDamageIDs adds the "weapon_damage" edge to the WeaponDamage entity by IDs.
-func (wuo *WeaponUpdateOne) AddWeaponDamageIDs(ids ...int) *WeaponUpdateOne {
-	wuo.mutation.AddWeaponDamageIDs(ids...)
-	return wuo
-}
-
-// AddWeaponDamage adds the "weapon_damage" edges to the WeaponDamage entity.
-func (wuo *WeaponUpdateOne) AddWeaponDamage(w ...*WeaponDamage) *WeaponUpdateOne {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wuo.AddWeaponDamageIDs(ids...)
-}
-
-// AddWeaponPropertyIDs adds the "weapon_properties" edge to the WeaponProperty entity by IDs.
-func (wuo *WeaponUpdateOne) AddWeaponPropertyIDs(ids ...int) *WeaponUpdateOne {
-	wuo.mutation.AddWeaponPropertyIDs(ids...)
-	return wuo
-}
-
-// AddWeaponProperties adds the "weapon_properties" edges to the WeaponProperty entity.
-func (wuo *WeaponUpdateOne) AddWeaponProperties(w ...*WeaponProperty) *WeaponUpdateOne {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wuo.AddWeaponPropertyIDs(ids...)
-}
-
 // Mutation returns the WeaponMutation object of the builder.
 func (wuo *WeaponUpdateOne) Mutation() *WeaponMutation {
 	return wuo.mutation
+}
+
+// ClearProperties clears all "properties" edges to the Property entity.
+func (wuo *WeaponUpdateOne) ClearProperties() *WeaponUpdateOne {
+	wuo.mutation.ClearProperties()
+	return wuo
+}
+
+// RemovePropertyIDs removes the "properties" edge to Property entities by IDs.
+func (wuo *WeaponUpdateOne) RemovePropertyIDs(ids ...int) *WeaponUpdateOne {
+	wuo.mutation.RemovePropertyIDs(ids...)
+	return wuo
+}
+
+// RemoveProperties removes "properties" edges to Property entities.
+func (wuo *WeaponUpdateOne) RemoveProperties(p ...*Property) *WeaponUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return wuo.RemovePropertyIDs(ids...)
+}
+
+// ClearDamageType clears the "damage_type" edge to the DamageType entity.
+func (wuo *WeaponUpdateOne) ClearDamageType() *WeaponUpdateOne {
+	wuo.mutation.ClearDamageType()
+	return wuo
 }
 
 // ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (wuo *WeaponUpdateOne) ClearEquipment() *WeaponUpdateOne {
 	wuo.mutation.ClearEquipment()
 	return wuo
-}
-
-// ClearWeaponDamage clears all "weapon_damage" edges to the WeaponDamage entity.
-func (wuo *WeaponUpdateOne) ClearWeaponDamage() *WeaponUpdateOne {
-	wuo.mutation.ClearWeaponDamage()
-	return wuo
-}
-
-// RemoveWeaponDamageIDs removes the "weapon_damage" edge to WeaponDamage entities by IDs.
-func (wuo *WeaponUpdateOne) RemoveWeaponDamageIDs(ids ...int) *WeaponUpdateOne {
-	wuo.mutation.RemoveWeaponDamageIDs(ids...)
-	return wuo
-}
-
-// RemoveWeaponDamage removes "weapon_damage" edges to WeaponDamage entities.
-func (wuo *WeaponUpdateOne) RemoveWeaponDamage(w ...*WeaponDamage) *WeaponUpdateOne {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wuo.RemoveWeaponDamageIDs(ids...)
-}
-
-// ClearWeaponProperties clears all "weapon_properties" edges to the WeaponProperty entity.
-func (wuo *WeaponUpdateOne) ClearWeaponProperties() *WeaponUpdateOne {
-	wuo.mutation.ClearWeaponProperties()
-	return wuo
-}
-
-// RemoveWeaponPropertyIDs removes the "weapon_properties" edge to WeaponProperty entities by IDs.
-func (wuo *WeaponUpdateOne) RemoveWeaponPropertyIDs(ids ...int) *WeaponUpdateOne {
-	wuo.mutation.RemoveWeaponPropertyIDs(ids...)
-	return wuo
-}
-
-// RemoveWeaponProperties removes "weapon_properties" edges to WeaponProperty entities.
-func (wuo *WeaponUpdateOne) RemoveWeaponProperties(w ...*WeaponProperty) *WeaponUpdateOne {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wuo.RemoveWeaponPropertyIDs(ids...)
 }
 
 // Where appends a list predicates to the WeaponUpdate builder.
@@ -516,17 +778,17 @@ func (wuo *WeaponUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (wuo *WeaponUpdateOne) check() error {
-	if v, ok := wuo.mutation.Indx(); ok {
-		if err := weapon.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Weapon.indx": %w`, err)}
+	if v, ok := wuo.mutation.WeaponCategory(); ok {
+		if err := weapon.WeaponCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "weapon_category", err: fmt.Errorf(`ent: validator failed for field "Weapon.weapon_category": %w`, err)}
 		}
 	}
-	if v, ok := wuo.mutation.Name(); ok {
-		if err := weapon.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Weapon.name": %w`, err)}
+	if v, ok := wuo.mutation.WeaponSubcategory(); ok {
+		if err := weapon.WeaponSubcategoryValidator(v); err != nil {
+			return &ValidationError{Name: "weapon_subcategory", err: fmt.Errorf(`ent: validator failed for field "Weapon.weapon_subcategory": %w`, err)}
 		}
 	}
-	if _, ok := wuo.mutation.EquipmentID(); wuo.mutation.EquipmentCleared() && !ok {
+	if wuo.mutation.EquipmentCleared() && len(wuo.mutation.EquipmentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Weapon.equipment"`)
 	}
 	return nil
@@ -561,17 +823,127 @@ func (wuo *WeaponUpdateOne) sqlSave(ctx context.Context) (_node *Weapon, err err
 			}
 		}
 	}
-	if value, ok := wuo.mutation.Indx(); ok {
-		_spec.SetField(weapon.FieldIndx, field.TypeString, value)
-	}
-	if value, ok := wuo.mutation.Name(); ok {
-		_spec.SetField(weapon.FieldName, field.TypeString, value)
-	}
 	if value, ok := wuo.mutation.WeaponCategory(); ok {
-		_spec.SetField(weapon.FieldWeaponCategory, field.TypeString, value)
+		_spec.SetField(weapon.FieldWeaponCategory, field.TypeEnum, value)
 	}
-	if value, ok := wuo.mutation.WeaponRange(); ok {
-		_spec.SetField(weapon.FieldWeaponRange, field.TypeString, value)
+	if value, ok := wuo.mutation.WeaponSubcategory(); ok {
+		_spec.SetField(weapon.FieldWeaponSubcategory, field.TypeEnum, value)
+	}
+	if value, ok := wuo.mutation.RangeNormal(); ok {
+		_spec.SetField(weapon.FieldRangeNormal, field.TypeInt, value)
+	}
+	if value, ok := wuo.mutation.AddedRangeNormal(); ok {
+		_spec.AddField(weapon.FieldRangeNormal, field.TypeInt, value)
+	}
+	if wuo.mutation.RangeNormalCleared() {
+		_spec.ClearField(weapon.FieldRangeNormal, field.TypeInt)
+	}
+	if value, ok := wuo.mutation.RangeLong(); ok {
+		_spec.SetField(weapon.FieldRangeLong, field.TypeInt, value)
+	}
+	if value, ok := wuo.mutation.AddedRangeLong(); ok {
+		_spec.AddField(weapon.FieldRangeLong, field.TypeInt, value)
+	}
+	if wuo.mutation.RangeLongCleared() {
+		_spec.ClearField(weapon.FieldRangeLong, field.TypeInt)
+	}
+	if value, ok := wuo.mutation.ThrowRangeNormal(); ok {
+		_spec.SetField(weapon.FieldThrowRangeNormal, field.TypeInt, value)
+	}
+	if value, ok := wuo.mutation.AddedThrowRangeNormal(); ok {
+		_spec.AddField(weapon.FieldThrowRangeNormal, field.TypeInt, value)
+	}
+	if wuo.mutation.ThrowRangeNormalCleared() {
+		_spec.ClearField(weapon.FieldThrowRangeNormal, field.TypeInt)
+	}
+	if value, ok := wuo.mutation.ThrowRangeLong(); ok {
+		_spec.SetField(weapon.FieldThrowRangeLong, field.TypeInt, value)
+	}
+	if value, ok := wuo.mutation.AddedThrowRangeLong(); ok {
+		_spec.AddField(weapon.FieldThrowRangeLong, field.TypeInt, value)
+	}
+	if wuo.mutation.ThrowRangeLongCleared() {
+		_spec.ClearField(weapon.FieldThrowRangeLong, field.TypeInt)
+	}
+	if value, ok := wuo.mutation.DamageDice(); ok {
+		_spec.SetField(weapon.FieldDamageDice, field.TypeString, value)
+	}
+	if wuo.mutation.DamageDiceCleared() {
+		_spec.ClearField(weapon.FieldDamageDice, field.TypeString)
+	}
+	if wuo.mutation.PropertiesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   weapon.PropertiesTable,
+			Columns: weapon.PropertiesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(property.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wuo.mutation.RemovedPropertiesIDs(); len(nodes) > 0 && !wuo.mutation.PropertiesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   weapon.PropertiesTable,
+			Columns: weapon.PropertiesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(property.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wuo.mutation.PropertiesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   weapon.PropertiesTable,
+			Columns: weapon.PropertiesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(property.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if wuo.mutation.DamageTypeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapon.DamageTypeTable,
+			Columns: []string{weapon.DamageTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wuo.mutation.DamageTypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapon.DamageTypeTable,
+			Columns: []string{weapon.DamageTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if wuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -595,96 +967,6 @@ func (wuo *WeaponUpdateOne) sqlSave(ctx context.Context) (_node *Weapon, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if wuo.mutation.WeaponDamageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapon.WeaponDamageTable,
-			Columns: []string{weapon.WeaponDamageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := wuo.mutation.RemovedWeaponDamageIDs(); len(nodes) > 0 && !wuo.mutation.WeaponDamageCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapon.WeaponDamageTable,
-			Columns: []string{weapon.WeaponDamageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := wuo.mutation.WeaponDamageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapon.WeaponDamageTable,
-			Columns: []string{weapon.WeaponDamageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if wuo.mutation.WeaponPropertiesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   weapon.WeaponPropertiesTable,
-			Columns: weapon.WeaponPropertiesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weaponproperty.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := wuo.mutation.RemovedWeaponPropertiesIDs(); len(nodes) > 0 && !wuo.mutation.WeaponPropertiesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   weapon.WeaponPropertiesTable,
-			Columns: weapon.WeaponPropertiesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weaponproperty.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := wuo.mutation.WeaponPropertiesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   weapon.WeaponPropertiesTable,
-			Columns: weapon.WeaponPropertiesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weaponproperty.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

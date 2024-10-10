@@ -32,7 +32,7 @@ func (msc *MagicSchoolCreate) SetName(s string) *MagicSchoolCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (msc *MagicSchoolCreate) SetDesc(s string) *MagicSchoolCreate {
+func (msc *MagicSchoolCreate) SetDesc(s []string) *MagicSchoolCreate {
 	msc.mutation.SetDesc(s)
 	return msc
 }
@@ -87,9 +87,6 @@ func (msc *MagicSchoolCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MagicSchool.name": %w`, err)}
 		}
 	}
-	if _, ok := msc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "MagicSchool.desc"`)}
-	}
 	return nil
 }
 
@@ -125,7 +122,7 @@ func (msc *MagicSchoolCreate) createSpec() (*MagicSchool, *sqlgraph.CreateSpec) 
 		_node.Name = value
 	}
 	if value, ok := msc.mutation.Desc(); ok {
-		_spec.SetField(magicschool.FieldDesc, field.TypeString, value)
+		_spec.SetField(magicschool.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
 	}
 	return _node, _spec
@@ -134,11 +131,15 @@ func (msc *MagicSchoolCreate) createSpec() (*MagicSchool, *sqlgraph.CreateSpec) 
 // MagicSchoolCreateBulk is the builder for creating many MagicSchool entities in bulk.
 type MagicSchoolCreateBulk struct {
 	config
+	err      error
 	builders []*MagicSchoolCreate
 }
 
 // Save creates the MagicSchool entities in the database.
 func (mscb *MagicSchoolCreateBulk) Save(ctx context.Context) ([]*MagicSchool, error) {
+	if mscb.err != nil {
+		return nil, mscb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mscb.builders))
 	nodes := make([]*MagicSchool, len(mscb.builders))
 	mutators := make([]Mutator, len(mscb.builders))

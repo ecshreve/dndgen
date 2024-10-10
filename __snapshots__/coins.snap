@@ -1,0 +1,42 @@
+
+[TestEndToEnd/TestQuery - 1]
+{
+ "coins": [
+  {
+   "desc": [
+    "A single copper piece buys a candle, a torch, or a piece of chalk."
+   ],
+   "indx": "coin-cp",
+   "name": "Copper Piece"
+  },
+  {
+   "desc": [
+    " A silver piece buys a laborer's work for half a day, a flask of lamp oil, or a night's rest in a poor inn."
+   ],
+   "indx": "coin-sp",
+   "name": "Silver Piece"
+  },
+  {
+   "desc": [
+    "Originates from fallen empires and lost kingdoms, and they sometimes arouse suspicion and skepticism when used in transactions."
+   ],
+   "indx": "coin-ep",
+   "name": "Electrum Piece"
+  },
+  {
+   "desc": [
+    "With one gold piece, a character can buy a bedroll, 50 feet of good rope, or a goat. A skilled (but not exceptional) artisan can earn one gold piece a day. The gold piece is the standard unit of measure for wealth, even if the coin itself is not commonly used. When merchants discuss deals that involve goods or services worth hundreds or thousands of gold pieces, the transactions don't usually involve the exchange of individual coins. Rather, the gold piece is a standard measure of value, and the actual exchange is in gold bars, letters of credit, or valuable goods."
+   ],
+   "indx": "coin-gp",
+   "name": "Gold Piece"
+  },
+  {
+   "desc": [
+    "Originates from fallen empires and lost kingdoms, and they sometimes arouse suspicion and skepticism when used in transactions."
+   ],
+   "indx": "coin-pp",
+   "name": "Platinum Piece"
+  }
+ ]
+}
+---

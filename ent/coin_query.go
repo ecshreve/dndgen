@@ -4,25 +4,30 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/coin"
+	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
 // CoinQuery is the builder for querying Coin entities.
 type CoinQuery struct {
 	config
-	ctx        *QueryContext
-	order      []coin.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Coin
-	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*Coin) error
+	ctx            *QueryContext
+	order          []coin.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.Coin
+	withCosts      *CostQuery
+	modifiers      []func(*sql.Selector)
+	loadTotal      []func(context.Context, []*Coin) error
+	withNamedCosts map[string]*CostQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -59,10 +64,32 @@ func (cq *CoinQuery) Order(o ...coin.OrderOption) *CoinQuery {
 	return cq
 }
 
+// QueryCosts chains the current query on the "costs" edge.
+func (cq *CoinQuery) QueryCosts() *CostQuery {
+	query := (&CostClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(coin.Table, coin.FieldID, selector),
+			sqlgraph.To(cost.Table, cost.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, coin.CostsTable, coin.CostsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Coin entity from the query.
 // Returns a *NotFoundError when no Coin was found.
 func (cq *CoinQuery) First(ctx context.Context) (*Coin, error) {
-	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, "First"))
+	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +112,7 @@ func (cq *CoinQuery) FirstX(ctx context.Context) *Coin {
 // Returns a *NotFoundError when no Coin ID was found.
 func (cq *CoinQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, "FirstID")); err != nil {
+	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -108,7 +135,7 @@ func (cq *CoinQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one Coin entity is found.
 // Returns a *NotFoundError when no Coin entities are found.
 func (cq *CoinQuery) Only(ctx context.Context) (*Coin, error) {
-	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, "Only"))
+	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +163,7 @@ func (cq *CoinQuery) OnlyX(ctx context.Context) *Coin {
 // Returns a *NotFoundError when no entities are found.
 func (cq *CoinQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, "OnlyID")); err != nil {
+	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -161,7 +188,7 @@ func (cq *CoinQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Coins.
 func (cq *CoinQuery) All(ctx context.Context) ([]*Coin, error) {
-	ctx = setContextOp(ctx, cq.ctx, "All")
+	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryAll)
 	if err := cq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -183,7 +210,7 @@ func (cq *CoinQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if cq.ctx.Unique == nil && cq.path != nil {
 		cq.Unique(true)
 	}
-	ctx = setContextOp(ctx, cq.ctx, "IDs")
+	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryIDs)
 	if err = cq.Select(coin.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -201,7 +228,7 @@ func (cq *CoinQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (cq *CoinQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, cq.ctx, "Count")
+	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryCount)
 	if err := cq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -219,7 +246,7 @@ func (cq *CoinQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (cq *CoinQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, cq.ctx, "Exist")
+	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryExist)
 	switch _, err := cq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -251,10 +278,22 @@ func (cq *CoinQuery) Clone() *CoinQuery {
 		order:      append([]coin.OrderOption{}, cq.order...),
 		inters:     append([]Interceptor{}, cq.inters...),
 		predicates: append([]predicate.Coin{}, cq.predicates...),
+		withCosts:  cq.withCosts.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
+}
+
+// WithCosts tells the query-builder to eager-load the nodes that are connected to
+// the "costs" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CoinQuery) WithCosts(opts ...func(*CostQuery)) *CoinQuery {
+	query := (&CostClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withCosts = query
+	return cq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -333,8 +372,11 @@ func (cq *CoinQuery) prepareQuery(ctx context.Context) error {
 
 func (cq *CoinQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Coin, error) {
 	var (
-		nodes = []*Coin{}
-		_spec = cq.querySpec()
+		nodes       = []*Coin{}
+		_spec       = cq.querySpec()
+		loadedTypes = [1]bool{
+			cq.withCosts != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Coin).scanValues(nil, columns)
@@ -342,6 +384,7 @@ func (cq *CoinQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Coin, e
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Coin{config: cq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(cq.modifiers) > 0 {
@@ -356,12 +399,58 @@ func (cq *CoinQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Coin, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := cq.withCosts; query != nil {
+		if err := cq.loadCosts(ctx, query, nodes,
+			func(n *Coin) { n.Edges.Costs = []*Cost{} },
+			func(n *Coin, e *Cost) { n.Edges.Costs = append(n.Edges.Costs, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range cq.withNamedCosts {
+		if err := cq.loadCosts(ctx, query, nodes,
+			func(n *Coin) { n.appendNamedCosts(name) },
+			func(n *Coin, e *Cost) { n.appendNamedCosts(name, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for i := range cq.loadTotal {
 		if err := cq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
+}
+
+func (cq *CoinQuery) loadCosts(ctx context.Context, query *CostQuery, nodes []*Coin, init func(*Coin), assign func(*Coin, *Cost)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Coin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Cost(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(coin.CostsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.cost_coin
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "cost_coin" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "cost_coin" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (cq *CoinQuery) sqlCount(ctx context.Context) (int, error) {
@@ -448,6 +537,20 @@ func (cq *CoinQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
+// WithNamedCosts tells the query-builder to eager-load the nodes that are connected to the "costs"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (cq *CoinQuery) WithNamedCosts(name string, opts ...func(*CostQuery)) *CoinQuery {
+	query := (&CostClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if cq.withNamedCosts == nil {
+		cq.withNamedCosts = make(map[string]*CostQuery)
+	}
+	cq.withNamedCosts[name] = query
+	return cq
+}
+
 // CoinGroupBy is the group-by builder for Coin entities.
 type CoinGroupBy struct {
 	selector
@@ -462,7 +565,7 @@ func (cgb *CoinGroupBy) Aggregate(fns ...AggregateFunc) *CoinGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (cgb *CoinGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, cgb.build.ctx, ent.OpQueryGroupBy)
 	if err := cgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -510,7 +613,7 @@ func (cs *CoinSelect) Aggregate(fns ...AggregateFunc) *CoinSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (cs *CoinSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cs.ctx, "Select")
+	ctx = setContextOp(ctx, cs.ctx, ent.OpQuerySelect)
 	if err := cs.prepareQuery(ctx); err != nil {
 		return err
 	}

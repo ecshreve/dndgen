@@ -53,154 +53,9 @@ func IDLTE(id int) predicate.Tool {
 	return predicate.Tool(sql.FieldLTE(FieldID, id))
 }
 
-// Indx applies equality check predicate on the "indx" field. It's identical to IndxEQ.
-func Indx(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldEQ(FieldIndx, v))
-}
-
-// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
-func Name(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldEQ(FieldName, v))
-}
-
 // ToolCategory applies equality check predicate on the "tool_category" field. It's identical to ToolCategoryEQ.
 func ToolCategory(v string) predicate.Tool {
 	return predicate.Tool(sql.FieldEQ(FieldToolCategory, v))
-}
-
-// EquipmentID applies equality check predicate on the "equipment_id" field. It's identical to EquipmentIDEQ.
-func EquipmentID(v int) predicate.Tool {
-	return predicate.Tool(sql.FieldEQ(FieldEquipmentID, v))
-}
-
-// IndxEQ applies the EQ predicate on the "indx" field.
-func IndxEQ(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldEQ(FieldIndx, v))
-}
-
-// IndxNEQ applies the NEQ predicate on the "indx" field.
-func IndxNEQ(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldNEQ(FieldIndx, v))
-}
-
-// IndxIn applies the In predicate on the "indx" field.
-func IndxIn(vs ...string) predicate.Tool {
-	return predicate.Tool(sql.FieldIn(FieldIndx, vs...))
-}
-
-// IndxNotIn applies the NotIn predicate on the "indx" field.
-func IndxNotIn(vs ...string) predicate.Tool {
-	return predicate.Tool(sql.FieldNotIn(FieldIndx, vs...))
-}
-
-// IndxGT applies the GT predicate on the "indx" field.
-func IndxGT(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldGT(FieldIndx, v))
-}
-
-// IndxGTE applies the GTE predicate on the "indx" field.
-func IndxGTE(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldGTE(FieldIndx, v))
-}
-
-// IndxLT applies the LT predicate on the "indx" field.
-func IndxLT(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldLT(FieldIndx, v))
-}
-
-// IndxLTE applies the LTE predicate on the "indx" field.
-func IndxLTE(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldLTE(FieldIndx, v))
-}
-
-// IndxContains applies the Contains predicate on the "indx" field.
-func IndxContains(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldContains(FieldIndx, v))
-}
-
-// IndxHasPrefix applies the HasPrefix predicate on the "indx" field.
-func IndxHasPrefix(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldHasPrefix(FieldIndx, v))
-}
-
-// IndxHasSuffix applies the HasSuffix predicate on the "indx" field.
-func IndxHasSuffix(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldHasSuffix(FieldIndx, v))
-}
-
-// IndxEqualFold applies the EqualFold predicate on the "indx" field.
-func IndxEqualFold(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldEqualFold(FieldIndx, v))
-}
-
-// IndxContainsFold applies the ContainsFold predicate on the "indx" field.
-func IndxContainsFold(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldContainsFold(FieldIndx, v))
-}
-
-// NameEQ applies the EQ predicate on the "name" field.
-func NameEQ(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldEQ(FieldName, v))
-}
-
-// NameNEQ applies the NEQ predicate on the "name" field.
-func NameNEQ(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldNEQ(FieldName, v))
-}
-
-// NameIn applies the In predicate on the "name" field.
-func NameIn(vs ...string) predicate.Tool {
-	return predicate.Tool(sql.FieldIn(FieldName, vs...))
-}
-
-// NameNotIn applies the NotIn predicate on the "name" field.
-func NameNotIn(vs ...string) predicate.Tool {
-	return predicate.Tool(sql.FieldNotIn(FieldName, vs...))
-}
-
-// NameGT applies the GT predicate on the "name" field.
-func NameGT(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldGT(FieldName, v))
-}
-
-// NameGTE applies the GTE predicate on the "name" field.
-func NameGTE(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldGTE(FieldName, v))
-}
-
-// NameLT applies the LT predicate on the "name" field.
-func NameLT(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldLT(FieldName, v))
-}
-
-// NameLTE applies the LTE predicate on the "name" field.
-func NameLTE(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldLTE(FieldName, v))
-}
-
-// NameContains applies the Contains predicate on the "name" field.
-func NameContains(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldContains(FieldName, v))
-}
-
-// NameHasPrefix applies the HasPrefix predicate on the "name" field.
-func NameHasPrefix(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldHasPrefix(FieldName, v))
-}
-
-// NameHasSuffix applies the HasSuffix predicate on the "name" field.
-func NameHasSuffix(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldHasSuffix(FieldName, v))
-}
-
-// NameEqualFold applies the EqualFold predicate on the "name" field.
-func NameEqualFold(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldEqualFold(FieldName, v))
-}
-
-// NameContainsFold applies the ContainsFold predicate on the "name" field.
-func NameContainsFold(v string) predicate.Tool {
-	return predicate.Tool(sql.FieldContainsFold(FieldName, v))
 }
 
 // ToolCategoryEQ applies the EQ predicate on the "tool_category" field.
@@ -268,24 +123,14 @@ func ToolCategoryContainsFold(v string) predicate.Tool {
 	return predicate.Tool(sql.FieldContainsFold(FieldToolCategory, v))
 }
 
-// EquipmentIDEQ applies the EQ predicate on the "equipment_id" field.
-func EquipmentIDEQ(v int) predicate.Tool {
-	return predicate.Tool(sql.FieldEQ(FieldEquipmentID, v))
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.Tool {
+	return predicate.Tool(sql.FieldIsNull(FieldDesc))
 }
 
-// EquipmentIDNEQ applies the NEQ predicate on the "equipment_id" field.
-func EquipmentIDNEQ(v int) predicate.Tool {
-	return predicate.Tool(sql.FieldNEQ(FieldEquipmentID, v))
-}
-
-// EquipmentIDIn applies the In predicate on the "equipment_id" field.
-func EquipmentIDIn(vs ...int) predicate.Tool {
-	return predicate.Tool(sql.FieldIn(FieldEquipmentID, vs...))
-}
-
-// EquipmentIDNotIn applies the NotIn predicate on the "equipment_id" field.
-func EquipmentIDNotIn(vs ...int) predicate.Tool {
-	return predicate.Tool(sql.FieldNotIn(FieldEquipmentID, vs...))
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.Tool {
+	return predicate.Tool(sql.FieldNotNull(FieldDesc))
 }
 
 // HasEquipment applies the HasEdge predicate on the "equipment" edge.
@@ -313,32 +158,15 @@ func HasEquipmentWith(preds ...predicate.Equipment) predicate.Tool {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Tool) predicate.Tool {
-	return predicate.Tool(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Tool(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Tool) predicate.Tool {
-	return predicate.Tool(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Tool(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Tool) predicate.Tool {
-	return predicate.Tool(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Tool(sql.NotPredicates(p))
 }

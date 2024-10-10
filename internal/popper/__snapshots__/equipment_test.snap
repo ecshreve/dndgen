@@ -1,0 +1,147 @@
+
+[TestEquipmentPopulator - 1]
+[
+ {
+  "category_range": "Simple Melee",
+  "cost": {
+   "quantity": 1,
+   "unit": "sp"
+  },
+  "damage": {
+   "damage_dice": "1d4",
+   "damage_type": {
+    "index": "bludgeoning"
+   }
+  },
+  "equipment_category": {
+   "index": "weapon"
+  },
+  "index": "club",
+  "name": "Club",
+  "properties": [
+   {
+    "index": "weap-light"
+   },
+   {
+    "index": "weap-monk"
+   }
+  ],
+  "range": {
+   "normal": 5
+  },
+  "weapon_category": "Simple",
+  "weapon_range": "Melee",
+  "weight": 2
+ },
+ {
+  "armor_category": "Light",
+  "armor_class": {
+   "base": 11,
+   "dex_bonus": true
+  },
+  "cost": {
+   "quantity": 5,
+   "unit": "gp"
+  },
+  "equipment_category": {
+   "index": "armor"
+  },
+  "index": "padded-armor",
+  "name": "Padded Armor",
+  "stealth_disadvantage": true,
+  "str_minimum": 0,
+  "weight": 8
+ },
+ {
+  "contents": [
+   {
+    "item": {
+     "index": "backpack"
+    },
+    "quantity": 1
+   },
+   {
+    "item": {
+     "index": "book"
+    },
+    "quantity": 1
+   },
+   {
+    "item": {
+     "index": "ink-1-ounce-bottle"
+    },
+    "quantity": 1
+   },
+   {
+    "item": {
+     "index": "ink-pen"
+    },
+    "quantity": 1
+   },
+   {
+    "item": {
+     "index": "parchment-one-sheet"
+    },
+    "quantity": 10
+   },
+   {
+    "item": {
+     "index": "little-bag-of-sand"
+    },
+    "quantity": 1
+   },
+   {
+    "item": {
+     "index": "small-knife"
+    },
+    "quantity": 1
+   }
+  ],
+  "cost": {
+   "quantity": 40,
+   "unit": "gp"
+  },
+  "equipment_category": {
+   "index": "adventuring-gear"
+  },
+  "gear_category": {
+   "index": "equipment-packs"
+  },
+  "index": "scholars-pack",
+  "name": "Scholar's Pack"
+ },
+ {
+  "cost": {
+   "quantity": 50,
+   "unit": "gp"
+  },
+  "desc": [
+   "These special tools include the items needed to pursue a craft or trade. The table shows examples of the most common types of tools, each providing items related to a single craft. Proficiency with a set of artisan's tools lets you add your proficiency bonus to any ability checks you make using the tools in your craft. Each type of artisan's tools requires a separate proficiency."
+  ],
+  "equipment_category": {
+   "index": "tools"
+  },
+  "index": "alchemists-supplies",
+  "name": "Alchemist's Supplies",
+  "tool_category": "Artisan's Tools",
+  "weight": 8
+ },
+ {
+  "capacity": "1,320 lb.",
+  "cost": {
+   "quantity": 200,
+   "unit": "gp"
+  },
+  "equipment_category": {
+   "index": "mounts-and-vehicles"
+  },
+  "index": "elephant",
+  "name": "Elephant",
+  "speed": {
+   "quantity": 40,
+   "unit": "ft/round"
+  },
+  "vehicle_category": "Mounts and Other Animals"
+ }
+]
+---

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -23,6 +24,7 @@ type GearQuery struct {
 	inters        []Interceptor
 	predicates    []predicate.Gear
 	withEquipment *EquipmentQuery
+	withFKs       bool
 	modifiers     []func(*sql.Selector)
 	loadTotal     []func(context.Context, []*Gear) error
 	// intermediate query (i.e. traversal path).
@@ -86,7 +88,7 @@ func (gq *GearQuery) QueryEquipment() *EquipmentQuery {
 // First returns the first Gear entity from the query.
 // Returns a *NotFoundError when no Gear was found.
 func (gq *GearQuery) First(ctx context.Context) (*Gear, error) {
-	nodes, err := gq.Limit(1).All(setContextOp(ctx, gq.ctx, "First"))
+	nodes, err := gq.Limit(1).All(setContextOp(ctx, gq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +111,7 @@ func (gq *GearQuery) FirstX(ctx context.Context) *Gear {
 // Returns a *NotFoundError when no Gear ID was found.
 func (gq *GearQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = gq.Limit(1).IDs(setContextOp(ctx, gq.ctx, "FirstID")); err != nil {
+	if ids, err = gq.Limit(1).IDs(setContextOp(ctx, gq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -132,7 +134,7 @@ func (gq *GearQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one Gear entity is found.
 // Returns a *NotFoundError when no Gear entities are found.
 func (gq *GearQuery) Only(ctx context.Context) (*Gear, error) {
-	nodes, err := gq.Limit(2).All(setContextOp(ctx, gq.ctx, "Only"))
+	nodes, err := gq.Limit(2).All(setContextOp(ctx, gq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +162,7 @@ func (gq *GearQuery) OnlyX(ctx context.Context) *Gear {
 // Returns a *NotFoundError when no entities are found.
 func (gq *GearQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = gq.Limit(2).IDs(setContextOp(ctx, gq.ctx, "OnlyID")); err != nil {
+	if ids, err = gq.Limit(2).IDs(setContextOp(ctx, gq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -185,7 +187,7 @@ func (gq *GearQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Gears.
 func (gq *GearQuery) All(ctx context.Context) ([]*Gear, error) {
-	ctx = setContextOp(ctx, gq.ctx, "All")
+	ctx = setContextOp(ctx, gq.ctx, ent.OpQueryAll)
 	if err := gq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -207,7 +209,7 @@ func (gq *GearQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if gq.ctx.Unique == nil && gq.path != nil {
 		gq.Unique(true)
 	}
-	ctx = setContextOp(ctx, gq.ctx, "IDs")
+	ctx = setContextOp(ctx, gq.ctx, ent.OpQueryIDs)
 	if err = gq.Select(gear.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -225,7 +227,7 @@ func (gq *GearQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (gq *GearQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, gq.ctx, "Count")
+	ctx = setContextOp(ctx, gq.ctx, ent.OpQueryCount)
 	if err := gq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -243,7 +245,7 @@ func (gq *GearQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (gq *GearQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, gq.ctx, "Exist")
+	ctx = setContextOp(ctx, gq.ctx, ent.OpQueryExist)
 	switch _, err := gq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -299,12 +301,12 @@ func (gq *GearQuery) WithEquipment(opts ...func(*EquipmentQuery)) *GearQuery {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"index"`
+//		GearCategory string `json:"gear_category,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Gear.Query().
-//		GroupBy(gear.FieldIndx).
+//		GroupBy(gear.FieldGearCategory).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (gq *GearQuery) GroupBy(field string, fields ...string) *GearGroupBy {
@@ -322,11 +324,11 @@ func (gq *GearQuery) GroupBy(field string, fields ...string) *GearGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"index"`
+//		GearCategory string `json:"gear_category,omitempty"`
 //	}
 //
 //	client.Gear.Query().
-//		Select(gear.FieldIndx).
+//		Select(gear.FieldGearCategory).
 //		Scan(ctx, &v)
 func (gq *GearQuery) Select(fields ...string) *GearSelect {
 	gq.ctx.Fields = append(gq.ctx.Fields, fields...)
@@ -370,11 +372,18 @@ func (gq *GearQuery) prepareQuery(ctx context.Context) error {
 func (gq *GearQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Gear, error) {
 	var (
 		nodes       = []*Gear{}
+		withFKs     = gq.withFKs
 		_spec       = gq.querySpec()
 		loadedTypes = [1]bool{
 			gq.withEquipment != nil,
 		}
 	)
+	if gq.withEquipment != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, gear.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Gear).scanValues(nil, columns)
 	}
@@ -414,7 +423,10 @@ func (gq *GearQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Gear)
 	for i := range nodes {
-		fk := nodes[i].EquipmentID
+		if nodes[i].equipment_gear == nil {
+			continue
+		}
+		fk := *nodes[i].equipment_gear
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -431,7 +443,7 @@ func (gq *GearQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_gear" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -467,9 +479,6 @@ func (gq *GearQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != gear.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if gq.withEquipment != nil {
-			_spec.Node.AddColumnOnce(gear.FieldEquipmentID)
 		}
 	}
 	if ps := gq.predicates; len(ps) > 0 {
@@ -541,7 +550,7 @@ func (ggb *GearGroupBy) Aggregate(fns ...AggregateFunc) *GearGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ggb *GearGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ggb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, ggb.build.ctx, ent.OpQueryGroupBy)
 	if err := ggb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -589,7 +598,7 @@ func (gs *GearSelect) Aggregate(fns ...AggregateFunc) *GearSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (gs *GearSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, gs.ctx, "Select")
+	ctx = setContextOp(ctx, gs.ctx, ent.OpQuerySelect)
 	if err := gs.prepareQuery(ctx); err != nil {
 		return err
 	}

@@ -18,59 +18,45 @@ type Armor struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Indx holds the value of the "indx" field.
-	Indx string `json:"index"`
-	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
 	// ArmorCategory holds the value of the "armor_category" field.
-	ArmorCategory string `json:"armor_category,omitempty"`
+	ArmorCategory armor.ArmorCategory `json:"armor_category,omitempty"`
+	// StrMinimum holds the value of the "str_minimum" field.
+	StrMinimum int `json:"str_minimum,omitempty"`
 	// StealthDisadvantage holds the value of the "stealth_disadvantage" field.
 	StealthDisadvantage bool `json:"stealth_disadvantage,omitempty"`
-	// MinStrength holds the value of the "min_strength" field.
-	MinStrength int `json:"min_strength,omitempty"`
-	// EquipmentID holds the value of the "equipment_id" field.
-	EquipmentID int `json:"equipment_id,omitempty"`
+	// AcBase holds the value of the "ac_base" field.
+	AcBase int `json:"ac_base,omitempty"`
+	// AcDexBonus holds the value of the "ac_dex_bonus" field.
+	AcDexBonus bool `json:"ac_dex_bonus,omitempty"`
+	// AcMaxBonus holds the value of the "ac_max_bonus" field.
+	AcMaxBonus int `json:"ac_max_bonus,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ArmorQuery when eager-loading is set.
-	Edges        ArmorEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges           ArmorEdges `json:"-"`
+	equipment_armor *int
+	selectValues    sql.SelectValues
 }
 
 // ArmorEdges holds the relations/edges for other nodes in the graph.
 type ArmorEdges struct {
 	// Equipment holds the value of the equipment edge.
 	Equipment *Equipment `json:"equipment,omitempty"`
-	// ArmorClass holds the value of the armor_class edge.
-	ArmorClass []*ArmorClass `json:"armor_class,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
-
-	namedArmorClass map[string][]*ArmorClass
+	totalCount [1]map[string]int
 }
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ArmorEdges) EquipmentOrErr() (*Equipment, error) {
-	if e.loadedTypes[0] {
-		if e.Equipment == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: equipment.Label}
-		}
+	if e.Equipment != nil {
 		return e.Equipment, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: equipment.Label}
 	}
 	return nil, &NotLoadedError{edge: "equipment"}
-}
-
-// ArmorClassOrErr returns the ArmorClass value or an error if the edge
-// was not loaded in eager-loading.
-func (e ArmorEdges) ArmorClassOrErr() ([]*ArmorClass, error) {
-	if e.loadedTypes[1] {
-		return e.ArmorClass, nil
-	}
-	return nil, &NotLoadedError{edge: "armor_class"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -78,12 +64,14 @@ func (*Armor) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case armor.FieldStealthDisadvantage:
+		case armor.FieldStealthDisadvantage, armor.FieldAcDexBonus:
 			values[i] = new(sql.NullBool)
-		case armor.FieldID, armor.FieldMinStrength, armor.FieldEquipmentID:
+		case armor.FieldID, armor.FieldStrMinimum, armor.FieldAcBase, armor.FieldAcMaxBonus:
 			values[i] = new(sql.NullInt64)
-		case armor.FieldIndx, armor.FieldName, armor.FieldArmorCategory:
+		case armor.FieldArmorCategory:
 			values[i] = new(sql.NullString)
+		case armor.ForeignKeys[0]: // equipment_armor
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -105,23 +93,17 @@ func (a *Armor) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			a.ID = int(value.Int64)
-		case armor.FieldIndx:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field indx", values[i])
-			} else if value.Valid {
-				a.Indx = value.String
-			}
-		case armor.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field name", values[i])
-			} else if value.Valid {
-				a.Name = value.String
-			}
 		case armor.FieldArmorCategory:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field armor_category", values[i])
 			} else if value.Valid {
-				a.ArmorCategory = value.String
+				a.ArmorCategory = armor.ArmorCategory(value.String)
+			}
+		case armor.FieldStrMinimum:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field str_minimum", values[i])
+			} else if value.Valid {
+				a.StrMinimum = int(value.Int64)
 			}
 		case armor.FieldStealthDisadvantage:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -129,17 +111,30 @@ func (a *Armor) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.StealthDisadvantage = value.Bool
 			}
-		case armor.FieldMinStrength:
+		case armor.FieldAcBase:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field min_strength", values[i])
+				return fmt.Errorf("unexpected type %T for field ac_base", values[i])
 			} else if value.Valid {
-				a.MinStrength = int(value.Int64)
+				a.AcBase = int(value.Int64)
 			}
-		case armor.FieldEquipmentID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field equipment_id", values[i])
+		case armor.FieldAcDexBonus:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field ac_dex_bonus", values[i])
 			} else if value.Valid {
-				a.EquipmentID = int(value.Int64)
+				a.AcDexBonus = value.Bool
+			}
+		case armor.FieldAcMaxBonus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field ac_max_bonus", values[i])
+			} else if value.Valid {
+				a.AcMaxBonus = int(value.Int64)
+			}
+		case armor.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field equipment_armor", value)
+			} else if value.Valid {
+				a.equipment_armor = new(int)
+				*a.equipment_armor = int(value.Int64)
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
@@ -157,11 +152,6 @@ func (a *Armor) Value(name string) (ent.Value, error) {
 // QueryEquipment queries the "equipment" edge of the Armor entity.
 func (a *Armor) QueryEquipment() *EquipmentQuery {
 	return NewArmorClient(a.config).QueryEquipment(a)
-}
-
-// QueryArmorClass queries the "armor_class" edge of the Armor entity.
-func (a *Armor) QueryArmorClass() *ArmorClassQuery {
-	return NewArmorClient(a.config).QueryArmorClass(a)
 }
 
 // Update returns a builder for updating this Armor.
@@ -187,23 +177,23 @@ func (a *Armor) String() string {
 	var builder strings.Builder
 	builder.WriteString("Armor(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
-	builder.WriteString("indx=")
-	builder.WriteString(a.Indx)
-	builder.WriteString(", ")
-	builder.WriteString("name=")
-	builder.WriteString(a.Name)
-	builder.WriteString(", ")
 	builder.WriteString("armor_category=")
-	builder.WriteString(a.ArmorCategory)
+	builder.WriteString(fmt.Sprintf("%v", a.ArmorCategory))
+	builder.WriteString(", ")
+	builder.WriteString("str_minimum=")
+	builder.WriteString(fmt.Sprintf("%v", a.StrMinimum))
 	builder.WriteString(", ")
 	builder.WriteString("stealth_disadvantage=")
 	builder.WriteString(fmt.Sprintf("%v", a.StealthDisadvantage))
 	builder.WriteString(", ")
-	builder.WriteString("min_strength=")
-	builder.WriteString(fmt.Sprintf("%v", a.MinStrength))
+	builder.WriteString("ac_base=")
+	builder.WriteString(fmt.Sprintf("%v", a.AcBase))
 	builder.WriteString(", ")
-	builder.WriteString("equipment_id=")
-	builder.WriteString(fmt.Sprintf("%v", a.EquipmentID))
+	builder.WriteString("ac_dex_bonus=")
+	builder.WriteString(fmt.Sprintf("%v", a.AcDexBonus))
+	builder.WriteString(", ")
+	builder.WriteString("ac_max_bonus=")
+	builder.WriteString(fmt.Sprintf("%v", a.AcMaxBonus))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -239,37 +229,13 @@ func (a *Armor) UnmarshalJSON(data []byte) error {
 }
 
 func (ac *ArmorCreate) SetArmor(input *Armor) *ArmorCreate {
-	ac.SetIndx(input.Indx)
-	ac.SetName(input.Name)
 	ac.SetArmorCategory(input.ArmorCategory)
+	ac.SetStrMinimum(input.StrMinimum)
 	ac.SetStealthDisadvantage(input.StealthDisadvantage)
-	ac.SetMinStrength(input.MinStrength)
-	ac.SetEquipmentID(input.EquipmentID)
+	ac.SetAcBase(input.AcBase)
+	ac.SetAcDexBonus(input.AcDexBonus)
+	ac.SetAcMaxBonus(input.AcMaxBonus)
 	return ac
-}
-
-// NamedArmorClass returns the ArmorClass named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (a *Armor) NamedArmorClass(name string) ([]*ArmorClass, error) {
-	if a.Edges.namedArmorClass == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := a.Edges.namedArmorClass[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (a *Armor) appendNamedArmorClass(name string, edges ...*ArmorClass) {
-	if a.Edges.namedArmorClass == nil {
-		a.Edges.namedArmorClass = make(map[string][]*ArmorClass)
-	}
-	if len(edges) == 0 {
-		a.Edges.namedArmorClass[name] = []*ArmorClass{}
-	} else {
-		a.Edges.namedArmorClass[name] = append(a.Edges.namedArmorClass[name], edges...)
-	}
 }
 
 // Armors is a parsable slice of Armor.

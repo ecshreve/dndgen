@@ -8,10 +8,12 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/race"
 )
@@ -19,14 +21,16 @@ import (
 // LanguageQuery is the builder for querying Language entities.
 type LanguageQuery struct {
 	config
-	ctx                   *QueryContext
-	order                 []language.OrderOption
-	inters                []Interceptor
-	predicates            []predicate.Language
-	withRaceSpeakers      *RaceQuery
-	modifiers             []func(*sql.Selector)
-	loadTotal             []func(context.Context, []*Language) error
-	withNamedRaceSpeakers map[string]*RaceQuery
+	ctx              *QueryContext
+	order            []language.OrderOption
+	inters           []Interceptor
+	predicates       []predicate.Language
+	withRace         *RaceQuery
+	withOptions      *LanguageChoiceQuery
+	modifiers        []func(*sql.Selector)
+	loadTotal        []func(context.Context, []*Language) error
+	withNamedRace    map[string]*RaceQuery
+	withNamedOptions map[string]*LanguageChoiceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -63,8 +67,8 @@ func (lq *LanguageQuery) Order(o ...language.OrderOption) *LanguageQuery {
 	return lq
 }
 
-// QueryRaceSpeakers chains the current query on the "race_speakers" edge.
-func (lq *LanguageQuery) QueryRaceSpeakers() *RaceQuery {
+// QueryRace chains the current query on the "race" edge.
+func (lq *LanguageQuery) QueryRace() *RaceQuery {
 	query := (&RaceClient{config: lq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := lq.prepareQuery(ctx); err != nil {
@@ -77,7 +81,29 @@ func (lq *LanguageQuery) QueryRaceSpeakers() *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(language.Table, language.FieldID, selector),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, language.RaceSpeakersTable, language.RaceSpeakersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, language.RaceTable, language.RacePrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOptions chains the current query on the "options" edge.
+func (lq *LanguageQuery) QueryOptions() *LanguageChoiceQuery {
+	query := (&LanguageChoiceClient{config: lq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := lq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := lq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(language.Table, language.FieldID, selector),
+			sqlgraph.To(languagechoice.Table, languagechoice.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, language.OptionsTable, language.OptionsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
 		return fromU, nil
@@ -88,7 +114,7 @@ func (lq *LanguageQuery) QueryRaceSpeakers() *RaceQuery {
 // First returns the first Language entity from the query.
 // Returns a *NotFoundError when no Language was found.
 func (lq *LanguageQuery) First(ctx context.Context) (*Language, error) {
-	nodes, err := lq.Limit(1).All(setContextOp(ctx, lq.ctx, "First"))
+	nodes, err := lq.Limit(1).All(setContextOp(ctx, lq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +137,7 @@ func (lq *LanguageQuery) FirstX(ctx context.Context) *Language {
 // Returns a *NotFoundError when no Language ID was found.
 func (lq *LanguageQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = lq.Limit(1).IDs(setContextOp(ctx, lq.ctx, "FirstID")); err != nil {
+	if ids, err = lq.Limit(1).IDs(setContextOp(ctx, lq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -134,7 +160,7 @@ func (lq *LanguageQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one Language entity is found.
 // Returns a *NotFoundError when no Language entities are found.
 func (lq *LanguageQuery) Only(ctx context.Context) (*Language, error) {
-	nodes, err := lq.Limit(2).All(setContextOp(ctx, lq.ctx, "Only"))
+	nodes, err := lq.Limit(2).All(setContextOp(ctx, lq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +188,7 @@ func (lq *LanguageQuery) OnlyX(ctx context.Context) *Language {
 // Returns a *NotFoundError when no entities are found.
 func (lq *LanguageQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = lq.Limit(2).IDs(setContextOp(ctx, lq.ctx, "OnlyID")); err != nil {
+	if ids, err = lq.Limit(2).IDs(setContextOp(ctx, lq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -187,7 +213,7 @@ func (lq *LanguageQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of Languages.
 func (lq *LanguageQuery) All(ctx context.Context) ([]*Language, error) {
-	ctx = setContextOp(ctx, lq.ctx, "All")
+	ctx = setContextOp(ctx, lq.ctx, ent.OpQueryAll)
 	if err := lq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -209,7 +235,7 @@ func (lq *LanguageQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if lq.ctx.Unique == nil && lq.path != nil {
 		lq.Unique(true)
 	}
-	ctx = setContextOp(ctx, lq.ctx, "IDs")
+	ctx = setContextOp(ctx, lq.ctx, ent.OpQueryIDs)
 	if err = lq.Select(language.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -227,7 +253,7 @@ func (lq *LanguageQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (lq *LanguageQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, lq.ctx, "Count")
+	ctx = setContextOp(ctx, lq.ctx, ent.OpQueryCount)
 	if err := lq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -245,7 +271,7 @@ func (lq *LanguageQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (lq *LanguageQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, lq.ctx, "Exist")
+	ctx = setContextOp(ctx, lq.ctx, ent.OpQueryExist)
 	switch _, err := lq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -272,26 +298,38 @@ func (lq *LanguageQuery) Clone() *LanguageQuery {
 		return nil
 	}
 	return &LanguageQuery{
-		config:           lq.config,
-		ctx:              lq.ctx.Clone(),
-		order:            append([]language.OrderOption{}, lq.order...),
-		inters:           append([]Interceptor{}, lq.inters...),
-		predicates:       append([]predicate.Language{}, lq.predicates...),
-		withRaceSpeakers: lq.withRaceSpeakers.Clone(),
+		config:      lq.config,
+		ctx:         lq.ctx.Clone(),
+		order:       append([]language.OrderOption{}, lq.order...),
+		inters:      append([]Interceptor{}, lq.inters...),
+		predicates:  append([]predicate.Language{}, lq.predicates...),
+		withRace:    lq.withRace.Clone(),
+		withOptions: lq.withOptions.Clone(),
 		// clone intermediate query.
 		sql:  lq.sql.Clone(),
 		path: lq.path,
 	}
 }
 
-// WithRaceSpeakers tells the query-builder to eager-load the nodes that are connected to
-// the "race_speakers" edge. The optional arguments are used to configure the query builder of the edge.
-func (lq *LanguageQuery) WithRaceSpeakers(opts ...func(*RaceQuery)) *LanguageQuery {
+// WithRace tells the query-builder to eager-load the nodes that are connected to
+// the "race" edge. The optional arguments are used to configure the query builder of the edge.
+func (lq *LanguageQuery) WithRace(opts ...func(*RaceQuery)) *LanguageQuery {
 	query := (&RaceClient{config: lq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	lq.withRaceSpeakers = query
+	lq.withRace = query
+	return lq
+}
+
+// WithOptions tells the query-builder to eager-load the nodes that are connected to
+// the "options" edge. The optional arguments are used to configure the query builder of the edge.
+func (lq *LanguageQuery) WithOptions(opts ...func(*LanguageChoiceQuery)) *LanguageQuery {
+	query := (&LanguageChoiceClient{config: lq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	lq.withOptions = query
 	return lq
 }
 
@@ -373,8 +411,9 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 	var (
 		nodes       = []*Language{}
 		_spec       = lq.querySpec()
-		loadedTypes = [1]bool{
-			lq.withRaceSpeakers != nil,
+		loadedTypes = [2]bool{
+			lq.withRace != nil,
+			lq.withOptions != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -398,17 +437,31 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := lq.withRaceSpeakers; query != nil {
-		if err := lq.loadRaceSpeakers(ctx, query, nodes,
-			func(n *Language) { n.Edges.RaceSpeakers = []*Race{} },
-			func(n *Language, e *Race) { n.Edges.RaceSpeakers = append(n.Edges.RaceSpeakers, e) }); err != nil {
+	if query := lq.withRace; query != nil {
+		if err := lq.loadRace(ctx, query, nodes,
+			func(n *Language) { n.Edges.Race = []*Race{} },
+			func(n *Language, e *Race) { n.Edges.Race = append(n.Edges.Race, e) }); err != nil {
 			return nil, err
 		}
 	}
-	for name, query := range lq.withNamedRaceSpeakers {
-		if err := lq.loadRaceSpeakers(ctx, query, nodes,
-			func(n *Language) { n.appendNamedRaceSpeakers(name) },
-			func(n *Language, e *Race) { n.appendNamedRaceSpeakers(name, e) }); err != nil {
+	if query := lq.withOptions; query != nil {
+		if err := lq.loadOptions(ctx, query, nodes,
+			func(n *Language) { n.Edges.Options = []*LanguageChoice{} },
+			func(n *Language, e *LanguageChoice) { n.Edges.Options = append(n.Edges.Options, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range lq.withNamedRace {
+		if err := lq.loadRace(ctx, query, nodes,
+			func(n *Language) { n.appendNamedRace(name) },
+			func(n *Language, e *Race) { n.appendNamedRace(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range lq.withNamedOptions {
+		if err := lq.loadOptions(ctx, query, nodes,
+			func(n *Language) { n.appendNamedOptions(name) },
+			func(n *Language, e *LanguageChoice) { n.appendNamedOptions(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -420,7 +473,7 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 	return nodes, nil
 }
 
-func (lq *LanguageQuery) loadRaceSpeakers(ctx context.Context, query *RaceQuery, nodes []*Language, init func(*Language), assign func(*Language, *Race)) error {
+func (lq *LanguageQuery) loadRace(ctx context.Context, query *RaceQuery, nodes []*Language, init func(*Language), assign func(*Language, *Race)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*Language)
 	nids := make(map[int]map[*Language]struct{})
@@ -432,11 +485,11 @@ func (lq *LanguageQuery) loadRaceSpeakers(ctx context.Context, query *RaceQuery,
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(language.RaceSpeakersTable)
-		s.Join(joinT).On(s.C(race.FieldID), joinT.C(language.RaceSpeakersPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(language.RaceSpeakersPrimaryKey[1]), edgeIDs...))
+		joinT := sql.Table(language.RaceTable)
+		s.Join(joinT).On(s.C(race.FieldID), joinT.C(language.RacePrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(language.RacePrimaryKey[1]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(language.RaceSpeakersPrimaryKey[1]))
+		s.Select(joinT.C(language.RacePrimaryKey[1]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -473,7 +526,68 @@ func (lq *LanguageQuery) loadRaceSpeakers(ctx context.Context, query *RaceQuery,
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "race_speakers" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "race" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (lq *LanguageQuery) loadOptions(ctx context.Context, query *LanguageChoiceQuery, nodes []*Language, init func(*Language), assign func(*Language, *LanguageChoice)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Language)
+	nids := make(map[int]map[*Language]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(language.OptionsTable)
+		s.Join(joinT).On(s.C(languagechoice.FieldID), joinT.C(language.OptionsPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(language.OptionsPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(language.OptionsPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Language]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*LanguageChoice](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "options" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -566,17 +680,31 @@ func (lq *LanguageQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// WithNamedRaceSpeakers tells the query-builder to eager-load the nodes that are connected to the "race_speakers"
+// WithNamedRace tells the query-builder to eager-load the nodes that are connected to the "race"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (lq *LanguageQuery) WithNamedRaceSpeakers(name string, opts ...func(*RaceQuery)) *LanguageQuery {
+func (lq *LanguageQuery) WithNamedRace(name string, opts ...func(*RaceQuery)) *LanguageQuery {
 	query := (&RaceClient{config: lq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	if lq.withNamedRaceSpeakers == nil {
-		lq.withNamedRaceSpeakers = make(map[string]*RaceQuery)
+	if lq.withNamedRace == nil {
+		lq.withNamedRace = make(map[string]*RaceQuery)
 	}
-	lq.withNamedRaceSpeakers[name] = query
+	lq.withNamedRace[name] = query
+	return lq
+}
+
+// WithNamedOptions tells the query-builder to eager-load the nodes that are connected to the "options"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (lq *LanguageQuery) WithNamedOptions(name string, opts ...func(*LanguageChoiceQuery)) *LanguageQuery {
+	query := (&LanguageChoiceClient{config: lq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if lq.withNamedOptions == nil {
+		lq.withNamedOptions = make(map[string]*LanguageChoiceQuery)
+	}
+	lq.withNamedOptions[name] = query
 	return lq
 }
 
@@ -594,7 +722,7 @@ func (lgb *LanguageGroupBy) Aggregate(fns ...AggregateFunc) *LanguageGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (lgb *LanguageGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, lgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, lgb.build.ctx, ent.OpQueryGroupBy)
 	if err := lgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -642,7 +770,7 @@ func (ls *LanguageSelect) Aggregate(fns ...AggregateFunc) *LanguageSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ls *LanguageSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ls.ctx, "Select")
+	ctx = setContextOp(ctx, ls.ctx, ent.OpQuerySelect)
 	if err := ls.prepareQuery(ctx); err != nil {
 		return err
 	}

@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/armor"
-	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
@@ -29,21 +28,38 @@ func (au *ArmorUpdate) Where(ps ...predicate.Armor) *ArmorUpdate {
 	return au
 }
 
-// SetIndx sets the "indx" field.
-func (au *ArmorUpdate) SetIndx(s string) *ArmorUpdate {
-	au.mutation.SetIndx(s)
-	return au
-}
-
-// SetName sets the "name" field.
-func (au *ArmorUpdate) SetName(s string) *ArmorUpdate {
-	au.mutation.SetName(s)
-	return au
-}
-
 // SetArmorCategory sets the "armor_category" field.
-func (au *ArmorUpdate) SetArmorCategory(s string) *ArmorUpdate {
-	au.mutation.SetArmorCategory(s)
+func (au *ArmorUpdate) SetArmorCategory(ac armor.ArmorCategory) *ArmorUpdate {
+	au.mutation.SetArmorCategory(ac)
+	return au
+}
+
+// SetNillableArmorCategory sets the "armor_category" field if the given value is not nil.
+func (au *ArmorUpdate) SetNillableArmorCategory(ac *armor.ArmorCategory) *ArmorUpdate {
+	if ac != nil {
+		au.SetArmorCategory(*ac)
+	}
+	return au
+}
+
+// SetStrMinimum sets the "str_minimum" field.
+func (au *ArmorUpdate) SetStrMinimum(i int) *ArmorUpdate {
+	au.mutation.ResetStrMinimum()
+	au.mutation.SetStrMinimum(i)
+	return au
+}
+
+// SetNillableStrMinimum sets the "str_minimum" field if the given value is not nil.
+func (au *ArmorUpdate) SetNillableStrMinimum(i *int) *ArmorUpdate {
+	if i != nil {
+		au.SetStrMinimum(*i)
+	}
+	return au
+}
+
+// AddStrMinimum adds i to the "str_minimum" field.
+func (au *ArmorUpdate) AddStrMinimum(i int) *ArmorUpdate {
+	au.mutation.AddStrMinimum(i)
 	return au
 }
 
@@ -53,43 +69,79 @@ func (au *ArmorUpdate) SetStealthDisadvantage(b bool) *ArmorUpdate {
 	return au
 }
 
-// SetMinStrength sets the "min_strength" field.
-func (au *ArmorUpdate) SetMinStrength(i int) *ArmorUpdate {
-	au.mutation.ResetMinStrength()
-	au.mutation.SetMinStrength(i)
+// SetNillableStealthDisadvantage sets the "stealth_disadvantage" field if the given value is not nil.
+func (au *ArmorUpdate) SetNillableStealthDisadvantage(b *bool) *ArmorUpdate {
+	if b != nil {
+		au.SetStealthDisadvantage(*b)
+	}
 	return au
 }
 
-// AddMinStrength adds i to the "min_strength" field.
-func (au *ArmorUpdate) AddMinStrength(i int) *ArmorUpdate {
-	au.mutation.AddMinStrength(i)
+// SetAcBase sets the "ac_base" field.
+func (au *ArmorUpdate) SetAcBase(i int) *ArmorUpdate {
+	au.mutation.ResetAcBase()
+	au.mutation.SetAcBase(i)
 	return au
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (au *ArmorUpdate) SetEquipmentID(i int) *ArmorUpdate {
-	au.mutation.SetEquipmentID(i)
+// SetNillableAcBase sets the "ac_base" field if the given value is not nil.
+func (au *ArmorUpdate) SetNillableAcBase(i *int) *ArmorUpdate {
+	if i != nil {
+		au.SetAcBase(*i)
+	}
+	return au
+}
+
+// AddAcBase adds i to the "ac_base" field.
+func (au *ArmorUpdate) AddAcBase(i int) *ArmorUpdate {
+	au.mutation.AddAcBase(i)
+	return au
+}
+
+// SetAcDexBonus sets the "ac_dex_bonus" field.
+func (au *ArmorUpdate) SetAcDexBonus(b bool) *ArmorUpdate {
+	au.mutation.SetAcDexBonus(b)
+	return au
+}
+
+// SetNillableAcDexBonus sets the "ac_dex_bonus" field if the given value is not nil.
+func (au *ArmorUpdate) SetNillableAcDexBonus(b *bool) *ArmorUpdate {
+	if b != nil {
+		au.SetAcDexBonus(*b)
+	}
+	return au
+}
+
+// SetAcMaxBonus sets the "ac_max_bonus" field.
+func (au *ArmorUpdate) SetAcMaxBonus(i int) *ArmorUpdate {
+	au.mutation.ResetAcMaxBonus()
+	au.mutation.SetAcMaxBonus(i)
+	return au
+}
+
+// SetNillableAcMaxBonus sets the "ac_max_bonus" field if the given value is not nil.
+func (au *ArmorUpdate) SetNillableAcMaxBonus(i *int) *ArmorUpdate {
+	if i != nil {
+		au.SetAcMaxBonus(*i)
+	}
+	return au
+}
+
+// AddAcMaxBonus adds i to the "ac_max_bonus" field.
+func (au *ArmorUpdate) AddAcMaxBonus(i int) *ArmorUpdate {
+	au.mutation.AddAcMaxBonus(i)
+	return au
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (au *ArmorUpdate) SetEquipmentID(id int) *ArmorUpdate {
+	au.mutation.SetEquipmentID(id)
 	return au
 }
 
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (au *ArmorUpdate) SetEquipment(e *Equipment) *ArmorUpdate {
 	return au.SetEquipmentID(e.ID)
-}
-
-// AddArmorClasIDs adds the "armor_class" edge to the ArmorClass entity by IDs.
-func (au *ArmorUpdate) AddArmorClasIDs(ids ...int) *ArmorUpdate {
-	au.mutation.AddArmorClasIDs(ids...)
-	return au
-}
-
-// AddArmorClass adds the "armor_class" edges to the ArmorClass entity.
-func (au *ArmorUpdate) AddArmorClass(a ...*ArmorClass) *ArmorUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return au.AddArmorClasIDs(ids...)
 }
 
 // Mutation returns the ArmorMutation object of the builder.
@@ -101,27 +153,6 @@ func (au *ArmorUpdate) Mutation() *ArmorMutation {
 func (au *ArmorUpdate) ClearEquipment() *ArmorUpdate {
 	au.mutation.ClearEquipment()
 	return au
-}
-
-// ClearArmorClass clears all "armor_class" edges to the ArmorClass entity.
-func (au *ArmorUpdate) ClearArmorClass() *ArmorUpdate {
-	au.mutation.ClearArmorClass()
-	return au
-}
-
-// RemoveArmorClasIDs removes the "armor_class" edge to ArmorClass entities by IDs.
-func (au *ArmorUpdate) RemoveArmorClasIDs(ids ...int) *ArmorUpdate {
-	au.mutation.RemoveArmorClasIDs(ids...)
-	return au
-}
-
-// RemoveArmorClass removes "armor_class" edges to ArmorClass entities.
-func (au *ArmorUpdate) RemoveArmorClass(a ...*ArmorClass) *ArmorUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return au.RemoveArmorClasIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -153,17 +184,17 @@ func (au *ArmorUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (au *ArmorUpdate) check() error {
-	if v, ok := au.mutation.Indx(); ok {
-		if err := armor.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Armor.indx": %w`, err)}
+	if v, ok := au.mutation.ArmorCategory(); ok {
+		if err := armor.ArmorCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "armor_category", err: fmt.Errorf(`ent: validator failed for field "Armor.armor_category": %w`, err)}
 		}
 	}
-	if v, ok := au.mutation.Name(); ok {
-		if err := armor.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Armor.name": %w`, err)}
+	if v, ok := au.mutation.AcBase(); ok {
+		if err := armor.AcBaseValidator(v); err != nil {
+			return &ValidationError{Name: "ac_base", err: fmt.Errorf(`ent: validator failed for field "Armor.ac_base": %w`, err)}
 		}
 	}
-	if _, ok := au.mutation.EquipmentID(); au.mutation.EquipmentCleared() && !ok {
+	if au.mutation.EquipmentCleared() && len(au.mutation.EquipmentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Armor.equipment"`)
 	}
 	return nil
@@ -181,23 +212,32 @@ func (au *ArmorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := au.mutation.Indx(); ok {
-		_spec.SetField(armor.FieldIndx, field.TypeString, value)
-	}
-	if value, ok := au.mutation.Name(); ok {
-		_spec.SetField(armor.FieldName, field.TypeString, value)
-	}
 	if value, ok := au.mutation.ArmorCategory(); ok {
-		_spec.SetField(armor.FieldArmorCategory, field.TypeString, value)
+		_spec.SetField(armor.FieldArmorCategory, field.TypeEnum, value)
+	}
+	if value, ok := au.mutation.StrMinimum(); ok {
+		_spec.SetField(armor.FieldStrMinimum, field.TypeInt, value)
+	}
+	if value, ok := au.mutation.AddedStrMinimum(); ok {
+		_spec.AddField(armor.FieldStrMinimum, field.TypeInt, value)
 	}
 	if value, ok := au.mutation.StealthDisadvantage(); ok {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)
 	}
-	if value, ok := au.mutation.MinStrength(); ok {
-		_spec.SetField(armor.FieldMinStrength, field.TypeInt, value)
+	if value, ok := au.mutation.AcBase(); ok {
+		_spec.SetField(armor.FieldAcBase, field.TypeInt, value)
 	}
-	if value, ok := au.mutation.AddedMinStrength(); ok {
-		_spec.AddField(armor.FieldMinStrength, field.TypeInt, value)
+	if value, ok := au.mutation.AddedAcBase(); ok {
+		_spec.AddField(armor.FieldAcBase, field.TypeInt, value)
+	}
+	if value, ok := au.mutation.AcDexBonus(); ok {
+		_spec.SetField(armor.FieldAcDexBonus, field.TypeBool, value)
+	}
+	if value, ok := au.mutation.AcMaxBonus(); ok {
+		_spec.SetField(armor.FieldAcMaxBonus, field.TypeInt, value)
+	}
+	if value, ok := au.mutation.AddedAcMaxBonus(); ok {
+		_spec.AddField(armor.FieldAcMaxBonus, field.TypeInt, value)
 	}
 	if au.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -228,51 +268,6 @@ func (au *ArmorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.ArmorClassCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   armor.ArmorClassTable,
-			Columns: []string{armor.ArmorClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.RemovedArmorClassIDs(); len(nodes) > 0 && !au.mutation.ArmorClassCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   armor.ArmorClassTable,
-			Columns: []string{armor.ArmorClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.ArmorClassIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   armor.ArmorClassTable,
-			Columns: []string{armor.ArmorClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{armor.Label}
@@ -293,21 +288,38 @@ type ArmorUpdateOne struct {
 	mutation *ArmorMutation
 }
 
-// SetIndx sets the "indx" field.
-func (auo *ArmorUpdateOne) SetIndx(s string) *ArmorUpdateOne {
-	auo.mutation.SetIndx(s)
-	return auo
-}
-
-// SetName sets the "name" field.
-func (auo *ArmorUpdateOne) SetName(s string) *ArmorUpdateOne {
-	auo.mutation.SetName(s)
-	return auo
-}
-
 // SetArmorCategory sets the "armor_category" field.
-func (auo *ArmorUpdateOne) SetArmorCategory(s string) *ArmorUpdateOne {
-	auo.mutation.SetArmorCategory(s)
+func (auo *ArmorUpdateOne) SetArmorCategory(ac armor.ArmorCategory) *ArmorUpdateOne {
+	auo.mutation.SetArmorCategory(ac)
+	return auo
+}
+
+// SetNillableArmorCategory sets the "armor_category" field if the given value is not nil.
+func (auo *ArmorUpdateOne) SetNillableArmorCategory(ac *armor.ArmorCategory) *ArmorUpdateOne {
+	if ac != nil {
+		auo.SetArmorCategory(*ac)
+	}
+	return auo
+}
+
+// SetStrMinimum sets the "str_minimum" field.
+func (auo *ArmorUpdateOne) SetStrMinimum(i int) *ArmorUpdateOne {
+	auo.mutation.ResetStrMinimum()
+	auo.mutation.SetStrMinimum(i)
+	return auo
+}
+
+// SetNillableStrMinimum sets the "str_minimum" field if the given value is not nil.
+func (auo *ArmorUpdateOne) SetNillableStrMinimum(i *int) *ArmorUpdateOne {
+	if i != nil {
+		auo.SetStrMinimum(*i)
+	}
+	return auo
+}
+
+// AddStrMinimum adds i to the "str_minimum" field.
+func (auo *ArmorUpdateOne) AddStrMinimum(i int) *ArmorUpdateOne {
+	auo.mutation.AddStrMinimum(i)
 	return auo
 }
 
@@ -317,43 +329,79 @@ func (auo *ArmorUpdateOne) SetStealthDisadvantage(b bool) *ArmorUpdateOne {
 	return auo
 }
 
-// SetMinStrength sets the "min_strength" field.
-func (auo *ArmorUpdateOne) SetMinStrength(i int) *ArmorUpdateOne {
-	auo.mutation.ResetMinStrength()
-	auo.mutation.SetMinStrength(i)
+// SetNillableStealthDisadvantage sets the "stealth_disadvantage" field if the given value is not nil.
+func (auo *ArmorUpdateOne) SetNillableStealthDisadvantage(b *bool) *ArmorUpdateOne {
+	if b != nil {
+		auo.SetStealthDisadvantage(*b)
+	}
 	return auo
 }
 
-// AddMinStrength adds i to the "min_strength" field.
-func (auo *ArmorUpdateOne) AddMinStrength(i int) *ArmorUpdateOne {
-	auo.mutation.AddMinStrength(i)
+// SetAcBase sets the "ac_base" field.
+func (auo *ArmorUpdateOne) SetAcBase(i int) *ArmorUpdateOne {
+	auo.mutation.ResetAcBase()
+	auo.mutation.SetAcBase(i)
 	return auo
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (auo *ArmorUpdateOne) SetEquipmentID(i int) *ArmorUpdateOne {
-	auo.mutation.SetEquipmentID(i)
+// SetNillableAcBase sets the "ac_base" field if the given value is not nil.
+func (auo *ArmorUpdateOne) SetNillableAcBase(i *int) *ArmorUpdateOne {
+	if i != nil {
+		auo.SetAcBase(*i)
+	}
+	return auo
+}
+
+// AddAcBase adds i to the "ac_base" field.
+func (auo *ArmorUpdateOne) AddAcBase(i int) *ArmorUpdateOne {
+	auo.mutation.AddAcBase(i)
+	return auo
+}
+
+// SetAcDexBonus sets the "ac_dex_bonus" field.
+func (auo *ArmorUpdateOne) SetAcDexBonus(b bool) *ArmorUpdateOne {
+	auo.mutation.SetAcDexBonus(b)
+	return auo
+}
+
+// SetNillableAcDexBonus sets the "ac_dex_bonus" field if the given value is not nil.
+func (auo *ArmorUpdateOne) SetNillableAcDexBonus(b *bool) *ArmorUpdateOne {
+	if b != nil {
+		auo.SetAcDexBonus(*b)
+	}
+	return auo
+}
+
+// SetAcMaxBonus sets the "ac_max_bonus" field.
+func (auo *ArmorUpdateOne) SetAcMaxBonus(i int) *ArmorUpdateOne {
+	auo.mutation.ResetAcMaxBonus()
+	auo.mutation.SetAcMaxBonus(i)
+	return auo
+}
+
+// SetNillableAcMaxBonus sets the "ac_max_bonus" field if the given value is not nil.
+func (auo *ArmorUpdateOne) SetNillableAcMaxBonus(i *int) *ArmorUpdateOne {
+	if i != nil {
+		auo.SetAcMaxBonus(*i)
+	}
+	return auo
+}
+
+// AddAcMaxBonus adds i to the "ac_max_bonus" field.
+func (auo *ArmorUpdateOne) AddAcMaxBonus(i int) *ArmorUpdateOne {
+	auo.mutation.AddAcMaxBonus(i)
+	return auo
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (auo *ArmorUpdateOne) SetEquipmentID(id int) *ArmorUpdateOne {
+	auo.mutation.SetEquipmentID(id)
 	return auo
 }
 
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (auo *ArmorUpdateOne) SetEquipment(e *Equipment) *ArmorUpdateOne {
 	return auo.SetEquipmentID(e.ID)
-}
-
-// AddArmorClasIDs adds the "armor_class" edge to the ArmorClass entity by IDs.
-func (auo *ArmorUpdateOne) AddArmorClasIDs(ids ...int) *ArmorUpdateOne {
-	auo.mutation.AddArmorClasIDs(ids...)
-	return auo
-}
-
-// AddArmorClass adds the "armor_class" edges to the ArmorClass entity.
-func (auo *ArmorUpdateOne) AddArmorClass(a ...*ArmorClass) *ArmorUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return auo.AddArmorClasIDs(ids...)
 }
 
 // Mutation returns the ArmorMutation object of the builder.
@@ -365,27 +413,6 @@ func (auo *ArmorUpdateOne) Mutation() *ArmorMutation {
 func (auo *ArmorUpdateOne) ClearEquipment() *ArmorUpdateOne {
 	auo.mutation.ClearEquipment()
 	return auo
-}
-
-// ClearArmorClass clears all "armor_class" edges to the ArmorClass entity.
-func (auo *ArmorUpdateOne) ClearArmorClass() *ArmorUpdateOne {
-	auo.mutation.ClearArmorClass()
-	return auo
-}
-
-// RemoveArmorClasIDs removes the "armor_class" edge to ArmorClass entities by IDs.
-func (auo *ArmorUpdateOne) RemoveArmorClasIDs(ids ...int) *ArmorUpdateOne {
-	auo.mutation.RemoveArmorClasIDs(ids...)
-	return auo
-}
-
-// RemoveArmorClass removes "armor_class" edges to ArmorClass entities.
-func (auo *ArmorUpdateOne) RemoveArmorClass(a ...*ArmorClass) *ArmorUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return auo.RemoveArmorClasIDs(ids...)
 }
 
 // Where appends a list predicates to the ArmorUpdate builder.
@@ -430,17 +457,17 @@ func (auo *ArmorUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (auo *ArmorUpdateOne) check() error {
-	if v, ok := auo.mutation.Indx(); ok {
-		if err := armor.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Armor.indx": %w`, err)}
+	if v, ok := auo.mutation.ArmorCategory(); ok {
+		if err := armor.ArmorCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "armor_category", err: fmt.Errorf(`ent: validator failed for field "Armor.armor_category": %w`, err)}
 		}
 	}
-	if v, ok := auo.mutation.Name(); ok {
-		if err := armor.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Armor.name": %w`, err)}
+	if v, ok := auo.mutation.AcBase(); ok {
+		if err := armor.AcBaseValidator(v); err != nil {
+			return &ValidationError{Name: "ac_base", err: fmt.Errorf(`ent: validator failed for field "Armor.ac_base": %w`, err)}
 		}
 	}
-	if _, ok := auo.mutation.EquipmentID(); auo.mutation.EquipmentCleared() && !ok {
+	if auo.mutation.EquipmentCleared() && len(auo.mutation.EquipmentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Armor.equipment"`)
 	}
 	return nil
@@ -475,23 +502,32 @@ func (auo *ArmorUpdateOne) sqlSave(ctx context.Context) (_node *Armor, err error
 			}
 		}
 	}
-	if value, ok := auo.mutation.Indx(); ok {
-		_spec.SetField(armor.FieldIndx, field.TypeString, value)
-	}
-	if value, ok := auo.mutation.Name(); ok {
-		_spec.SetField(armor.FieldName, field.TypeString, value)
-	}
 	if value, ok := auo.mutation.ArmorCategory(); ok {
-		_spec.SetField(armor.FieldArmorCategory, field.TypeString, value)
+		_spec.SetField(armor.FieldArmorCategory, field.TypeEnum, value)
+	}
+	if value, ok := auo.mutation.StrMinimum(); ok {
+		_spec.SetField(armor.FieldStrMinimum, field.TypeInt, value)
+	}
+	if value, ok := auo.mutation.AddedStrMinimum(); ok {
+		_spec.AddField(armor.FieldStrMinimum, field.TypeInt, value)
 	}
 	if value, ok := auo.mutation.StealthDisadvantage(); ok {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)
 	}
-	if value, ok := auo.mutation.MinStrength(); ok {
-		_spec.SetField(armor.FieldMinStrength, field.TypeInt, value)
+	if value, ok := auo.mutation.AcBase(); ok {
+		_spec.SetField(armor.FieldAcBase, field.TypeInt, value)
 	}
-	if value, ok := auo.mutation.AddedMinStrength(); ok {
-		_spec.AddField(armor.FieldMinStrength, field.TypeInt, value)
+	if value, ok := auo.mutation.AddedAcBase(); ok {
+		_spec.AddField(armor.FieldAcBase, field.TypeInt, value)
+	}
+	if value, ok := auo.mutation.AcDexBonus(); ok {
+		_spec.SetField(armor.FieldAcDexBonus, field.TypeBool, value)
+	}
+	if value, ok := auo.mutation.AcMaxBonus(); ok {
+		_spec.SetField(armor.FieldAcMaxBonus, field.TypeInt, value)
+	}
+	if value, ok := auo.mutation.AddedAcMaxBonus(); ok {
+		_spec.AddField(armor.FieldAcMaxBonus, field.TypeInt, value)
 	}
 	if auo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -515,51 +551,6 @@ func (auo *ArmorUpdateOne) sqlSave(ctx context.Context) (_node *Armor, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if auo.mutation.ArmorClassCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   armor.ArmorClassTable,
-			Columns: []string{armor.ArmorClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.RemovedArmorClassIDs(); len(nodes) > 0 && !auo.mutation.ArmorClassCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   armor.ArmorClassTable,
-			Columns: []string{armor.ArmorClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.ArmorClassIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   armor.ArmorClassTable,
-			Columns: []string{armor.ArmorClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

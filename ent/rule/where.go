@@ -63,11 +63,6 @@ func Name(v string) predicate.Rule {
 	return predicate.Rule(sql.FieldEQ(FieldName, v))
 }
 
-// Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
-func Desc(v string) predicate.Rule {
-	return predicate.Rule(sql.FieldEQ(FieldDesc, v))
-}
-
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Rule {
 	return predicate.Rule(sql.FieldEQ(FieldIndx, v))
@@ -198,86 +193,31 @@ func NameContainsFold(v string) predicate.Rule {
 	return predicate.Rule(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescEQ applies the EQ predicate on the "desc" field.
-func DescEQ(v string) predicate.Rule {
-	return predicate.Rule(sql.FieldEQ(FieldDesc, v))
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.Rule {
+	return predicate.Rule(sql.FieldIsNull(FieldDesc))
 }
 
-// DescNEQ applies the NEQ predicate on the "desc" field.
-func DescNEQ(v string) predicate.Rule {
-	return predicate.Rule(sql.FieldNEQ(FieldDesc, v))
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.Rule {
+	return predicate.Rule(sql.FieldNotNull(FieldDesc))
 }
 
-// DescIn applies the In predicate on the "desc" field.
-func DescIn(vs ...string) predicate.Rule {
-	return predicate.Rule(sql.FieldIn(FieldDesc, vs...))
-}
-
-// DescNotIn applies the NotIn predicate on the "desc" field.
-func DescNotIn(vs ...string) predicate.Rule {
-	return predicate.Rule(sql.FieldNotIn(FieldDesc, vs...))
-}
-
-// DescGT applies the GT predicate on the "desc" field.
-func DescGT(v string) predicate.Rule {
-	return predicate.Rule(sql.FieldGT(FieldDesc, v))
-}
-
-// DescGTE applies the GTE predicate on the "desc" field.
-func DescGTE(v string) predicate.Rule {
-	return predicate.Rule(sql.FieldGTE(FieldDesc, v))
-}
-
-// DescLT applies the LT predicate on the "desc" field.
-func DescLT(v string) predicate.Rule {
-	return predicate.Rule(sql.FieldLT(FieldDesc, v))
-}
-
-// DescLTE applies the LTE predicate on the "desc" field.
-func DescLTE(v string) predicate.Rule {
-	return predicate.Rule(sql.FieldLTE(FieldDesc, v))
-}
-
-// DescContains applies the Contains predicate on the "desc" field.
-func DescContains(v string) predicate.Rule {
-	return predicate.Rule(sql.FieldContains(FieldDesc, v))
-}
-
-// DescHasPrefix applies the HasPrefix predicate on the "desc" field.
-func DescHasPrefix(v string) predicate.Rule {
-	return predicate.Rule(sql.FieldHasPrefix(FieldDesc, v))
-}
-
-// DescHasSuffix applies the HasSuffix predicate on the "desc" field.
-func DescHasSuffix(v string) predicate.Rule {
-	return predicate.Rule(sql.FieldHasSuffix(FieldDesc, v))
-}
-
-// DescEqualFold applies the EqualFold predicate on the "desc" field.
-func DescEqualFold(v string) predicate.Rule {
-	return predicate.Rule(sql.FieldEqualFold(FieldDesc, v))
-}
-
-// DescContainsFold applies the ContainsFold predicate on the "desc" field.
-func DescContainsFold(v string) predicate.Rule {
-	return predicate.Rule(sql.FieldContainsFold(FieldDesc, v))
-}
-
-// HasRuleSections applies the HasEdge predicate on the "rule_sections" edge.
-func HasRuleSections() predicate.Rule {
+// HasSections applies the HasEdge predicate on the "sections" edge.
+func HasSections() predicate.Rule {
 	return predicate.Rule(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, RuleSectionsTable, RuleSectionsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, SectionsTable, SectionsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasRuleSectionsWith applies the HasEdge predicate on the "rule_sections" edge with a given conditions (other predicates).
-func HasRuleSectionsWith(preds ...predicate.RuleSection) predicate.Rule {
+// HasSectionsWith applies the HasEdge predicate on the "sections" edge with a given conditions (other predicates).
+func HasSectionsWith(preds ...predicate.RuleSection) predicate.Rule {
 	return predicate.Rule(func(s *sql.Selector) {
-		step := newRuleSectionsStep()
+		step := newSectionsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -288,32 +228,15 @@ func HasRuleSectionsWith(preds ...predicate.RuleSection) predicate.Rule {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Rule) predicate.Rule {
-	return predicate.Rule(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Rule(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Rule) predicate.Rule {
-	return predicate.Rule(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Rule(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Rule) predicate.Rule {
-	return predicate.Rule(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Rule(sql.NotPredicates(p))
 }

@@ -4,10 +4,10 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -19,14 +19,14 @@ import (
 // RuleSectionQuery is the builder for querying RuleSection entities.
 type RuleSectionQuery struct {
 	config
-	ctx            *QueryContext
-	order          []rulesection.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.RuleSection
-	withRules      *RuleQuery
-	modifiers      []func(*sql.Selector)
-	loadTotal      []func(context.Context, []*RuleSection) error
-	withNamedRules map[string]*RuleQuery
+	ctx        *QueryContext
+	order      []rulesection.OrderOption
+	inters     []Interceptor
+	predicates []predicate.RuleSection
+	withRule   *RuleQuery
+	withFKs    bool
+	modifiers  []func(*sql.Selector)
+	loadTotal  []func(context.Context, []*RuleSection) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -63,8 +63,8 @@ func (rsq *RuleSectionQuery) Order(o ...rulesection.OrderOption) *RuleSectionQue
 	return rsq
 }
 
-// QueryRules chains the current query on the "rules" edge.
-func (rsq *RuleSectionQuery) QueryRules() *RuleQuery {
+// QueryRule chains the current query on the "rule" edge.
+func (rsq *RuleSectionQuery) QueryRule() *RuleQuery {
 	query := (&RuleClient{config: rsq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rsq.prepareQuery(ctx); err != nil {
@@ -77,7 +77,7 @@ func (rsq *RuleSectionQuery) QueryRules() *RuleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(rulesection.Table, rulesection.FieldID, selector),
 			sqlgraph.To(rule.Table, rule.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, rulesection.RulesTable, rulesection.RulesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, rulesection.RuleTable, rulesection.RuleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rsq.driver.Dialect(), step)
 		return fromU, nil
@@ -88,7 +88,7 @@ func (rsq *RuleSectionQuery) QueryRules() *RuleQuery {
 // First returns the first RuleSection entity from the query.
 // Returns a *NotFoundError when no RuleSection was found.
 func (rsq *RuleSectionQuery) First(ctx context.Context) (*RuleSection, error) {
-	nodes, err := rsq.Limit(1).All(setContextOp(ctx, rsq.ctx, "First"))
+	nodes, err := rsq.Limit(1).All(setContextOp(ctx, rsq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (rsq *RuleSectionQuery) FirstX(ctx context.Context) *RuleSection {
 // Returns a *NotFoundError when no RuleSection ID was found.
 func (rsq *RuleSectionQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = rsq.Limit(1).IDs(setContextOp(ctx, rsq.ctx, "FirstID")); err != nil {
+	if ids, err = rsq.Limit(1).IDs(setContextOp(ctx, rsq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -134,7 +134,7 @@ func (rsq *RuleSectionQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one RuleSection entity is found.
 // Returns a *NotFoundError when no RuleSection entities are found.
 func (rsq *RuleSectionQuery) Only(ctx context.Context) (*RuleSection, error) {
-	nodes, err := rsq.Limit(2).All(setContextOp(ctx, rsq.ctx, "Only"))
+	nodes, err := rsq.Limit(2).All(setContextOp(ctx, rsq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +162,7 @@ func (rsq *RuleSectionQuery) OnlyX(ctx context.Context) *RuleSection {
 // Returns a *NotFoundError when no entities are found.
 func (rsq *RuleSectionQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = rsq.Limit(2).IDs(setContextOp(ctx, rsq.ctx, "OnlyID")); err != nil {
+	if ids, err = rsq.Limit(2).IDs(setContextOp(ctx, rsq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -187,7 +187,7 @@ func (rsq *RuleSectionQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of RuleSections.
 func (rsq *RuleSectionQuery) All(ctx context.Context) ([]*RuleSection, error) {
-	ctx = setContextOp(ctx, rsq.ctx, "All")
+	ctx = setContextOp(ctx, rsq.ctx, ent.OpQueryAll)
 	if err := rsq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func (rsq *RuleSectionQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if rsq.ctx.Unique == nil && rsq.path != nil {
 		rsq.Unique(true)
 	}
-	ctx = setContextOp(ctx, rsq.ctx, "IDs")
+	ctx = setContextOp(ctx, rsq.ctx, ent.OpQueryIDs)
 	if err = rsq.Select(rulesection.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -227,7 +227,7 @@ func (rsq *RuleSectionQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (rsq *RuleSectionQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, rsq.ctx, "Count")
+	ctx = setContextOp(ctx, rsq.ctx, ent.OpQueryCount)
 	if err := rsq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -245,7 +245,7 @@ func (rsq *RuleSectionQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (rsq *RuleSectionQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, rsq.ctx, "Exist")
+	ctx = setContextOp(ctx, rsq.ctx, ent.OpQueryExist)
 	switch _, err := rsq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -277,21 +277,21 @@ func (rsq *RuleSectionQuery) Clone() *RuleSectionQuery {
 		order:      append([]rulesection.OrderOption{}, rsq.order...),
 		inters:     append([]Interceptor{}, rsq.inters...),
 		predicates: append([]predicate.RuleSection{}, rsq.predicates...),
-		withRules:  rsq.withRules.Clone(),
+		withRule:   rsq.withRule.Clone(),
 		// clone intermediate query.
 		sql:  rsq.sql.Clone(),
 		path: rsq.path,
 	}
 }
 
-// WithRules tells the query-builder to eager-load the nodes that are connected to
-// the "rules" edge. The optional arguments are used to configure the query builder of the edge.
-func (rsq *RuleSectionQuery) WithRules(opts ...func(*RuleQuery)) *RuleSectionQuery {
+// WithRule tells the query-builder to eager-load the nodes that are connected to
+// the "rule" edge. The optional arguments are used to configure the query builder of the edge.
+func (rsq *RuleSectionQuery) WithRule(opts ...func(*RuleQuery)) *RuleSectionQuery {
 	query := (&RuleClient{config: rsq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	rsq.withRules = query
+	rsq.withRule = query
 	return rsq
 }
 
@@ -372,11 +372,18 @@ func (rsq *RuleSectionQuery) prepareQuery(ctx context.Context) error {
 func (rsq *RuleSectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*RuleSection, error) {
 	var (
 		nodes       = []*RuleSection{}
+		withFKs     = rsq.withFKs
 		_spec       = rsq.querySpec()
 		loadedTypes = [1]bool{
-			rsq.withRules != nil,
+			rsq.withRule != nil,
 		}
 	)
+	if rsq.withRule != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, rulesection.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*RuleSection).scanValues(nil, columns)
 	}
@@ -398,17 +405,9 @@ func (rsq *RuleSectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := rsq.withRules; query != nil {
-		if err := rsq.loadRules(ctx, query, nodes,
-			func(n *RuleSection) { n.Edges.Rules = []*Rule{} },
-			func(n *RuleSection, e *Rule) { n.Edges.Rules = append(n.Edges.Rules, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range rsq.withNamedRules {
-		if err := rsq.loadRules(ctx, query, nodes,
-			func(n *RuleSection) { n.appendNamedRules(name) },
-			func(n *RuleSection, e *Rule) { n.appendNamedRules(name, e) }); err != nil {
+	if query := rsq.withRule; query != nil {
+		if err := rsq.loadRule(ctx, query, nodes, nil,
+			func(n *RuleSection, e *Rule) { n.Edges.Rule = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -420,63 +419,34 @@ func (rsq *RuleSectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	return nodes, nil
 }
 
-func (rsq *RuleSectionQuery) loadRules(ctx context.Context, query *RuleQuery, nodes []*RuleSection, init func(*RuleSection), assign func(*RuleSection, *Rule)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*RuleSection)
-	nids := make(map[int]map[*RuleSection]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
+func (rsq *RuleSectionQuery) loadRule(ctx context.Context, query *RuleQuery, nodes []*RuleSection, init func(*RuleSection), assign func(*RuleSection, *Rule)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*RuleSection)
+	for i := range nodes {
+		if nodes[i].rule_id == nil {
+			continue
 		}
+		fk := *nodes[i].rule_id
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(rulesection.RulesTable)
-		s.Join(joinT).On(s.C(rule.FieldID), joinT.C(rulesection.RulesPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(rulesection.RulesPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(rulesection.RulesPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
+	if len(ids) == 0 {
+		return nil
 	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*RuleSection]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Rule](ctx, query, qr, query.inters)
+	query.Where(rule.IDIn(ids...))
+	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "rules" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "rule_id" returned %v`, n.ID)
 		}
-		for kn := range nodes {
-			assign(kn, n)
+		for i := range nodes {
+			assign(nodes[i], n)
 		}
 	}
 	return nil
@@ -566,20 +536,6 @@ func (rsq *RuleSectionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// WithNamedRules tells the query-builder to eager-load the nodes that are connected to the "rules"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (rsq *RuleSectionQuery) WithNamedRules(name string, opts ...func(*RuleQuery)) *RuleSectionQuery {
-	query := (&RuleClient{config: rsq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if rsq.withNamedRules == nil {
-		rsq.withNamedRules = make(map[string]*RuleQuery)
-	}
-	rsq.withNamedRules[name] = query
-	return rsq
-}
-
 // RuleSectionGroupBy is the group-by builder for RuleSection entities.
 type RuleSectionGroupBy struct {
 	selector
@@ -594,7 +550,7 @@ func (rsgb *RuleSectionGroupBy) Aggregate(fns ...AggregateFunc) *RuleSectionGrou
 
 // Scan applies the selector query and scans the result into the given value.
 func (rsgb *RuleSectionGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, rsgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, rsgb.build.ctx, ent.OpQueryGroupBy)
 	if err := rsgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -642,7 +598,7 @@ func (rss *RuleSectionSelect) Aggregate(fns ...AggregateFunc) *RuleSectionSelect
 
 // Scan applies the selector query and scans the result into the given value.
 func (rss *RuleSectionSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, rss.ctx, "Select")
+	ctx = setContextOp(ctx, rss.ctx, ent.OpQuerySelect)
 	if err := rss.prepareQuery(ctx); err != nil {
 		return err
 	}

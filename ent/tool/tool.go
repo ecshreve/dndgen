@@ -12,14 +12,10 @@ const (
 	Label = "tool"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldIndx holds the string denoting the indx field in the database.
-	FieldIndx = "indx"
-	// FieldName holds the string denoting the name field in the database.
-	FieldName = "name"
 	// FieldToolCategory holds the string denoting the tool_category field in the database.
 	FieldToolCategory = "tool_category"
-	// FieldEquipmentID holds the string denoting the equipment_id field in the database.
-	FieldEquipmentID = "equipment_id"
+	// FieldDesc holds the string denoting the desc field in the database.
+	FieldDesc = "desc"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
 	// Table holds the table name of the tool in the database.
@@ -30,16 +26,20 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "equipment_id"
+	EquipmentColumn = "equipment_tool"
 )
 
 // Columns holds all SQL columns for tool fields.
 var Columns = []string{
 	FieldID,
-	FieldIndx,
-	FieldName,
 	FieldToolCategory,
-	FieldEquipmentID,
+	FieldDesc,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "tools"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"equipment_tool",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -49,15 +49,13 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
-
-var (
-	// IndxValidator is a validator for the "indx" field. It is called by the builders before save.
-	IndxValidator func(string) error
-	// NameValidator is a validator for the "name" field. It is called by the builders before save.
-	NameValidator func(string) error
-)
 
 // OrderOption defines the ordering options for the Tool queries.
 type OrderOption func(*sql.Selector)
@@ -67,24 +65,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByIndx orders the results by the indx field.
-func ByIndx(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIndx, opts...).ToFunc()
-}
-
-// ByName orders the results by the name field.
-func ByName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldName, opts...).ToFunc()
-}
-
 // ByToolCategory orders the results by the tool_category field.
 func ByToolCategory(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldToolCategory, opts...).ToFunc()
-}
-
-// ByEquipmentID orders the results by the equipment_id field.
-func ByEquipmentID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEquipmentID, opts...).ToFunc()
 }
 
 // ByEquipmentField orders the results by equipment field.

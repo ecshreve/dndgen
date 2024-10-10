@@ -2,32 +2,43 @@
 #     General tasks
 # ------------------------------------------------------------------------------
 [[task]]
-  id = "dndgen"
-  type = "short"
-  dependencies = ["build"]
-  cmd = """
-    echo "Running binary..."
-    ./bin/dndgen
-  """
+  id = "dev"
+  type = "long"
+  env = { CLICOLOR_FORCE = "1" }
+  dependencies = ["frontend"]
+
 
 [[task]]
-  id = "build"
-  type = "short"
+  id = "frontend"
+  type = "long"
+  env = { CLICOLOR_FORCE = "1" }
+  dependencies = ["dndgen"]
   cmd = """
-    echo "Building binary..."
-    go build -mod=mod -o ./bin/dndgen cmd/dndgen/main.go
+    echo "Running frontend..."
+    cd frontend && npm start
   """
 
 # ------------------------------------------------------------------------------
 #     Run in DEV mode (watch for changes)
 # ------------------------------------------------------------------------------
 [[task]]
-  id = "dev"
+  id = "dndgen"
   type = "long"
-  dependencies = ["entvizfix","gengen"]
+  env = { CLICOLOR_FORCE = "1" }
+  dependencies = ["genall"]
   cmd = """
-    echo "Running dev server..."
+    echo "Running dndgen..."
     go run -mod=mod cmd/dndgen/main.go
+  """
+
+[[task]]
+  id = "creator"
+  type = "short"
+  env = { CLICOLOR_FORCE = "1" }
+  # dependencies = ["popper"]
+  cmd = """
+    echo "Running creator..."
+    go run -mod=mod cmd/creator/main.go
   """
 
 # ------------------------------------------------------------------------------
@@ -35,39 +46,56 @@
 # ------------------------------------------------------------------------------
 [[task]]
   id = "popper"
-  description = "Populate a db file with data"
   type = "short"
-  # dependencies = ["gengen"]
+  env = { CLICOLOR_FORCE = "1" }
+  dependencies = ["entgen"]
   cmd = """
-    echo "Running popper populater..."
-    go run -mod=mod cmd/popper/main.go dev.db
+    echo "Backing up data..."
+    cp dev.db dev.db.bak
+    
+    echo "Removing existing data..."
+    rm -f dev.db
+
+    echo "Running popper"
+    go run -mod=mod cmd/popper/main.go
   """
 
 # ------------------------------------------------------------------------------
 #     Code Generation
 # ------------------------------------------------------------------------------
 [[task]]
+  id = "genall"
+  description = "Generate all"
+  dependencies = ["entgen", "popgen", "gqlgen", "describe"]
+  type = "short"
+
+[[task]]
   id = "entgen"
   description = "Generate ent schema"
   type = "short"
-  watch = ["ent/schema/*.go","ent/entc.go","gqlgen.yml"]
   cmd = """
     echo "Running ent generation with entc DIRECTLY..."
     go run -mod=mod ent/entc.go
   """
 
 [[task]]
-  id = "gengen"
+  id = "popgen"
+  description = "Generate populator functions"
+  dependencies = ["entgen"]
+  type = "short"
+  cmd = """
+    echo "running popgen"
+    go run -mod=mod cmd/popgen/main.go
+  """
+
+[[task]]
+  id = "gqlgen"
   description = "Generate graphql"
   type = "short"
-  watch = ["gqlgen.yml"]
   dependencies = ["entgen"]
   cmd = """
-    echo "Running go get for gqlgen..."
-    go get github.com/99designs/gqlgen@v0.17.30
-
-    echo "Running code generation generation via go generate..."
-    go generate .
+    echo "Running gqlgen..."
+    go run -mod=mod github.com/99designs/gqlgen generate
   """
 
 # ------------------------------------------------------------------------------
@@ -79,7 +107,6 @@
   description = "Fix entviz html"
   type = "short"
   triggers = ["entgen"]
-  dependencies = ["entgen"]
   cmd = """
     echo "Sleeping for 1 second to allow ent to generate schema..."
     sleep 1
@@ -108,6 +135,15 @@
     echo "Creating atlas cloud explore link for database schema with entviz..."
     go run -mod=mod ariga.io/entviz ./ent/schema   
    """
+
+[[task]]
+  id = "describe"
+  type = "short"
+  dependencies = ["entgen"]
+  cmd = """
+    echo "Describing database schema..."
+    go run -mod=mod entgo.io/ent/cmd/ent describe ./ent/schema > ./entschema.md
+  """
 
 # ------------------------------------------------------------------------------
 #     Testing

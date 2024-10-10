@@ -18,15 +18,17 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
-	// EdgeRules holds the string denoting the rules edge name in mutations.
-	EdgeRules = "rules"
+	// EdgeRule holds the string denoting the rule edge name in mutations.
+	EdgeRule = "rule"
 	// Table holds the table name of the rulesection in the database.
 	Table = "rule_sections"
-	// RulesTable is the table that holds the rules relation/edge. The primary key declared below.
-	RulesTable = "rule_rule_sections"
-	// RulesInverseTable is the table name for the Rule entity.
+	// RuleTable is the table that holds the rule relation/edge.
+	RuleTable = "rule_sections"
+	// RuleInverseTable is the table name for the Rule entity.
 	// It exists in this package in order to avoid circular dependency with the "rule" package.
-	RulesInverseTable = "rules"
+	RuleInverseTable = "rules"
+	// RuleColumn is the table column denoting the rule relation/edge.
+	RuleColumn = "rule_id"
 )
 
 // Columns holds all SQL columns for rulesection fields.
@@ -37,16 +39,21 @@ var Columns = []string{
 	FieldDesc,
 }
 
-var (
-	// RulesPrimaryKey and RulesColumn2 are the table columns denoting the
-	// primary key for the rules relation (M2M).
-	RulesPrimaryKey = []string{"rule_id", "rule_section_id"}
-)
+// ForeignKeys holds the SQL foreign-keys that are owned by the "rule_sections"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"rule_id",
+}
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -78,28 +85,16 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByDesc orders the results by the desc field.
-func ByDesc(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDesc, opts...).ToFunc()
-}
-
-// ByRulesCount orders the results by rules count.
-func ByRulesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByRuleField orders the results by rule field.
+func ByRuleField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRulesStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newRuleStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByRules orders the results by rules terms.
-func ByRules(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRulesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newRulesStep() *sqlgraph.Step {
+func newRuleStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RulesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, RulesTable, RulesPrimaryKey...),
+		sqlgraph.To(RuleInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, RuleTable, RuleColumn),
 	)
 }

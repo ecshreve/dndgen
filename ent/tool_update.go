@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -28,27 +29,41 @@ func (tu *ToolUpdate) Where(ps ...predicate.Tool) *ToolUpdate {
 	return tu
 }
 
-// SetIndx sets the "indx" field.
-func (tu *ToolUpdate) SetIndx(s string) *ToolUpdate {
-	tu.mutation.SetIndx(s)
-	return tu
-}
-
-// SetName sets the "name" field.
-func (tu *ToolUpdate) SetName(s string) *ToolUpdate {
-	tu.mutation.SetName(s)
-	return tu
-}
-
 // SetToolCategory sets the "tool_category" field.
 func (tu *ToolUpdate) SetToolCategory(s string) *ToolUpdate {
 	tu.mutation.SetToolCategory(s)
 	return tu
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (tu *ToolUpdate) SetEquipmentID(i int) *ToolUpdate {
-	tu.mutation.SetEquipmentID(i)
+// SetNillableToolCategory sets the "tool_category" field if the given value is not nil.
+func (tu *ToolUpdate) SetNillableToolCategory(s *string) *ToolUpdate {
+	if s != nil {
+		tu.SetToolCategory(*s)
+	}
+	return tu
+}
+
+// SetDesc sets the "desc" field.
+func (tu *ToolUpdate) SetDesc(s []string) *ToolUpdate {
+	tu.mutation.SetDesc(s)
+	return tu
+}
+
+// AppendDesc appends s to the "desc" field.
+func (tu *ToolUpdate) AppendDesc(s []string) *ToolUpdate {
+	tu.mutation.AppendDesc(s)
+	return tu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (tu *ToolUpdate) ClearDesc() *ToolUpdate {
+	tu.mutation.ClearDesc()
+	return tu
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (tu *ToolUpdate) SetEquipmentID(id int) *ToolUpdate {
+	tu.mutation.SetEquipmentID(id)
 	return tu
 }
 
@@ -97,17 +112,7 @@ func (tu *ToolUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tu *ToolUpdate) check() error {
-	if v, ok := tu.mutation.Indx(); ok {
-		if err := tool.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Tool.indx": %w`, err)}
-		}
-	}
-	if v, ok := tu.mutation.Name(); ok {
-		if err := tool.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Tool.name": %w`, err)}
-		}
-	}
-	if _, ok := tu.mutation.EquipmentID(); tu.mutation.EquipmentCleared() && !ok {
+	if tu.mutation.EquipmentCleared() && len(tu.mutation.EquipmentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Tool.equipment"`)
 	}
 	return nil
@@ -125,14 +130,19 @@ func (tu *ToolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := tu.mutation.Indx(); ok {
-		_spec.SetField(tool.FieldIndx, field.TypeString, value)
-	}
-	if value, ok := tu.mutation.Name(); ok {
-		_spec.SetField(tool.FieldName, field.TypeString, value)
-	}
 	if value, ok := tu.mutation.ToolCategory(); ok {
 		_spec.SetField(tool.FieldToolCategory, field.TypeString, value)
+	}
+	if value, ok := tu.mutation.Desc(); ok {
+		_spec.SetField(tool.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := tu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, tool.FieldDesc, value)
+		})
+	}
+	if tu.mutation.DescCleared() {
+		_spec.ClearField(tool.FieldDesc, field.TypeJSON)
 	}
 	if tu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -183,27 +193,41 @@ type ToolUpdateOne struct {
 	mutation *ToolMutation
 }
 
-// SetIndx sets the "indx" field.
-func (tuo *ToolUpdateOne) SetIndx(s string) *ToolUpdateOne {
-	tuo.mutation.SetIndx(s)
-	return tuo
-}
-
-// SetName sets the "name" field.
-func (tuo *ToolUpdateOne) SetName(s string) *ToolUpdateOne {
-	tuo.mutation.SetName(s)
-	return tuo
-}
-
 // SetToolCategory sets the "tool_category" field.
 func (tuo *ToolUpdateOne) SetToolCategory(s string) *ToolUpdateOne {
 	tuo.mutation.SetToolCategory(s)
 	return tuo
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (tuo *ToolUpdateOne) SetEquipmentID(i int) *ToolUpdateOne {
-	tuo.mutation.SetEquipmentID(i)
+// SetNillableToolCategory sets the "tool_category" field if the given value is not nil.
+func (tuo *ToolUpdateOne) SetNillableToolCategory(s *string) *ToolUpdateOne {
+	if s != nil {
+		tuo.SetToolCategory(*s)
+	}
+	return tuo
+}
+
+// SetDesc sets the "desc" field.
+func (tuo *ToolUpdateOne) SetDesc(s []string) *ToolUpdateOne {
+	tuo.mutation.SetDesc(s)
+	return tuo
+}
+
+// AppendDesc appends s to the "desc" field.
+func (tuo *ToolUpdateOne) AppendDesc(s []string) *ToolUpdateOne {
+	tuo.mutation.AppendDesc(s)
+	return tuo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (tuo *ToolUpdateOne) ClearDesc() *ToolUpdateOne {
+	tuo.mutation.ClearDesc()
+	return tuo
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (tuo *ToolUpdateOne) SetEquipmentID(id int) *ToolUpdateOne {
+	tuo.mutation.SetEquipmentID(id)
 	return tuo
 }
 
@@ -265,17 +289,7 @@ func (tuo *ToolUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tuo *ToolUpdateOne) check() error {
-	if v, ok := tuo.mutation.Indx(); ok {
-		if err := tool.IndxValidator(v); err != nil {
-			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Tool.indx": %w`, err)}
-		}
-	}
-	if v, ok := tuo.mutation.Name(); ok {
-		if err := tool.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Tool.name": %w`, err)}
-		}
-	}
-	if _, ok := tuo.mutation.EquipmentID(); tuo.mutation.EquipmentCleared() && !ok {
+	if tuo.mutation.EquipmentCleared() && len(tuo.mutation.EquipmentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Tool.equipment"`)
 	}
 	return nil
@@ -310,14 +324,19 @@ func (tuo *ToolUpdateOne) sqlSave(ctx context.Context) (_node *Tool, err error) 
 			}
 		}
 	}
-	if value, ok := tuo.mutation.Indx(); ok {
-		_spec.SetField(tool.FieldIndx, field.TypeString, value)
-	}
-	if value, ok := tuo.mutation.Name(); ok {
-		_spec.SetField(tool.FieldName, field.TypeString, value)
-	}
 	if value, ok := tuo.mutation.ToolCategory(); ok {
 		_spec.SetField(tool.FieldToolCategory, field.TypeString, value)
+	}
+	if value, ok := tuo.mutation.Desc(); ok {
+		_spec.SetField(tool.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := tuo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, tool.FieldDesc, value)
+		})
+	}
+	if tuo.mutation.DescCleared() {
+		_spec.ClearField(tool.FieldDesc, field.TypeJSON)
 	}
 	if tuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{

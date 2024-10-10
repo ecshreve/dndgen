@@ -20,6 +20,8 @@ const (
 	FieldDesc = "desc"
 	// EdgeAbilityScore holds the string denoting the ability_score edge name in mutations.
 	EdgeAbilityScore = "ability_score"
+	// EdgeCharacterSkill holds the string denoting the character_skill edge name in mutations.
+	EdgeCharacterSkill = "character_skill"
 	// Table holds the table name of the skill in the database.
 	Table = "skills"
 	// AbilityScoreTable is the table that holds the ability_score relation/edge.
@@ -28,7 +30,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
 	AbilityScoreInverseTable = "ability_scores"
 	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
-	AbilityScoreColumn = "skill_ability_score"
+	AbilityScoreColumn = "ability_score_skills"
+	// CharacterSkillTable is the table that holds the character_skill relation/edge.
+	CharacterSkillTable = "character_skills"
+	// CharacterSkillInverseTable is the table name for the CharacterSkill entity.
+	// It exists in this package in order to avoid circular dependency with the "characterskill" package.
+	CharacterSkillInverseTable = "character_skills"
+	// CharacterSkillColumn is the table column denoting the character_skill relation/edge.
+	CharacterSkillColumn = "character_skill_skill"
 )
 
 // Columns holds all SQL columns for skill fields.
@@ -42,8 +51,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "skills"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"proficiency_skill",
-	"skill_ability_score",
+	"ability_score_skills",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -92,10 +100,31 @@ func ByAbilityScoreField(field string, opts ...sql.OrderTermOption) OrderOption 
 		sqlgraph.OrderByNeighborTerms(s, newAbilityScoreStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByCharacterSkillCount orders the results by character_skill count.
+func ByCharacterSkillCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCharacterSkillStep(), opts...)
+	}
+}
+
+// ByCharacterSkill orders the results by character_skill terms.
+func ByCharacterSkill(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharacterSkillStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newAbilityScoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityScoreInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, AbilityScoreTable, AbilityScoreColumn),
+	)
+}
+func newCharacterSkillStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharacterSkillInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CharacterSkillTable, CharacterSkillColumn),
 	)
 }

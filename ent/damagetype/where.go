@@ -193,21 +193,31 @@ func NameContainsFold(v string) predicate.DamageType {
 	return predicate.DamageType(sql.FieldContainsFold(FieldName, v))
 }
 
-// HasWeaponDamage applies the HasEdge predicate on the "weapon_damage" edge.
-func HasWeaponDamage() predicate.DamageType {
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.DamageType {
+	return predicate.DamageType(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.DamageType {
+	return predicate.DamageType(sql.FieldNotNull(FieldDesc))
+}
+
+// HasWeapons applies the HasEdge predicate on the "weapons" edge.
+func HasWeapons() predicate.DamageType {
 	return predicate.DamageType(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, WeaponDamageTable, WeaponDamageColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, WeaponsTable, WeaponsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasWeaponDamageWith applies the HasEdge predicate on the "weapon_damage" edge with a given conditions (other predicates).
-func HasWeaponDamageWith(preds ...predicate.WeaponDamage) predicate.DamageType {
+// HasWeaponsWith applies the HasEdge predicate on the "weapons" edge with a given conditions (other predicates).
+func HasWeaponsWith(preds ...predicate.Weapon) predicate.DamageType {
 	return predicate.DamageType(func(s *sql.Selector) {
-		step := newWeaponDamageStep()
+		step := newWeaponsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -218,32 +228,15 @@ func HasWeaponDamageWith(preds ...predicate.WeaponDamage) predicate.DamageType {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.DamageType) predicate.DamageType {
-	return predicate.DamageType(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.DamageType(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.DamageType) predicate.DamageType {
-	return predicate.DamageType(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.DamageType(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.DamageType) predicate.DamageType {
-	return predicate.DamageType(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.DamageType(sql.NotPredicates(p))
 }

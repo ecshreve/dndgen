@@ -1,7 +1,9 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -11,26 +13,39 @@ type Class struct {
 	ent.Schema
 }
 
-func (Class) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		CommonMixin{},
-	}
-}
-
 // Fields of the Class.
 func (Class) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("hit_die"),
+		field.String("indx").StructTag(`json:"index"`).
+			NotEmpty().
+			Unique().
+			Annotations(
+				entgql.OrderField("INDX"),
+			),
+		field.String("name").
+			NotEmpty().
+			Annotations(
+				entgql.OrderField("NAME"),
+			),
+		field.Int("hit_die").
+			Positive(),
 	}
 }
 
-// Edges of the Class.
 func (Class) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("proficiencies", Proficiency.Type),
-		edge.To("proficiency_choices", ProficiencyChoice.Type),
-		edge.To("equipment", Equipment.Type).
-			Through("class_equipment", ClassEquipment.Type),
-		edge.To("equipment_choices", EquipmentChoice.Type),
+		edge.To("proficiency_options", ProficiencyChoice.Type),
+		edge.To("starting_equipment", EquipmentEntry.Type),
+		edge.To("saving_throws", AbilityScore.Type),
+		edge.From("characters", Character.Type).
+			Ref("class"),
+	}
+}
+
+// Annotations of the Class.
+func (Class) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
 	}
 }
