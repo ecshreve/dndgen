@@ -96,9 +96,7 @@ func (csc *CharacterSkillCreate) Mutation() *CharacterSkillMutation {
 
 // Save creates the CharacterSkill in the database.
 func (csc *CharacterSkillCreate) Save(ctx context.Context) (*CharacterSkill, error) {
-	if err := csc.defaults(); err != nil {
-		return nil, err
-	}
+	csc.defaults()
 	return withHooks(ctx, csc.sqlSave, csc.mutation, csc.hooks)
 }
 
@@ -125,12 +123,11 @@ func (csc *CharacterSkillCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (csc *CharacterSkillCreate) defaults() error {
+func (csc *CharacterSkillCreate) defaults() {
 	if _, ok := csc.mutation.Proficient(); !ok {
 		v := characterskill.DefaultProficient
 		csc.mutation.SetProficient(v)
 	}
-	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

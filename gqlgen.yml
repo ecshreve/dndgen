@@ -17,12 +17,14 @@ exec:
 # gqlgen will search for any type names in the schema in the generated
 # ent package. If they match it will use them, otherwise it will new ones.
 autobind:
+  - github.com/99designs/gqlgen/graphql/introspection
   - github.com/ecshreve/dndgen/ent
 
 models:
   ID:
     model:
       - github.com/99designs/gqlgen/graphql.IntID
+      
   Node:
     model:
       - github.com/ecshreve/dndgen/ent.Noder

@@ -55,101 +55,165 @@ type Noder interface {
 	IsNode()
 }
 
-// IsNode implements the Node interface check for GQLGen.
-func (n *AbilityScore) IsNode() {}
+var abilityscoreImplementors = []string{"AbilityScore", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Alignment) IsNode() {}
+func (*AbilityScore) IsNode() {}
+
+var alignmentImplementors = []string{"Alignment", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Armor) IsNode() {}
+func (*Alignment) IsNode() {}
+
+var armorImplementors = []string{"Armor", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Character) IsNode() {}
+func (*Armor) IsNode() {}
+
+var characterImplementors = []string{"Character", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *CharacterAbilityScore) IsNode() {}
+func (*Character) IsNode() {}
+
+var characterabilityscoreImplementors = []string{"CharacterAbilityScore", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *CharacterProficiency) IsNode() {}
+func (*CharacterAbilityScore) IsNode() {}
+
+var characterproficiencyImplementors = []string{"CharacterProficiency", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *CharacterSkill) IsNode() {}
+func (*CharacterProficiency) IsNode() {}
+
+var characterskillImplementors = []string{"CharacterSkill", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Class) IsNode() {}
+func (*CharacterSkill) IsNode() {}
+
+var classImplementors = []string{"Class", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Coin) IsNode() {}
+func (*Class) IsNode() {}
+
+var coinImplementors = []string{"Coin", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Condition) IsNode() {}
+func (*Coin) IsNode() {}
+
+var conditionImplementors = []string{"Condition", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Cost) IsNode() {}
+func (*Condition) IsNode() {}
+
+var costImplementors = []string{"Cost", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *DamageType) IsNode() {}
+func (*Cost) IsNode() {}
+
+var damagetypeImplementors = []string{"DamageType", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Equipment) IsNode() {}
+func (*DamageType) IsNode() {}
+
+var equipmentImplementors = []string{"Equipment", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *EquipmentEntry) IsNode() {}
+func (*Equipment) IsNode() {}
+
+var equipmententryImplementors = []string{"EquipmentEntry", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Feat) IsNode() {}
+func (*EquipmentEntry) IsNode() {}
+
+var featImplementors = []string{"Feat", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Feature) IsNode() {}
+func (*Feat) IsNode() {}
+
+var featureImplementors = []string{"Feature", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Gear) IsNode() {}
+func (*Feature) IsNode() {}
+
+var gearImplementors = []string{"Gear", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Language) IsNode() {}
+func (*Gear) IsNode() {}
+
+var languageImplementors = []string{"Language", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *LanguageChoice) IsNode() {}
+func (*Language) IsNode() {}
+
+var languagechoiceImplementors = []string{"LanguageChoice", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *MagicSchool) IsNode() {}
+func (*LanguageChoice) IsNode() {}
+
+var magicschoolImplementors = []string{"MagicSchool", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Prerequisite) IsNode() {}
+func (*MagicSchool) IsNode() {}
+
+var prerequisiteImplementors = []string{"Prerequisite", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Proficiency) IsNode() {}
+func (*Prerequisite) IsNode() {}
+
+var proficiencyImplementors = []string{"Proficiency", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *ProficiencyChoice) IsNode() {}
+func (*Proficiency) IsNode() {}
+
+var proficiencychoiceImplementors = []string{"ProficiencyChoice", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Property) IsNode() {}
+func (*ProficiencyChoice) IsNode() {}
+
+var propertyImplementors = []string{"Property", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Race) IsNode() {}
+func (*Property) IsNode() {}
+
+var raceImplementors = []string{"Race", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Rule) IsNode() {}
+func (*Race) IsNode() {}
+
+var ruleImplementors = []string{"Rule", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *RuleSection) IsNode() {}
+func (*Rule) IsNode() {}
+
+var rulesectionImplementors = []string{"RuleSection", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Skill) IsNode() {}
+func (*RuleSection) IsNode() {}
+
+var skillImplementors = []string{"Skill", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Tool) IsNode() {}
+func (*Skill) IsNode() {}
+
+var toolImplementors = []string{"Tool", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Trait) IsNode() {}
+func (*Tool) IsNode() {}
+
+var traitImplementors = []string{"Trait", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Vehicle) IsNode() {}
+func (*Trait) IsNode() {}
+
+var vehicleImplementors = []string{"Vehicle", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Weapon) IsNode() {}
+func (*Vehicle) IsNode() {}
+
+var weaponImplementors = []string{"Weapon", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*Weapon) IsNode() {}
 
 var errNodeInvalidID = &NotFoundError{"node"}
 
@@ -212,387 +276,291 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 	case abilityscore.Table:
 		query := c.AbilityScore.Query().
 			Where(abilityscore.ID(id))
-		query, err := query.CollectFields(ctx, "AbilityScore")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, abilityscoreImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case alignment.Table:
 		query := c.Alignment.Query().
 			Where(alignment.ID(id))
-		query, err := query.CollectFields(ctx, "Alignment")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, alignmentImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case armor.Table:
 		query := c.Armor.Query().
 			Where(armor.ID(id))
-		query, err := query.CollectFields(ctx, "Armor")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, armorImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case character.Table:
 		query := c.Character.Query().
 			Where(character.ID(id))
-		query, err := query.CollectFields(ctx, "Character")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, characterImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case characterabilityscore.Table:
 		query := c.CharacterAbilityScore.Query().
 			Where(characterabilityscore.ID(id))
-		query, err := query.CollectFields(ctx, "CharacterAbilityScore")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, characterabilityscoreImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case characterproficiency.Table:
 		query := c.CharacterProficiency.Query().
 			Where(characterproficiency.ID(id))
-		query, err := query.CollectFields(ctx, "CharacterProficiency")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, characterproficiencyImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case characterskill.Table:
 		query := c.CharacterSkill.Query().
 			Where(characterskill.ID(id))
-		query, err := query.CollectFields(ctx, "CharacterSkill")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, characterskillImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case class.Table:
 		query := c.Class.Query().
 			Where(class.ID(id))
-		query, err := query.CollectFields(ctx, "Class")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, classImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case coin.Table:
 		query := c.Coin.Query().
 			Where(coin.ID(id))
-		query, err := query.CollectFields(ctx, "Coin")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, coinImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case condition.Table:
 		query := c.Condition.Query().
 			Where(condition.ID(id))
-		query, err := query.CollectFields(ctx, "Condition")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, conditionImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case cost.Table:
 		query := c.Cost.Query().
 			Where(cost.ID(id))
-		query, err := query.CollectFields(ctx, "Cost")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, costImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case damagetype.Table:
 		query := c.DamageType.Query().
 			Where(damagetype.ID(id))
-		query, err := query.CollectFields(ctx, "DamageType")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, damagetypeImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case equipment.Table:
 		query := c.Equipment.Query().
 			Where(equipment.ID(id))
-		query, err := query.CollectFields(ctx, "Equipment")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, equipmentImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case equipmententry.Table:
 		query := c.EquipmentEntry.Query().
 			Where(equipmententry.ID(id))
-		query, err := query.CollectFields(ctx, "EquipmentEntry")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, equipmententryImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case feat.Table:
 		query := c.Feat.Query().
 			Where(feat.ID(id))
-		query, err := query.CollectFields(ctx, "Feat")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, featImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case feature.Table:
 		query := c.Feature.Query().
 			Where(feature.ID(id))
-		query, err := query.CollectFields(ctx, "Feature")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, featureImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case gear.Table:
 		query := c.Gear.Query().
 			Where(gear.ID(id))
-		query, err := query.CollectFields(ctx, "Gear")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, gearImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case language.Table:
 		query := c.Language.Query().
 			Where(language.ID(id))
-		query, err := query.CollectFields(ctx, "Language")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, languageImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case languagechoice.Table:
 		query := c.LanguageChoice.Query().
 			Where(languagechoice.ID(id))
-		query, err := query.CollectFields(ctx, "LanguageChoice")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, languagechoiceImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case magicschool.Table:
 		query := c.MagicSchool.Query().
 			Where(magicschool.ID(id))
-		query, err := query.CollectFields(ctx, "MagicSchool")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, magicschoolImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case prerequisite.Table:
 		query := c.Prerequisite.Query().
 			Where(prerequisite.ID(id))
-		query, err := query.CollectFields(ctx, "Prerequisite")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, prerequisiteImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case proficiency.Table:
 		query := c.Proficiency.Query().
 			Where(proficiency.ID(id))
-		query, err := query.CollectFields(ctx, "Proficiency")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, proficiencyImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case proficiencychoice.Table:
 		query := c.ProficiencyChoice.Query().
 			Where(proficiencychoice.ID(id))
-		query, err := query.CollectFields(ctx, "ProficiencyChoice")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, proficiencychoiceImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case property.Table:
 		query := c.Property.Query().
 			Where(property.ID(id))
-		query, err := query.CollectFields(ctx, "Property")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, propertyImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case race.Table:
 		query := c.Race.Query().
 			Where(race.ID(id))
-		query, err := query.CollectFields(ctx, "Race")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, raceImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case rule.Table:
 		query := c.Rule.Query().
 			Where(rule.ID(id))
-		query, err := query.CollectFields(ctx, "Rule")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, ruleImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case rulesection.Table:
 		query := c.RuleSection.Query().
 			Where(rulesection.ID(id))
-		query, err := query.CollectFields(ctx, "RuleSection")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, rulesectionImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case skill.Table:
 		query := c.Skill.Query().
 			Where(skill.ID(id))
-		query, err := query.CollectFields(ctx, "Skill")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, skillImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case tool.Table:
 		query := c.Tool.Query().
 			Where(tool.ID(id))
-		query, err := query.CollectFields(ctx, "Tool")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, toolImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case trait.Table:
 		query := c.Trait.Query().
 			Where(trait.ID(id))
-		query, err := query.CollectFields(ctx, "Trait")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, traitImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case vehicle.Table:
 		query := c.Vehicle.Query().
 			Where(vehicle.ID(id))
-		query, err := query.CollectFields(ctx, "Vehicle")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, vehicleImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	case weapon.Table:
 		query := c.Weapon.Query().
 			Where(weapon.ID(id))
-		query, err := query.CollectFields(ctx, "Weapon")
-		if err != nil {
-			return nil, err
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, weaponImplementors...); err != nil {
+				return nil, err
+			}
 		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
+		return query.Only(ctx)
 	default:
 		return nil, fmt.Errorf("cannot resolve noder from table %q: %w", table, errNodeInvalidID)
 	}
@@ -669,7 +637,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case abilityscore.Table:
 		query := c.AbilityScore.Query().
 			Where(abilityscore.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "AbilityScore")
+		query, err := query.CollectFields(ctx, abilityscoreImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -685,7 +653,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case alignment.Table:
 		query := c.Alignment.Query().
 			Where(alignment.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Alignment")
+		query, err := query.CollectFields(ctx, alignmentImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -701,7 +669,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case armor.Table:
 		query := c.Armor.Query().
 			Where(armor.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Armor")
+		query, err := query.CollectFields(ctx, armorImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -717,7 +685,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case character.Table:
 		query := c.Character.Query().
 			Where(character.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Character")
+		query, err := query.CollectFields(ctx, characterImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -733,7 +701,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case characterabilityscore.Table:
 		query := c.CharacterAbilityScore.Query().
 			Where(characterabilityscore.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "CharacterAbilityScore")
+		query, err := query.CollectFields(ctx, characterabilityscoreImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -749,7 +717,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case characterproficiency.Table:
 		query := c.CharacterProficiency.Query().
 			Where(characterproficiency.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "CharacterProficiency")
+		query, err := query.CollectFields(ctx, characterproficiencyImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -765,7 +733,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case characterskill.Table:
 		query := c.CharacterSkill.Query().
 			Where(characterskill.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "CharacterSkill")
+		query, err := query.CollectFields(ctx, characterskillImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -781,7 +749,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case class.Table:
 		query := c.Class.Query().
 			Where(class.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Class")
+		query, err := query.CollectFields(ctx, classImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -797,7 +765,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case coin.Table:
 		query := c.Coin.Query().
 			Where(coin.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Coin")
+		query, err := query.CollectFields(ctx, coinImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -813,7 +781,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case condition.Table:
 		query := c.Condition.Query().
 			Where(condition.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Condition")
+		query, err := query.CollectFields(ctx, conditionImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -829,7 +797,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case cost.Table:
 		query := c.Cost.Query().
 			Where(cost.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Cost")
+		query, err := query.CollectFields(ctx, costImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -845,7 +813,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case damagetype.Table:
 		query := c.DamageType.Query().
 			Where(damagetype.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "DamageType")
+		query, err := query.CollectFields(ctx, damagetypeImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -861,7 +829,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case equipment.Table:
 		query := c.Equipment.Query().
 			Where(equipment.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Equipment")
+		query, err := query.CollectFields(ctx, equipmentImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -877,7 +845,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case equipmententry.Table:
 		query := c.EquipmentEntry.Query().
 			Where(equipmententry.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "EquipmentEntry")
+		query, err := query.CollectFields(ctx, equipmententryImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -893,7 +861,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case feat.Table:
 		query := c.Feat.Query().
 			Where(feat.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Feat")
+		query, err := query.CollectFields(ctx, featImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -909,7 +877,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case feature.Table:
 		query := c.Feature.Query().
 			Where(feature.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Feature")
+		query, err := query.CollectFields(ctx, featureImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -925,7 +893,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case gear.Table:
 		query := c.Gear.Query().
 			Where(gear.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Gear")
+		query, err := query.CollectFields(ctx, gearImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -941,7 +909,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case language.Table:
 		query := c.Language.Query().
 			Where(language.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Language")
+		query, err := query.CollectFields(ctx, languageImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -957,7 +925,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case languagechoice.Table:
 		query := c.LanguageChoice.Query().
 			Where(languagechoice.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "LanguageChoice")
+		query, err := query.CollectFields(ctx, languagechoiceImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -973,7 +941,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case magicschool.Table:
 		query := c.MagicSchool.Query().
 			Where(magicschool.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "MagicSchool")
+		query, err := query.CollectFields(ctx, magicschoolImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -989,7 +957,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case prerequisite.Table:
 		query := c.Prerequisite.Query().
 			Where(prerequisite.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Prerequisite")
+		query, err := query.CollectFields(ctx, prerequisiteImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -1005,7 +973,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case proficiency.Table:
 		query := c.Proficiency.Query().
 			Where(proficiency.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Proficiency")
+		query, err := query.CollectFields(ctx, proficiencyImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -1021,7 +989,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case proficiencychoice.Table:
 		query := c.ProficiencyChoice.Query().
 			Where(proficiencychoice.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "ProficiencyChoice")
+		query, err := query.CollectFields(ctx, proficiencychoiceImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -1037,7 +1005,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case property.Table:
 		query := c.Property.Query().
 			Where(property.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Property")
+		query, err := query.CollectFields(ctx, propertyImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -1053,7 +1021,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case race.Table:
 		query := c.Race.Query().
 			Where(race.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Race")
+		query, err := query.CollectFields(ctx, raceImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -1069,7 +1037,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case rule.Table:
 		query := c.Rule.Query().
 			Where(rule.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Rule")
+		query, err := query.CollectFields(ctx, ruleImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -1085,7 +1053,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case rulesection.Table:
 		query := c.RuleSection.Query().
 			Where(rulesection.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "RuleSection")
+		query, err := query.CollectFields(ctx, rulesectionImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -1101,7 +1069,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case skill.Table:
 		query := c.Skill.Query().
 			Where(skill.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Skill")
+		query, err := query.CollectFields(ctx, skillImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -1117,7 +1085,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case tool.Table:
 		query := c.Tool.Query().
 			Where(tool.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Tool")
+		query, err := query.CollectFields(ctx, toolImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -1133,7 +1101,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case trait.Table:
 		query := c.Trait.Query().
 			Where(trait.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Trait")
+		query, err := query.CollectFields(ctx, traitImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -1149,7 +1117,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case vehicle.Table:
 		query := c.Vehicle.Query().
 			Where(vehicle.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Vehicle")
+		query, err := query.CollectFields(ctx, vehicleImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -1165,7 +1133,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case weapon.Table:
 		query := c.Weapon.Query().
 			Where(weapon.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Weapon")
+		query, err := query.CollectFields(ctx, weaponImplementors...)
 		if err != nil {
 			return nil, err
 		}

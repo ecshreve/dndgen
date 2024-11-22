@@ -1,18 +1,11 @@
 package schema
 
 import (
-	"context"
-	"errors"
-
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/charmbracelet/log"
-	gen "github.com/ecshreve/dndgen/ent"
-	"github.com/ecshreve/dndgen/ent/hook"
-	"github.com/ecshreve/dndgen/internal/utils"
 )
 
 // Character holds the schema definition for the Character entity.
@@ -65,22 +58,22 @@ func (Character) Annotations() []schema.Annotation {
 	}
 }
 
-func (Character) Hooks() []ent.Hook {
-	return []ent.Hook{
-		hook.If(
-			func(next ent.Mutator) ent.Mutator {
-				return hook.CharacterFunc(func(ctx context.Context, m *gen.CharacterMutation) (ent.Value, error) {
-					log.Info("Character mutation -- set proficiency bonus hook")
-					level, ok := m.Level()
-					if !ok {
-						return nil, errors.New("level is not set")
-					}
-					bonus := utils.LevelProficiencyBonus(level)
-					m.SetProficiencyBonus(bonus)
-					return next.Mutate(ctx, m)
-				})
-			},
-			hook.HasFields("level"),
-		),
-	}
-}
+// func (Character) Hooks() []ent.Hook {
+// 	return []ent.Hook{
+// 		hook.If(
+// 			func(next ent.Mutator) ent.Mutator {
+// 				return hook.CharacterFunc(func(ctx context.Context, m *gen.CharacterMutation) (ent.Value, error) {
+// 					log.Info("Character mutation -- set proficiency bonus hook")
+// 					level, ok := m.Level()
+// 					if !ok {
+// 						return nil, errors.New("level is not set")
+// 					}
+// 					bonus := utils.LevelProficiencyBonus(level)
+// 					m.SetProficiencyBonus(bonus)
+// 					return next.Mutate(ctx, m)
+// 				})
+// 			},
+// 			hook.HasFields("level"),
+// 		),
+// 	}
+// }
