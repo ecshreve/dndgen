@@ -134,14 +134,6 @@
     echo "Done fixing entviz html"
   """
 
-[[task]]
-  id = "atlasviz"
-  description = "Create atlas cloud explore link for database schema with entviz"
-  type = "short"
-  cmd = """
-    echo "Creating atlas cloud explore link for database schema with entviz..."
-    go run -mod=mod ariga.io/entviz ./ent/schema   
-   """
 
 [[task]]
   id = "describe"
@@ -179,9 +171,10 @@
   id = "snaps"
   description = "Update snapshots"
   type = "short"
+  env = { CLICOLOR_FORCE = "1", UPDATE_SNAPS = "true" }
   cmd = """
     echo "Updating snapshots..."
-    go test ./internal/... -rewriteSnapshots
+    go test ./internal/... 
   """
 
 
@@ -249,3 +242,12 @@
 #     --url "sqlite://dev.db?cache=shared&_fk=1" \
 #     --auto-approve
 #   """
+
+# [[task]]
+#   id = "atlasviz"
+#   description = "Create atlas cloud explore link for database schema with entviz"
+#   type = "short"
+#   cmd = """
+#     echo "Creating atlas cloud explore link for database schema with entviz..."
+#     go run -mod=mod ariga.io/entviz ./ent/schema   
+#    """

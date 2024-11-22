@@ -5,8 +5,6 @@ import (
 	"text/template"
 
 	"github.com/charmbracelet/log"
-
-	"github.com/samsarahq/go/oops"
 )
 
 func main() {
@@ -37,12 +35,12 @@ func main() {
 
 	ofile, err := os.Create("internal/popper/generated.go")
 	if err != nil {
-		log.Fatal(oops.Wrapf(err, "unable to create output file for populators"))
+		log.Fatal(err)
 	}
 	defer ofile.Close()
 
 	if err := tmpl.Execute(ofile, typeNamesToGenerate); err != nil {
-		log.Fatal(oops.Wrapf(err, "unable to execute template"))
+		log.Fatal(err)
 	}
 
 	// template for Populator.PopulateAll()

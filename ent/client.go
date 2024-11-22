@@ -1290,8 +1290,7 @@ func (c *CharacterClient) QueryCharacterProficiencies(ch *Character) *CharacterP
 
 // Hooks returns the client hooks.
 func (c *CharacterClient) Hooks() []Hook {
-	hooks := c.hooks.Character
-	return append(hooks[:len(hooks):len(hooks)], character.Hooks[:]...)
+	return c.hooks.Character
 }
 
 // Interceptors returns the client interceptors.
@@ -1472,8 +1471,7 @@ func (c *CharacterAbilityScoreClient) QueryCharacterSkills(cas *CharacterAbility
 
 // Hooks returns the client hooks.
 func (c *CharacterAbilityScoreClient) Hooks() []Hook {
-	hooks := c.hooks.CharacterAbilityScore
-	return append(hooks[:len(hooks):len(hooks)], characterabilityscore.Hooks[:]...)
+	return c.hooks.CharacterAbilityScore
 }
 
 // Interceptors returns the client interceptors.
@@ -1851,8 +1849,7 @@ func (c *CharacterSkillClient) QueryCharacterProficiency(cs *CharacterSkill) *Ch
 
 // Hooks returns the client hooks.
 func (c *CharacterSkillClient) Hooks() []Hook {
-	hooks := c.hooks.CharacterSkill
-	return append(hooks[:len(hooks):len(hooks)], characterskill.Hooks[:]...)
+	return c.hooks.CharacterSkill
 }
 
 // Interceptors returns the client interceptors.

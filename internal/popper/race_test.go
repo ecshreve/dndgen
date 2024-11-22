@@ -9,7 +9,6 @@ import (
 	"github.com/ecshreve/dndgen/internal/popper"
 	"github.com/ecshreve/dndgen/internal/utils"
 	"github.com/gkampitakis/go-snaps/snaps"
-	"github.com/kr/pretty"
 	"github.com/stretchr/testify/require"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -26,24 +25,23 @@ func TestRacePopulator(t *testing.T) {
 	err := utils.LoadJSONFile("testdata/simpleRace.json", &data)
 	require.NoError(t, err)
 
-	pretty.Print(data)
-
 	snaps.MatchJSON(t, data)
 }
 
 func TestRacePopulatorFull(t *testing.T) {
 	ctx := context.Background()
-	cl, err := ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
+	// cl, err := ent.Open("sqlite3", "file:ent?cache=shared&mode=memory&_fk=1")
+	cl, err := ent.Open("sqlite3", "file:testdb.db?_fk=1")
 	require.NoError(t, err)
 
 	err = cl.Schema.Create(ctx, schema.WithGlobalUniqueID(true))
 	require.NoError(t, err)
 
-	pp := popper.NewPopper(ctx, cl, "../../data")
+	pp := popper.NewPopper(ctx, cl, "data")
 	err = pp.PopulateAll(ctx)
 	require.NoError(t, err)
 
-	profPop := popper.NewProficiencyPopulator(pp, "../../data/Proficiency.json")
+	profPop := popper.NewProficiencyPopulator(pp, "data/Proficiency.json")
 	err = profPop.Populate(ctx)
 	require.NoError(t, err)
 
