@@ -18,6 +18,13 @@
     cd frontend && npm start
   """
 
+[[task]]
+  id = "build"
+  type = "short"
+  cmd = """
+    echo "Building backend..."
+    go build -mod=mod -o bin/dndgen cmd/dndgen/main.go
+  """
 # ------------------------------------------------------------------------------
 #     Run in DEV mode (watch for changes)
 # ------------------------------------------------------------------------------

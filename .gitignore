@@ -28,3 +28,4 @@ bin/
 reference/live-schema.graphql
 coverage.*
 logs/
+.DS_Store
