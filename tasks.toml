@@ -171,7 +171,7 @@
   id = "snaps"
   description = "Update snapshots"
   type = "short"
-  env = { CLICOLOR_FORCE = "1", UPDATE_SNAPS = "true" }
+  env = { UPDATE_SNAPS = "true" }
   cmd = """
     echo "Updating snapshots..."
     go test ./internal/... 
